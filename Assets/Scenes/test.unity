@@ -168,12 +168,12 @@ GameObject:
   - component: {fileID: 1600604362}
   - component: {fileID: 1600604361}
   m_Layer: 0
-  m_Name: Mesh Test
+  m_Name: Planar Mesh Test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1600604361
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -220,9 +220,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _filePath: C:\Users\Alvin\Desktop\delete this\LRO_NAC_DEM_20S337E_400cmp.tif
+  _surfaceGeometryType: 0
   _scale: 0.2
-  _heightScale: 0.04
-  _downsample: 1
+  _heightScale: 0.0333
+  _downsample: 2
 --- !u!4 &1600604363
 Transform:
   m_ObjectHideFlags: 0
@@ -317,6 +318,86 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!1 &1914724590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1914724593}
+  - component: {fileID: 1914724592}
+  - component: {fileID: 1914724591}
+  m_Layer: 0
+  m_Name: Spherical Mesh Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &1914724591
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1914724590}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 9ba2b47f16137e344b5174156a245f3e, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!114 &1914724592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1914724590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af1977132f8565a42963305b69d4c4b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _filePath: D:\Alvin\Downloads\mola128_mola64_merge_90Nto90S_SimpleC_clon0_small.tif
+  _surfaceGeometryType: 1
+  _scale: 1
+  _heightScale: 1
+  _downsample: 32
+--- !u!4 &1914724593
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1914724590}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1960510432
 GameObject:
   m_ObjectHideFlags: 0
