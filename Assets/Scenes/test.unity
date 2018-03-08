@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44300658, g: 0.4921953, b: 0.57192475, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -135,14 +135,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1590865643}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0, y: -0.86602545, z: 0, w: 0.49999994}
+  m_LocalPosition: {x: 400, y: 150, z: 200}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1719499497}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -120, z: 0}
 --- !u!114 &1590865645
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,8 +154,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de6f5e107450ea48a2199d4b893302b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 0.1
-  _sprintSpeed: 1
+  _speed: 0.5
+  _sprintSpeed: 5
   _mouseSensitivity: 2
 --- !u!1 &1600604360
 GameObject:
@@ -221,9 +221,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _filePath: C:\Users\Alvin\Desktop\delete this\LRO_NAC_DEM_20S337E_400cmp.tif
   _surfaceGeometryType: 0
-  _scale: 0.2
+  _scale: 0.5
   _heightScale: 0.0333
-  _downsample: 2
+  _downsample: 4
 --- !u!4 &1600604363
 Transform:
   m_ObjectHideFlags: 0
@@ -261,13 +261,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1719499496}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1590865644}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!81 &1719499498
 AudioListener:
   m_ObjectHideFlags: 0
@@ -382,9 +382,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _filePath: D:\Alvin\Downloads\mola128_mola64_merge_90Nto90S_SimpleC_clon0_small.tif
   _surfaceGeometryType: 1
-  _scale: 1
-  _heightScale: 1
-  _downsample: 32
+  _scale: 250
+  _heightScale: 0.69
+  _downsample: 4
 --- !u!4 &1914724593
 Transform:
   m_ObjectHideFlags: 0
@@ -456,10 +456,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1960510432}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.8365164, y: -0.12940949, z: 0.22414386, w: 0.48296288}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 120, y: -30, z: 0}

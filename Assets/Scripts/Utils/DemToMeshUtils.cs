@@ -64,7 +64,8 @@ public class DemToMeshUtils {
 
             // Vertex counts in the horizontal and vertical directions are the
             // same as the downsampled texture width and height, respectively.
-            int hVertCount = width / downsample, vVertCount = height / downsample;
+            int hVertCount = width / downsample;
+            int vVertCount = height / downsample;
 
             Vector3[] vertices = new Vector3[hVertCount * vVertCount];
             Vector2[] uvs = new Vector2[hVertCount * vVertCount];
@@ -81,7 +82,7 @@ public class DemToMeshUtils {
                 for (int x = 0; x < hVertCount; x++) {
                     float value = values[x * downsample];
                     vertices[vertexIndex] = new Vector3(x * scale, value * heightScale, y * scale);
-                    uvs[vertexIndex] = new Vector2(x / (float)hVertCount, -y / (float)vVertCount);
+                    uvs[vertexIndex] = GenerateStandardUV(x, y, hVertCount, vVertCount);
                     min = value < min ? value : min;
                     vertexIndex++;
                 }
@@ -92,7 +93,7 @@ public class DemToMeshUtils {
 
             mesh.vertices = vertices;
             mesh.uv = uvs;
-            mesh.triangles = GeneratePlaneTriangles(hVertCount, vVertCount);
+            mesh.triangles = GenerateTriangles(hVertCount, vVertCount);
 
             mesh.RecalculateNormals();
 
@@ -101,9 +102,13 @@ public class DemToMeshUtils {
         // Generate spherical terrain mesh.
         else if (surfaceType == SurfaceGeometryType.Spherical) {
 
-            // Vertex counts in the longitude and latitude are the same as
-            // the downsampled texture width and height, respectively.
-            int lonVertCount = width / downsample, latVertCount = height / downsample;
+            // Vertex count for the latitude is the same as the downsampled texture height.
+            // However, we need to generate an extra set of vertices in the longitude
+            // direction to complete the loop around. We cannot simply reuse the first
+            // vertices of of the loop, due to the start and end having different UV
+            // coordinates despite having same world coordinates.
+            int lonVertCount = width / downsample + 1;
+            int latVertCount = height / downsample;
 
             Debug.Log(lonVertCount + ", " + latVertCount);
 
@@ -115,36 +120,32 @@ public class DemToMeshUtils {
 
             // Calculate the incretmental step sizes of the latitude
             // and longitude here for potential performance increase.
-            float latStepSize = (float)Math.PI / (latVertCount - 1);
-            float lonStepSize = 360.0f / lonVertCount;
-
-            // Radius of the sphere.
-            // TODO Make this a const.
-            float R = 10.0f;
+            float latStepSize = Mathf.PI / (latVertCount - 1);
+            float lonStepSize = 360.0f / (lonVertCount - 1);
 
             for (int y = 0; y < latVertCount; y++) {
                 tiff.ReadScanline(scanline, y * downsample);
                 float[] values = bpp == 32 ? Scanline32ToFloat(scanline) : Scanline16ToFloat(scanline);
 
                 // Calculate the actual angle of the latitude.
-                float latAng = latStepSize * y + (float)Math.PI / 2;
+                float latAng = latStepSize * y + Mathf.PI / 2;
 
                 // Create a new vertex using the latitude angle. The coordinates of this
                 // vertex will serve as a base for all the other vertices in this latitude.
-                Vector3 baseLatVertex = scale * R * new Vector3((float)Math.Cos(latAng), (float)Math.Sin(latAng), 0);
+                Vector3 baseLatVertex = new Vector3(Mathf.Cos(latAng), Mathf.Sin(latAng), 0);
 
                 for (int x = 0; x < lonVertCount; x++) {
-                    float value = values[x * downsample];
-                    vertices[vertexIndex] =  Quaternion.Euler(0, x * lonStepSize, 0) * baseLatVertex;
-                    uvs[vertexIndex] = new Vector2(x / (float)lonVertCount, -y / (float)latVertCount);
+                    float value = values[Mathf.Clamp(x * downsample, 0, values.Length - 1)];
+                    // TODO Add default radius for the sphere.
+                    vertices[vertexIndex] = Quaternion.Euler(0, x * lonStepSize, 0) * ((scale + heightScale * value) * baseLatVertex);
+                    uvs[vertexIndex] = GenerateStandardUV(x, y, lonVertCount, latVertCount);
                     vertexIndex++;
                 }
             }
 
             mesh.vertices = vertices;
             mesh.uv = uvs;
-            mesh.triangles = GenerateSphereTriangles(lonVertCount, latVertCount);
-            //mesh.triangles = GeneratePlaneTriangles(lonVertCount, latVertCount);
+            mesh.triangles = GenerateTriangles(lonVertCount, latVertCount);
 
             Debug.Log(mesh.vertices.Length);
 
@@ -182,7 +183,7 @@ public class DemToMeshUtils {
         return result;
     }
 
-    private static int[] GeneratePlaneTriangles(int hVertCount, int vVertCount) {
+    private static int[] GenerateTriangles(int hVertCount, int vVertCount) {
 
         // The number of quads (triangle pairs) in each dimension is 
         // one less than the vertex counts in the respective dimensions.
@@ -214,49 +215,8 @@ public class DemToMeshUtils {
         return result;
     }
 
-    private static int[] GenerateSphereTriangles(int lonVertCount, int latVertCount) {
-
-        int lonQuadCount = lonVertCount - 1, latQuadCount = latVertCount - 1;
-
-        int[] result = new int[6 * (lonQuadCount + 2) * latQuadCount];
-
-        int startIndex = 0, rt = 0, rb = 0, lt, lb;
-        for (int y = 0; y < latQuadCount; y++) {
-            for (int x = 0; x < lonQuadCount; x++) {
-
-                lt = x + y * lonVertCount;
-                rt = lt + 1;
-                lb = lt + lonVertCount;
-                rb = lb + 1;
-
-                // TODO Alternate the triangle orientation of each consecutive quad.
-
-                result[startIndex] = lt;
-                result[startIndex + 1] = lb;
-                result[startIndex + 2] = rb;
-                result[startIndex + 3] = rb;
-                result[startIndex + 4] = rt;
-                result[startIndex + 5] = lt;
-
-                startIndex += 6;
-            }
-
-            // Add one more quad that completes the strip loop.
-            lt = rt;
-            lb = rb;
-            rt = y * lonVertCount;
-            rb = rt + lonVertCount;
-
-            result[startIndex] = lt;
-            result[startIndex + 1] = lb;
-            result[startIndex + 2] = rb;
-            result[startIndex + 3] = rb;
-            result[startIndex + 4] = rt;
-            result[startIndex + 5] = lt;
-            startIndex += 6;
-
-        }
-        return result;
+    private static Vector2 GenerateStandardUV(int x, int y, int width, int height) {
+        return new Vector2(x / (width - 1f), -y / (height - 1f));
     }
 
 }
