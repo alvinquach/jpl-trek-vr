@@ -176,7 +176,7 @@ public class DemToMeshUtils {
         float[] result = new float[length];
         for (int i = 0; i < length; i++) {
             // TODO Check if CPU uses little endian.
-            result[i] = BitConverter.ToInt16(scanline, 2 * i); ;
+            result[i] = BitConverter.ToInt16(scanline, 2 * i);
         }
         return result;
     }
