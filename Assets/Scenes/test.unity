@@ -382,8 +382,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _filePath: D:\Alvin\Downloads\mola128_mola64_merge_90Nto90S_SimpleC_clon0_small.tif
   _surfaceGeometryType: 1
-  _scale: 250
-  _heightScale: 0.69
+  _scale: 339
+  _heightScale: 0.0001
   _downsample: 4
 --- !u!4 &1914724593
 Transform:
