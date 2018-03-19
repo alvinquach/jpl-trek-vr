@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BitMiracle.LibTiff.Classic;
 
-public class TerrainGenerator : MonoBehaviour {
+public class TerrainGroup : MonoBehaviour {
 
     [SerializeField] private string _filePath;
 
