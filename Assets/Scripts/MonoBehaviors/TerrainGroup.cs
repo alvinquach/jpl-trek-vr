@@ -39,9 +39,17 @@ public class TerrainGroup : MonoBehaviour {
 
         // Create a child GameObject containing a mesh for each LOD level.
         for (int i = 0; i <= _LODLevels; i++) {
+
             GameObject child = new GameObject();
             child.transform.SetParent(transform);
+
+            // Name the LOD game object.
             child.name = "LOD_" + i;
+
+            // Use the parent's tranformations.
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localScale = Vector3.one;
+            child.transform.localEulerAngles = Vector3.zero;
 
             // Add MeshRenderer to child, and to the LOD group.
             MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
@@ -57,8 +65,15 @@ public class TerrainGroup : MonoBehaviour {
 
         }
 
+        // Assign LOD meshes to LOD group, and then recalculate bounds.
         lodGroup.SetLODs(lods);
         lodGroup.RecalculateBounds();
+
+        // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
+        if (_surfaceGeometryType == SurfaceGeometryType.Spherical) {
+            SphereCollider collider = gameObject.AddComponent<SphereCollider>();
+            collider.radius = _scale;
+        }
 
     }
 
