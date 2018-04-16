@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 using BitMiracle.LibTiff.Classic;
 
@@ -19,6 +20,21 @@ public class DemToMeshUtils {
 
             if (tiff == null) {
                 Debug.LogError("Cannot open TIFF from " + filePath);
+                return;
+            }
+
+            GenerateMesh(tiff, mesh, surfaceType, scale, heightScale, downsample);
+
+        }
+
+    }
+
+    public static void GenerateMesh(byte[] bytes, Mesh mesh, SurfaceGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+
+        using (Tiff tiff = Tiff.ClientOpen("in-memory", "r", new MemoryStream(bytes), new TiffStream())) {
+
+            if (tiff == null) {
+                Debug.LogError("Cannot open TIFF from memory.");
                 return;
             }
 

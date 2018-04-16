@@ -6,7 +6,8 @@ using BitMiracle.LibTiff.Classic;
 
 public class TerrainGroup : MonoBehaviour {
 
-    [SerializeField] private string _filePath;
+    //[SerializeField] private string _filePath;
+    [SerializeField] private TextAsset _DEMFile;
 
     [SerializeField] private SurfaceGeometryType _surfaceGeometryType = SurfaceGeometryType.Planar;
 
@@ -25,7 +26,7 @@ public class TerrainGroup : MonoBehaviour {
     // Use this for initialization
     void Start() {
 
-        if (_filePath == null) {
+        if (_DEMFile == null) {
             return;
         }
 
@@ -61,7 +62,7 @@ public class TerrainGroup : MonoBehaviour {
             }
 
             Mesh mesh = child.AddComponent<MeshFilter>().mesh;
-            DemToMeshUtils.GenerateMesh(_filePath, mesh, _surfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+            DemToMeshUtils.GenerateMesh(_DEMFile.bytes, mesh, _surfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
         }
 

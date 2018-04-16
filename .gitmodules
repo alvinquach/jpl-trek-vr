@@ -1,3 +1,6 @@
 [submodule "Assets/External"]
 	path = Assets/External
 	url = git@github.com:alvinquach/jpl-trek-vr-ext-assets.git
+[submodule "Assets/Textures"]
+	path = Assets/Textures
+	url = https://github.com/alvinquach/jpl-trek-vr-textures
