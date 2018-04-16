@@ -47,14 +47,19 @@ public class CustomControllerBehavior : MonoBehaviour {
     private void TriggerClickedHandler(object sender, ClickedEventArgs e) {
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, _maxGrabDistance)) {
-            _targetObject = hit.transform.GetComponent<MovableObject>();
-            if (_targetObject != null) {
-                _grabPoint = hit.point;
-                _grabRadius = Vector3.Distance(_targetObject.transform.position, _grabPoint); // This should not change until another grab is made.
-                _targetObject.grabbed = _grabbed = true;
-                Debug.Log("Grabbed something at " + _grabPoint);
+            //_targetObject = hit.transform.GetComponent<MovableObject>();
+            //if (_targetObject != null) {
+            //    _grabPoint = hit.point;
+            //    _grabRadius = Vector3.Distance(_targetObject.transform.position, _grabPoint); // This should not change until another grab is made.
+            //    _targetObject.grabbed = _grabbed = true;
+            //    Debug.Log("Grabbed something at " + _grabPoint);
 
-                _test.SetActive(true);
+            //    _test.SetActive(true);
+            //}
+
+            POIControlTest asdf = hit.transform.GetComponent<POIControlTest>();
+            if (asdf != null) {
+                asdf.GoTo(hit.point - hit.transform.position, transform.position);
             }
         }
     }
