@@ -2,12 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class XRInteractableObject : MonoBehaviour {
+public abstract class XRInteractableObject : MonoBehaviour {
 
+    public bool triggerClick = true;
+    public bool triggerDoubleClick = true;
+    public bool triggerDown = true;
+    public bool triggerUp = true;
 
+    public virtual void OnTriggerClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
 
-	// Use this for initialization
-	void Start () {
+    public virtual void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
+
+    public virtual void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
+
+    public virtual void OnTriggerUp(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
+
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
