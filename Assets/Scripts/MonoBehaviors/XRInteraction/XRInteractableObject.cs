@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class XRInteractableObject : MonoBehaviour {
 
+
+
 	// Use this for initialization
 	void Start () {
 		

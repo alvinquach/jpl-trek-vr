@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class POIControlTest : MonoBehaviour {
 
-    private Vector3 _startCoords;
-
-    private Vector3 _targetCoords;
+    private Vector3 _rotationAxis;
+    private float _rotationAngle;
 
     private float _moveTime = 1.0f;
 
@@ -21,58 +20,39 @@ public class POIControlTest : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-
         if (_moving) {
-
-            _moveProgress += Time.deltaTime / _moveTime;
-
-            Vector3 _currentCoords = Vector3.Lerp(_startCoords, _targetCoords, _moveProgress);
-            //PrintCoords("Current (" + _moveProgress + ")", _currentCoords);
-
-            transform.forward = _currentCoords;
-
+            float deltaProgress = Time.deltaTime / _moveTime;
+            transform.Rotate(_rotationAxis, _rotationAngle * deltaProgress, Space.World);
+            _moveProgress += deltaProgress;
             if (_moveProgress >= 1f) {
                 _moving = false;
             }
         }
-
-        
-
 	}
 
     public void GoTo(Vector2 coords, Vector3 cameraPosition) {
-        _startCoords = transform.forward;
-        PrintCoords("Start", _startCoords);
-
-        _targetCoords = cameraPosition - transform.position;
-        PrintCoords("Dest", _targetCoords);
-
-        _moveProgress = 0;
-        _moving = true;
+        GoTo(LatLongToDirection(coords), cameraPosition);
     }
 
     public void GoTo(Vector3 direction, Vector3 cameraPosition) {
-        _startCoords = transform.forward;
-
-        _targetCoords = _startCoords + (cameraPosition - transform.position).normalized - direction.normalized;
-
+        _rotationAxis = Vector3.Cross(direction, cameraPosition - transform.position);
+        _rotationAngle = Vector3.Angle(direction, cameraPosition - transform.position);
         _moveProgress = 0;
         _moving = true;
     }
 
-
-    private Vector2 directionToLatLong(Vector3 direction) {
+    private Vector2 DirectionToLatLong(Vector3 direction) {
         return new Vector2(
-            Mathf.Atan2(direction.y, Mathf.Sqrt(direction.x * direction.x + direction.z * direction.z)),
-            Mathf.Atan2(direction.z, direction.x)
+            Mathf.Atan2(direction.y, Mathf.Sqrt(direction.x * direction.x + direction.z * direction.z)) * Mathf.Rad2Deg,
+            Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg
         );
     }
 
     private Vector3 LatLongToDirection(Vector2 latLong) {
-        //float lat = latLong.x * Mathf.Deg2Rad;
-        //float lon = latLong.y * Mathf.Deg2Rad;
-        float lat = latLong.x;
-        float lon = latLong.y;
+        float lat = latLong.x * Mathf.Deg2Rad;
+        float lon = latLong.y * Mathf.Deg2Rad;
+        //float lat = latLong.x;
+        //float lon = latLong.y;
         return new Vector3(
             Mathf.Sin(lat) * Mathf.Cos(lon),
             Mathf.Cos(lat),
@@ -80,8 +60,8 @@ public class POIControlTest : MonoBehaviour {
         );
     }
 
-    private void PrintCoords(string label, Vector2 coord) {
-        Debug.Log(label + ": (" + coord.x * Mathf.Rad2Deg + ", " + coord.y * Mathf.Rad2Deg + ")");
+    private void PrintCoords(string label, Vector3 vector) {
+        Debug.Log(label + ": (" + vector.x + ", " + vector.y + ", " + vector.z + ")");
     }
 
 }

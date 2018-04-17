@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 using UnityEditor;
 
 public class CustomControllerBehavior : MonoBehaviour {
@@ -58,8 +59,10 @@ public class CustomControllerBehavior : MonoBehaviour {
             //}
 
             POIControlTest asdf = hit.transform.GetComponent<POIControlTest>();
+            Camera eye = _cameraRig.GetComponentInChildren<Camera>();
+            //Debug.Log(eye.transform.position);
             if (asdf != null) {
-                asdf.GoTo(hit.point - hit.transform.position, transform.position);
+                asdf.GoTo(hit.point - hit.transform.position, eye.transform.position);
             }
         }
     }
