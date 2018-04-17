@@ -129,7 +129,9 @@ public class CustomControllerBehavior : MonoBehaviour {
             Vector2 axis = device.GetAxis();
 
             // Move the player based on controller direction and pad position.
-            _cameraRig.transform.position += (axis.y > 0 ? 1 : -1) * _speedMultiplier * transform.forward;
+            // Movement is limited along the xz-plane.
+            Vector3 direction = Vector3.Scale(transform.forward, new Vector3(1, 0, 1));
+            _cameraRig.transform.position += (axis.y > 0 ? 1 : -1) * _speedMultiplier * direction;
 
         }
 
