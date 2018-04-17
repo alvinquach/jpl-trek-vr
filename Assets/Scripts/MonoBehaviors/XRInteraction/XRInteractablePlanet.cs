@@ -5,9 +5,6 @@ using UnityEditor;
 
 public class XRInteractablePlanet : XRInteractableObject {
 
-    [SerializeField]
-    private GameObject _cameraRig;
-
     #region Grab Variables
 
     [SerializeField]
@@ -57,7 +54,7 @@ public class XRInteractablePlanet : XRInteractableObject {
     }
 
     public override void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
-        Camera eye = _cameraRig.GetComponentInChildren<Camera>();
+        Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
         GoTo(point - transform.position, eye.transform.position);
     }
 
@@ -114,14 +111,34 @@ public class XRInteractablePlanet : XRInteractableObject {
     }
 
     public void GoTo(Vector2 coords, Vector3 cameraPosition) {
-        GoTo(LatLongToDirection(coords), cameraPosition);
+
+        // TODO Find a better way to do this.
+        Quaternion asdf = transform.rotation;
+        transform.Rotate(-coords.x, -coords.y, 0, Space.Self);
+        Vector3 direction = transform.forward;
+
+        transform.rotation = asdf;
+
+        //_rotationAxis = Vector3.Cross(direction, cameraPosition - transform.position);
+        //_rotationAngle = Vector3.Angle(direction, cameraPosition - transform.position);
+        //transform.Rotate(_rotationAxis, _rotationAngle, Space.World);
+
+        GoTo(direction, cameraPosition);
     }
 
     private void GoTo(Vector3 direction, Vector3 cameraPosition) {
+        Debug.Log(direction);
         _rotationAxis = Vector3.Cross(direction, cameraPosition - transform.position);
         _rotationAngle = Vector3.Angle(direction, cameraPosition - transform.position);
         _moveProgress = 0;
         _moving = true;
+    }
+
+    private Vector2 DirectionToLatLong(Vector3 direction) {
+        return new Vector2(
+            Mathf.Atan2(direction.y, Mathf.Sqrt(direction.x * direction.x + direction.z * direction.z)) * Mathf.Rad2Deg,
+            Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg
+        );
     }
 
     private Vector3 LatLongToDirection(Vector2 latLong) {

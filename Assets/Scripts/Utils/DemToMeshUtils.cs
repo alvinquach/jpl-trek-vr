@@ -150,10 +150,12 @@ public class DemToMeshUtils {
                 // vertex will serve as a base for all the other vertices in this latitude.
                 Vector3 baseLatVertex = new Vector3(Mathf.Cos(latAng), Mathf.Sin(latAng), 0);
 
-                for (int x = 0; x < lonVertCount; x++) {
+                // Loop traverses backwards in order to get correct orientation of texture and normals.
+                for (int x = lonVertCount - 1; x >= 0; x--) {
                     float value = values[Mathf.Clamp(x * downsample, 0, values.Length - 1)];
-                    // TODO Add default radius for the sphere.
-                    vertices[vertexIndex] = Quaternion.Euler(0, x * lonStepSize, 0) * ((scale + heightScale * value) * baseLatVertex);
+
+                    // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
+                    vertices[vertexIndex] = Quaternion.Euler(0, -90 - x * lonStepSize, 0) * ((scale + heightScale * value) * baseLatVertex);
                     uvs[vertexIndex] = GenerateStandardUV(x, y, lonVertCount, latVertCount);
                     vertexIndex++;
                 }

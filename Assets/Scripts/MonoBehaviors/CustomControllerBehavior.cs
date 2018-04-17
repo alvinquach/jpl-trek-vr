@@ -12,8 +12,12 @@ public class CustomControllerBehavior : MonoBehaviour {
     [SerializeField]
     public GameObject cursor;
 
+    // TODO Make this private setter.
     [SerializeField]
-    private GameObject _cameraRig;
+    public GameObject cameraRig;
+
+    [SerializeField]
+    private XRMenu _menu;
 
     [SerializeField]
     private float _speedMultiplier = 0.1f;
@@ -28,6 +32,7 @@ public class CustomControllerBehavior : MonoBehaviour {
         controller.TriggerUnclicked += TriggerUnclickedHandler;
         controller.PadClicked += PadClickedHandler;
         controller.PadUnclicked += PadUnclickedHandler;
+        controller.MenuButtonClicked += MenuButtonClickedHandler;
     }
 
     private void OnDisable() {
@@ -35,6 +40,7 @@ public class CustomControllerBehavior : MonoBehaviour {
         controller.TriggerUnclicked -= TriggerUnclickedHandler;
         controller.PadClicked -= PadClickedHandler;
         controller.PadUnclicked -= PadUnclickedHandler;
+        controller.MenuButtonClicked -= MenuButtonClickedHandler;
     }
 
     #region Controller Event Handlers
@@ -71,6 +77,21 @@ public class CustomControllerBehavior : MonoBehaviour {
         _padClicked = false;
     }
 
+    private void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
+        if (_menu.gameObject.activeSelf) {
+            _menu.gameObject.SetActive(false);
+        }
+        else {
+            Camera eye = cameraRig.GetComponentInChildren<Camera>();
+            Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0 ,1)));
+            Vector3 menuPosition = forward.GetPoint(_menu.distance);
+            menuPosition.y = _menu.height;
+            _menu.transform.position = menuPosition;
+            _menu.transform.forward = menuPosition - eye.transform.position;
+            _menu.gameObject.SetActive(true);
+        }
+    }
+
     #endregion
 
 
@@ -86,7 +107,7 @@ public class CustomControllerBehavior : MonoBehaviour {
             // Move the player based on controller direction and pad position.
             // Movement is limited along the xz-plane.
             Vector3 direction = Vector3.Scale(transform.forward, new Vector3(1, 0, 1));
-            _cameraRig.transform.position += (axis.y > 0 ? 1 : -1) * _speedMultiplier * direction;
+            cameraRig.transform.position += (axis.y > 0 ? 1 : -1) * _speedMultiplier * direction;
 
         }
 
