@@ -35,7 +35,7 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #endregion
 
-    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
+    public override void OnGripDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
         if (Vector3.Distance(sender.transform.position, point) > _maxGrabDistance) {
             return;
         }
@@ -48,11 +48,11 @@ public class XRInteractablePlanet : XRInteractableObject {
         _grabber.cursor.SetActive(true);
     }
 
-    public override void OnTriggerUp(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
+    public override void OnGripUp(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
         Ungrab();
     }
 
-    public override void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
+    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
         Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
         NavigateTo(point - transform.position, eye.transform.position);
     }

@@ -33,6 +33,8 @@ public class CustomControllerBehavior : MonoBehaviour {
         controller.PadClicked += PadClickedHandler;
         controller.PadUnclicked += PadUnclickedHandler;
         controller.MenuButtonClicked += MenuButtonClickedHandler;
+        controller.Gripped += GrippedHandler;
+        controller.Ungripped += UngrippedHandler;
     }
 
     private void OnDisable() {
@@ -41,6 +43,8 @@ public class CustomControllerBehavior : MonoBehaviour {
         controller.PadClicked -= PadClickedHandler;
         controller.PadUnclicked -= PadUnclickedHandler;
         controller.MenuButtonClicked -= MenuButtonClickedHandler;
+        controller.Gripped -= GrippedHandler;
+        controller.Ungripped -= UngrippedHandler;
     }
 
     #region Controller Event Handlers
@@ -49,7 +53,7 @@ public class CustomControllerBehavior : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
             XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
-            if (obj != null) {
+            if (obj != null && obj.triggerDown) {
                 // TODO Verify sender class.
                 obj.OnTriggerDown(this, hit.point, e);
                 //obj.OnTriggerDoubleClick(this, hit.point, e);
@@ -61,7 +65,7 @@ public class CustomControllerBehavior : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
             XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
-            if (obj != null) {
+            if (obj != null && obj.triggerUp) {
                 // TODO Verify sender class.
                 obj.OnTriggerUp(this, hit.point, e);
             }
@@ -90,6 +94,28 @@ public class CustomControllerBehavior : MonoBehaviour {
             _menu.transform.position = menuPosition;
             _menu.transform.forward = menuPosition - eye.transform.position;
             _menu.gameObject.SetActive(true);
+        }
+    }
+
+    private void GrippedHandler(object sender, ClickedEventArgs e) {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
+            XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
+            if (obj != null && obj.gripDown) {
+                // TODO Verify sender class.
+                obj.OnGripDown(this, hit.point, e);
+            }
+        }
+    }
+
+    private void UngrippedHandler(object sender, ClickedEventArgs e) {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
+            XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
+            if (obj != null && obj.gripUp) {
+                // TODO Verify sender class.
+                obj.OnGripUp(this, hit.point, e);
+            }
         }
     }
 

@@ -8,6 +8,8 @@ public abstract class XRInteractableObject : MonoBehaviour {
     public bool triggerDoubleClick = true;
     public bool triggerDown = true;
     public bool triggerUp = true;
+    public bool gripDown = true;
+    public bool gripUp = true;
 
     public virtual void OnTriggerClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
 
@@ -16,6 +18,10 @@ public abstract class XRInteractableObject : MonoBehaviour {
     public virtual void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
 
     public virtual void OnTriggerUp(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
+
+    public virtual void OnGripDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
+
+    public virtual void OnGripUp(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) { }
 
     // Use this for initialization
     void Start () {
