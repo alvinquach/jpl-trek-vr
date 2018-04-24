@@ -11,12 +11,23 @@ public class BookmarkMenuTest : MonoBehaviour {
 
     private IList<Bookmark> _bookmarks;
 
-    public GameObject template;
+    private List<GameObject> pins = new List<GameObject>();
+
+    public GameObject buttonTemplate;
+
+    public GameObject pinTemplate;
+
+    public TerrainGroup planet;
 
     void OnEnable() {
         if (_bookmarks == null) {
             StartCoroutine(Test());
         }
+        ActivatePins(true);
+    }
+
+    void OnDisable() {
+        ActivatePins(false);
     }
 
     IEnumerator Test() {
@@ -34,14 +45,14 @@ public class BookmarkMenuTest : MonoBehaviour {
 
             _bookmarks = response.response.docs;
 
-            if (template != null) {
-                for (int i = 0; i < _bookmarks.Count; i++) {
-                    Bookmark bookmark = _bookmarks[i];
+            for (int i = 0; i < _bookmarks.Count; i++) {
+                Bookmark bookmark = _bookmarks[i];
+                Vector2 centerCoords = CalculateCenterCoordinates(bookmark.bbox);
 
-                    GameObject obj = Instantiate(template, transform);
+                if (buttonTemplate != null) {
+                    GameObject obj = Instantiate(buttonTemplate, transform);
                     obj.transform.localPosition += 24 * i * Vector3.down;
 
-                    Vector2 centerCoords = CalculateCenterCoordinates(bookmark.bbox);
                     XRMenuElement menuElem = obj.GetComponent<XRMenuElement>();
                     menuElem.latitude = centerCoords.x;
                     menuElem.longitude = centerCoords.y;
@@ -51,6 +62,30 @@ public class BookmarkMenuTest : MonoBehaviour {
 
                     obj.SetActive(true);
                 }
+
+                if (pinTemplate != null && planet != null) {
+
+                    GameObject pin = Instantiate(pinTemplate, planet.transform);
+
+                    pin.transform.forward = planet.transform.forward;
+
+                    pin.transform.Rotate(planet.transform.right, -centerCoords.x, Space.World);
+                    pin.transform.Rotate(planet.transform.up, -centerCoords.y, Space.World);
+
+                    pin.transform.position = planet.transform.position + planet.transform.localScale.x * planet.scale * pin.transform.forward;
+                    
+                    pin.transform.forward = planet.transform.position - pin.transform.position;
+
+                    pin.transform.localScale = 4 * pin.transform.localScale;
+
+                    Text text = pin.GetComponentInChildren<Text>();
+                    text.text = bookmark.title;
+
+                    pins.Add(pin);
+                }
+
+                ActivatePins(true);
+
             }
         }
     }
@@ -62,6 +97,12 @@ public class BookmarkMenuTest : MonoBehaviour {
             float.Parse(split[1]) + float.Parse(split[3]),
             float.Parse(split[0]) + float.Parse(split[2])
         ) / 2;
+    }
+
+    private void ActivatePins(bool active) {
+        foreach (GameObject pin in pins) {
+            pin.SetActive(active);
+        }
     }
 
 }

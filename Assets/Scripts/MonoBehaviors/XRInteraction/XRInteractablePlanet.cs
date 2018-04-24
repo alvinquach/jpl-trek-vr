@@ -45,7 +45,7 @@ public class XRInteractablePlanet : XRInteractableObject {
         _grabbed = true;
         Debug.Log("Grabbed something at " + point);
 
-        _grabber.cursor.SetActive(true);
+        _grabber.cursor.transform.localScale *= 2;
     }
 
     public override void OnGripUp(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
@@ -100,7 +100,6 @@ public class XRInteractablePlanet : XRInteractableObject {
                 // Update the grab point.
                 _grabPoint = newGrabPoint;
 
-                _grabber.cursor.transform.position = _grabPoint;
             }
         }
     }
@@ -191,7 +190,7 @@ public class XRInteractablePlanet : XRInteractableObject {
     private void Ungrab() {
         if (_grabber != null) {
             _grabbed = false;
-            _grabber.cursor.SetActive(false);
+            _grabber.cursor.transform.localScale /= 2;
             _grabber = null;
         }
     }

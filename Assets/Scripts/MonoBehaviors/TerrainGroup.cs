@@ -11,7 +11,7 @@ public class TerrainGroup : MonoBehaviour {
 
     [SerializeField] private SurfaceGeometryType _surfaceGeometryType = SurfaceGeometryType.Planar;
 
-    [SerializeField] private float _scale = 1.0f;
+    public float scale; // TODO Do get/set properly.
 
     [SerializeField] private float _heightScale = 1.0f;
 
@@ -62,7 +62,7 @@ public class TerrainGroup : MonoBehaviour {
             }
 
             Mesh mesh = child.AddComponent<MeshFilter>().mesh;
-            DemToMeshUtils.GenerateMesh(_DEMFile.bytes, mesh, _surfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+            DemToMeshUtils.GenerateMesh(_DEMFile.bytes, mesh, _surfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
         }
 
@@ -73,7 +73,7 @@ public class TerrainGroup : MonoBehaviour {
         // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
         if (_surfaceGeometryType == SurfaceGeometryType.Spherical) {
             SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-            collider.radius = _scale;
+            collider.radius = scale;
         }
 
     }
