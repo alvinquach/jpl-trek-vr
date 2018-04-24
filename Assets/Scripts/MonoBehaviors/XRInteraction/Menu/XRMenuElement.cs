@@ -13,10 +13,11 @@ public class XRMenuElement : XRInteractableObject {
     [SerializeField]
     private float _longitude;
 
+    //public override void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
     public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
         if (_planet != null) {
             Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
-            _planet.GoTo(new Vector2(_latitude, _longitude), eye.transform.position);
+            _planet.NavigateTo(new Vector2(_latitude, _longitude), eye.transform.position);
         }
     }
 

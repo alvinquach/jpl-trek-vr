@@ -26,13 +26,12 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #endregion
 
-    #region Planet Navigation Variables
+    #region Planet "Navigate To" Variables
 
-    private Vector3 _rotationAxis;
-    private float _rotationAngle;
-    private float _moveTime = 1.0f;
-    private float _moveProgress = 0f;
-    private bool _moving = false;
+    private Quaternion _initRotation;
+    private Quaternion _destRotation;
+    private float _navToDuration = 1.0f;
+    private float _navToProgress = 1;
 
     #endregion
 
@@ -55,7 +54,7 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     public override void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
         Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
-        GoTo(point - transform.position, eye.transform.position);
+        NavigateTo(point - transform.position, eye.transform.position);
     }
 
     // Use this for initialization
@@ -65,13 +64,9 @@ public class XRInteractablePlanet : XRInteractableObject {
 	
 	// Update is called once per frame
 	void Update () {
-        if (_moving) {
-            float deltaProgress = Time.deltaTime / _moveTime;
-            transform.Rotate(_rotationAxis, _rotationAngle * deltaProgress, Space.World);
-            _moveProgress += deltaProgress;
-            if (_moveProgress >= 1f) {
-                _moving = false;
-            }
+        if (_navToProgress < 1) {
+            _navToProgress += Time.deltaTime / _navToDuration;
+            transform.rotation = Quaternion.Lerp(_initRotation, _destRotation, _navToProgress);
         }
 
         if (_grabbed && _grabber != null) {
@@ -110,51 +105,73 @@ public class XRInteractablePlanet : XRInteractableObject {
         }
     }
 
-    public void GoTo(Vector2 coords, Vector3 cameraPosition) {
-
-        // TODO Find a better way to do this.
-        Quaternion asdf = transform.rotation;
+    public void NavigateTo(Vector2 coords, Vector3 cameraPosition) {
+        // TODO Find a better way to do this without having to
+        // rotate the planet to get the new direction.
+        Quaternion originalRotation = transform.rotation;
         transform.Rotate(-coords.x, -coords.y, 0, Space.Self);
         Vector3 direction = transform.forward;
-
-        transform.rotation = asdf;
-
-        //_rotationAxis = Vector3.Cross(direction, cameraPosition - transform.position);
-        //_rotationAngle = Vector3.Angle(direction, cameraPosition - transform.position);
-        //transform.Rotate(_rotationAxis, _rotationAngle, Space.World);
-
-        GoTo(direction, cameraPosition);
+        transform.rotation = originalRotation;
+        NavigateTo(direction, cameraPosition);
     }
 
-    private void GoTo(Vector3 direction, Vector3 cameraPosition) {
-        Debug.Log(direction);
-        _rotationAxis = Vector3.Cross(direction, cameraPosition - transform.position);
-        _rotationAngle = Vector3.Angle(direction, cameraPosition - transform.position);
-        _moveProgress = 0;
-        _moving = true;
+    public void NavigateTo(Vector3 localDirection, Vector3 cameraPosition) {
+        Vector3 axis = Vector3.Cross(localDirection, cameraPosition - transform.position);
+        float angle = Vector3.Angle(localDirection, cameraPosition - transform.position);
+        NavigateTo(angle, axis, cameraPosition);
     }
 
-    private Vector2 DirectionToLatLong(Vector3 direction) {
-        return new Vector2(
-            Mathf.Atan2(direction.y, Mathf.Sqrt(direction.x * direction.x + direction.z * direction.z)) * Mathf.Rad2Deg,
-            Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg
-        );
-    }
+    private void NavigateTo(float angle, Vector3 axis, Vector3 cameraPosition) {
+        
+        // Set the initial rotation to the planet's current rotation.
+        _initRotation = transform.rotation;
 
-    private Vector3 LatLongToDirection(Vector2 latLong) {
-        float lat = latLong.x * Mathf.Deg2Rad;
-        float lon = latLong.y * Mathf.Deg2Rad;
-        //float lat = latLong.x;
-        //float lon = latLong.y;
-        return new Vector3(
-            Mathf.Sin(lat) * Mathf.Cos(lon),
-            Mathf.Cos(lat),
-            Mathf.Sin(lat) * Mathf.Sin(lon)
-        );
+        // Rotate the planet by the specified angle along the specified axis.
+        // After rotation, the desired navigation point should be facing the
+        // camera, but the orientation of the planet is not guaranteed.
+        transform.Rotate(axis, angle, Space.World);
+
+        // Orient the planet relative to the camera position such that the 
+        // planet's up direction is aligned with the world's up direction.
+        // This will be the destination rotation for the navigation.
+        _destRotation = GetOrientedRotation(cameraPosition - transform.position);
+
+        // Reset the planet's rotation.
+        transform.rotation = _initRotation;
+
+        // Set the navigation progress counter to zero to start the navigation process.
+        _navToProgress = 0;
+
     }
 
     /// <summary>
-    /// This function uses the law of cosines formula to find the distance between the controller and the current location of the grab point.
+    /// Calculates a version of the planet's current rotation but with the  
+    /// planet's up direction oriented toward the world's up direction when 
+    /// viewed from the provided relative position.
+    /// </summary>
+    /// <param name="relativePosition">
+    /// A vector describing a position relative to the planet's center.
+    /// This is typically the vector between the camera's position and planet's position.
+    /// </param>
+    private Quaternion GetOrientedRotation(Vector3 relativePosition) {
+
+        // Find the projection of the planet's up vector on the relative position plane.
+        // The relative position plane has a normal equal to the relative position vector.
+        Vector3 projectedUp = Vector3.ProjectOnPlane(transform.up, relativePosition);
+
+        // Find the "up direction" of the relative position plane by projecting the world up vector to the plane.
+        // TODO Handle the cases where the relative position vector is up or down.
+        Vector3 relativeUp = Vector3.ProjectOnPlane(Vector3.up, relativePosition);
+
+        // Return the planet's rotation rotated by the angle between the 
+        // two projected vectors about the relative position vector.
+        return Quaternion.FromToRotation(projectedUp, relativeUp) * transform.rotation;
+
+    }
+
+    /// <summary>
+    /// This function uses the law of cosines formula to find the distance
+    /// between the controller and the current location of the grab point.
     /// </summary>
     private float CalculateGrabPointDistance() {
 

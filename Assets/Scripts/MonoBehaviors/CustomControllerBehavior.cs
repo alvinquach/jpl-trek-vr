@@ -52,6 +52,7 @@ public class CustomControllerBehavior : MonoBehaviour {
             if (obj != null) {
                 // TODO Verify sender class.
                 obj.OnTriggerDown(this, hit.point, e);
+                //obj.OnTriggerDoubleClick(this, hit.point, e);
             }
         }
     }
