@@ -17,22 +17,11 @@ public class BookmarksWebService : WebService {
             callback(new List<Bookmark>(_bookmarks));
         }
         else {
-            StartCoroutine(GetBookmarksCoroutine(callback));
+            StartCoroutine(GetCoroutine(_webServiceManager.BookmarksUrl, (ResponseContainer<BookmarksResponse> res) => {
+                _bookmarks = res.response.docs;
+                callback(new List<Bookmark>(_bookmarks));
+            }));
         }
     }
 
-    private IEnumerator GetBookmarksCoroutine(ListResponseCallback<Bookmark> callback) {
-        UnityWebRequest request = UnityWebRequest.Get(_webServiceManager.BookmarksUrl);
-        yield return request.SendWebRequest();
-        if (request.isNetworkError || request.isHttpError) {
-            Debug.LogError(request.error);
-        }
-        else {
-            string responseBody = request.downloadHandler.text;
-            ResponseContainer<BookmarksResponse> response = JsonConvert.DeserializeObject<ResponseContainer<BookmarksResponse>>(responseBody);
-            _bookmarks = response.response.docs;
-            callback(new List<Bookmark>(_bookmarks));
-        }
-
-    }
 }
