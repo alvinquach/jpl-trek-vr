@@ -11,13 +11,13 @@ public abstract class WebService : MonoBehaviour {
 
     #region Callback Function Definitions
 
-    public delegate void ResponseContainerCallback<T>(ResponseContainer<T> res) where T : ResponseObject;
+    public delegate void ResponseCallback<T>(ResponseContainer<T> res) where T : ResponseObject;
 
-    public delegate void ObjectResponseCallback(JObject res);
+    public delegate void JObjectCallback(JObject res);
 
-    public delegate void TypedObjectResponseCallback<T>(T res);
+    public delegate void TypedObjectCallback<T>(T res);
 
-    public delegate void ListResponseCallback<T>(IList<T> res);
+    public delegate void ListCallback<T>(IList<T> res);
 
     #endregion
 
@@ -43,7 +43,7 @@ public abstract class WebService : MonoBehaviour {
     ///     The callback function that is executed when the request is sucessful.
     ///     The response object is parsed and passed as a parameter through this function.
     /// </param>
-    protected IEnumerator GetCoroutine<T>(string resourceUrl, ResponseContainerCallback<T> callback) where T : ResponseObject {
+    protected IEnumerator GetCoroutine<T>(string resourceUrl, ResponseCallback<T> callback) where T : ResponseObject {
         UnityWebRequest request = UnityWebRequest.Get(resourceUrl);
         yield return request.SendWebRequest();
         if (request.isNetworkError || request.isHttpError) {
@@ -67,7 +67,7 @@ public abstract class WebService : MonoBehaviour {
     ///     The callback function that is executed when the request is sucessful.
     ///     The response object is parsed as a JOBject and passed as a parameter through this function.
     /// </param>
-    protected IEnumerator GetCoroutine(string resourceUrl, ObjectResponseCallback callback) {
+    protected IEnumerator GetCoroutine(string resourceUrl, JObjectCallback callback) {
         UnityWebRequest request = UnityWebRequest.Get(resourceUrl);
         yield return request.SendWebRequest();
         if (request.isNetworkError || request.isHttpError) {

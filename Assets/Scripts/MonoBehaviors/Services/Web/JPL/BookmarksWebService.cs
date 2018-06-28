@@ -8,7 +8,7 @@ public class BookmarksWebService : WebService {
         _bookmarks = null;
     }
 
-    public void GetBookmarks(ListResponseCallback<Bookmark> callback) {
+    public void GetBookmarks(ListCallback<Bookmark> callback) {
         if (_bookmarks != null) {
             callback(new List<Bookmark>(_bookmarks));
         }
