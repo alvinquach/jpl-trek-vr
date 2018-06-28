@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [DisallowMultipleComponent]
 public class WebServiceManager : MonoBehaviour {
@@ -33,6 +31,6 @@ public class WebServiceManager : MonoBehaviour {
         if (WebServiceManager._instance == null) {
             WebServiceManager._instance = this;
         }
-	}
+    }
 	
 }
