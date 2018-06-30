@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 public class BookmarksWebService : WebService {
 
@@ -8,13 +10,14 @@ public class BookmarksWebService : WebService {
         _bookmarks = null;
     }
 
-    public void GetBookmarks(ListCallback<Bookmark> callback) {
+    public void GetBookmarks(TypedObjectCallback<IList<Bookmark>> callback) {
         if (_bookmarks != null) {
             callback(new List<Bookmark>(_bookmarks));
         }
         else {
-            StartCoroutine(GetCoroutine(_webServiceManager.BookmarksUrl, (ResponseContainer<BookmarksResponse> res) => {
-                _bookmarks = res.response.docs;
+            StartCoroutine(GetCoroutine(_webServiceManager.BookmarksUrl, (DownloadHandler res) => {
+                ResponseContainer<BookmarksResponse> response = JsonConvert.DeserializeObject<ResponseContainer<BookmarksResponse>>(res.text);
+                _bookmarks = response.response.docs;
                 callback(new List<Bookmark>(_bookmarks));
             }));
         }
