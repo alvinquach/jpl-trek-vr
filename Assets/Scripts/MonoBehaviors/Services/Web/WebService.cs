@@ -19,6 +19,8 @@ public abstract class WebService : MonoBehaviour {
 
     public delegate void ListCallback<T>(IList<T> res);
 
+    public delegate void FileCallback(byte[] res);
+
     #endregion
 
     protected virtual void Start() {
@@ -76,6 +78,29 @@ public abstract class WebService : MonoBehaviour {
         else {
             string responseBody = request.downloadHandler.text;
             JObject response = (JObject)JsonConvert.DeserializeObject(responseBody);
+            callback(response);
+        }
+    }
+
+    /// <summary>
+    ///     Coroutine for asynchronously making a GET request to a specified API URL.
+    ///     The expected response type is a file which will be passed as a byte array.
+    /// </summary>
+    /// <param name="resourceUrl">
+    ///     The URL to the API resource.
+    /// </param>
+    /// <param name="callback">
+    ///     The callback function that is executed when the request is sucessful.
+    ///     The response object is parsed as a byte array and passed as a parameter through this function.
+    /// </param>
+    protected IEnumerator GetCoroutine(string resourceUrl, FileCallback callback) {
+        UnityWebRequest request = UnityWebRequest.Get(resourceUrl);
+        yield return request.SendWebRequest();
+        if (request.isNetworkError || request.isHttpError) {
+            Debug.LogError(request.error);
+        }
+        else {
+            byte[] response = request.downloadHandler.data;
             callback(response);
         }
     }
