@@ -15,7 +15,7 @@ public class BookmarksWebService : WebService {
             callback(new List<Bookmark>(_bookmarks));
         }
         else {
-            StartCoroutine(GetCoroutine(_webServiceManager.BookmarksUrl, (DownloadHandler res) => {
+            StartCoroutine(GetBufferCoroutine(_webServiceManager.BookmarksUrl, (DownloadHandler res) => {
                 ResponseContainer<BookmarksResponse> response = JsonConvert.DeserializeObject<ResponseContainer<BookmarksResponse>>(res.text);
                 _bookmarks = response.response.docs;
                 callback(new List<Bookmark>(_bookmarks));
