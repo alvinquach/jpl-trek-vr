@@ -36,7 +36,7 @@ public class BookmarkMenuTest : MonoBehaviour {
                 GameObject obj = Instantiate(buttonTemplate, transform);
                 obj.transform.localPosition += 24 * i * Vector3.down;
 
-                XRMenuElement menuElem = obj.GetComponent<XRMenuElement>();
+                XRMenuPlanetNavigationButton menuElem = obj.GetComponent<XRMenuPlanetNavigationButton>();
                 menuElem.latitude = centerCoords.x;
                 menuElem.longitude = centerCoords.y;
 
