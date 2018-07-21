@@ -27,7 +27,7 @@ This section contains instructions on how to clone and setup the project for dev
 ### Prerequisites
 The following hardware/software is required:
 * All of the requirments as listed in the [requirements](https://github.com/alvinquach/jpl-trek-vr/blob/master/README.md#requirements) section.
-* [Unity Editor](https://unity3d.com/get-unity/download/archive) (Version 2017.4 preferred)
+* [Unity Editor](https://unity3d.com/get-unity/download/archive) (currently being developed on 2018.2.0f2)
 * Git and [Git LFS](https://git-lfs.github.com/)
 ### Repository Setup
 1. Clone this repository.
