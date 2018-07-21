@@ -16,7 +16,7 @@ public class BookmarkMenuTest : MonoBehaviour {
 
     void OnEnable() {
         if (_bookmarks == null) {
-            WebServiceManager.Instance.BookmarksWebService.GetBookmarks(OnGetBookmarks);
+            WebServiceManager.Instance?.BookmarksWebService.GetBookmarks(OnGetBookmarks);
         }
         ActivatePins(true);
     }
