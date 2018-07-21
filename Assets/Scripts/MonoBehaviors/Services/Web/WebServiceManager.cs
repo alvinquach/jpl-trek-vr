@@ -31,6 +31,12 @@ public class WebServiceManager : MonoBehaviour {
         DataElevationModelWebService = new MockDataElevationModelWebService();
     }
 
+    /// <summary>
+    ///     Helper method for WebService classes to run their request coroutines;
+    ///     WebService does not extend MonoBehaviour and thus cannot run its own coroutines.
+    /// </summary>
+    /// <param name="routine">The routine to run.</param>
+    /// <returns>The coroutine that was run.</returns>
     public Coroutine RunCoroutine(IEnumerator routine) {
         return StartCoroutine(routine);
     }
