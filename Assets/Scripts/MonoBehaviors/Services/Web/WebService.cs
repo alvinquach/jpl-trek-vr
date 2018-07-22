@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,7 +14,7 @@ public abstract class WebService {
 
     // TODO Convert IEnumerator coroutines to async-await functions.
 
-    #region Buffer GET Request
+    #region Buffer Requests
 
     /// <summary>
     ///     Starts the coroutine for asynchronously making a GET request to a specified API URL.
@@ -41,9 +42,38 @@ public abstract class WebService {
         }
     }
 
+    /// <summary>
+    ///     Starts the coroutine for asynchronously making a POST request to a specified API URL.
+    ///     The response will be passed back through the callback function.
+    /// </summary>
+    /// <param name="resourceUrl">
+    ///     The URL to the API resource.
+    /// </param>
+    /// <param name="callback">
+    ///     The callback function that is executed when the request is sucessful.
+    ///     The response object is passed as a parameter through this function.
+    /// </param>
+    protected Coroutine PostBuffer(string resourceUrl, object postData, ResponseCallback callback = null) {
+        return _webServiceManager.RunCoroutine(PostBufferCoroutine(resourceUrl, postData, callback));
+    }
+
+    private IEnumerator PostBufferCoroutine(string resourceUrl, object postData, ResponseCallback callback) {
+        UnityWebRequest request = UnityWebRequest.Put(resourceUrl, ConvertToJsonString(postData));
+        Debug.Log(GetContentType(postData));
+        request.SetRequestHeader("Content-Type", GetContentType(postData));
+        request.method = UnityWebRequest.kHttpVerbPOST;
+        yield return request.SendWebRequest();
+        if (request.isNetworkError || request.isHttpError) {
+            Debug.LogError(request.error);
+        }
+        else {
+            callback?.Invoke(request.downloadHandler);
+        }
+    }
+
     #endregion
 
-    #region File GET Request
+    #region File Requests
 
     /// <summary>
     ///     Starts the coroutine for asynchronously making a GET request to a specified API URL.
@@ -77,7 +107,7 @@ public abstract class WebService {
 
     #endregion
 
-    #region Texture GET Request
+    #region Texture Requests
 
     /// <summary>
     ///     Starts the coroutine for asynchronously making a GET request to a specified API URL to retreive a texture.
@@ -108,5 +138,19 @@ public abstract class WebService {
     }
 
     #endregion
+
+    private string ConvertToJsonString(object data) {
+        if (data is string) {
+            return (string)data;
+        }
+        return JsonConvert.SerializeObject(data);
+    }
+
+    private string GetContentType(object data) {
+        if (data is string) {
+            return "text/plain";
+        }
+        return "application/json";
+    }
 
 }
