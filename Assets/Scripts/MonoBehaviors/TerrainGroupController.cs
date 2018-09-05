@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using BitMiracle.LibTiff.Classic;
+﻿using UnityEngine;
 
-public class TerrainGroup : MonoBehaviour {
+public class TerrainGroupController : MonoBehaviour {
 
     //[SerializeField] private string _filePath;
     [SerializeField] private TextAsset _DEMFile;
