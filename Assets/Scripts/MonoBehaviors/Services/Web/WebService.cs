@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using static System.Exception;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -25,8 +26,11 @@ public abstract class WebService {
     ///     The callback function that is executed when the request is sucessful.
     ///     The response object is passed as a parameter through this function.
     /// </param>
-    protected Coroutine BufferRequest(UnityWebRequest request, ResponseCallback callback = null) {
-        return _webServiceManager.RunCoroutine(BufferRequestCoroutine(request, callback));
+    protected void BufferRequest(UnityWebRequest request, ResponseCallback callback = null) {
+        if (RequestAlreadySent(request)) {
+            return;
+        }
+        _webServiceManager.RunCoroutine(BufferRequestCoroutine(request, callback));
     }
 
     private IEnumerator BufferRequestCoroutine(UnityWebRequest request, ResponseCallback callback) {
@@ -52,13 +56,15 @@ public abstract class WebService {
     /// <param name="callback">
     ///     The callback function that is executed when the request is sucessful.
     /// </param>
-    protected Coroutine FileRequest(string resourceUrl, string filePath, VoidCallback callback = null) {
-        return _webServiceManager.RunCoroutine(FileRequestCoroutine(resourceUrl, filePath, callback));
+    protected void FileRequest(UnityWebRequest request, string filePath, VoidCallback callback = null) {
+        if (RequestAlreadySent(request)) {
+            return;
+        }
+        _webServiceManager.RunCoroutine(FileRequestCoroutine(request, filePath, callback));
     }
 
-    private IEnumerator FileRequestCoroutine(string resourceUrl, string filePath, VoidCallback callback) {
+    private IEnumerator FileRequestCoroutine(UnityWebRequest request, string filePath, VoidCallback callback) {
         string path = Path.Combine(Application.persistentDataPath, filePath);
-        UnityWebRequest request = new UnityWebRequest(resourceUrl, UnityWebRequest.kHttpVerbGET);
         request.downloadHandler = new DownloadHandlerFile(path);
         yield return request.SendWebRequest();
         if (request.isNetworkError || request.isHttpError) {
@@ -80,12 +86,14 @@ public abstract class WebService {
     ///     The callback function that is executed when the request is sucessful.
     ///     The downloaded texture is passed as a parameter through this function.
     /// </param>
-    protected Coroutine TextureRequest(string resourceUrl, TypedObjectCallback<Texture2D> callback = null) {
-        return _webServiceManager.RunCoroutine(TextureRequestCoroutine(resourceUrl, callback));
+    protected void TextureRequest(UnityWebRequest request, TypedObjectCallback<Texture2D> callback = null) {
+        if (RequestAlreadySent(request)) {
+            return;
+        }
+        _webServiceManager.RunCoroutine(TextureRequestCoroutine(request, callback));
     }
 
-    private IEnumerator TextureRequestCoroutine(string resourceUrl, TypedObjectCallback<Texture2D> callback) {
-        UnityWebRequest request = new UnityWebRequest(resourceUrl, UnityWebRequest.kHttpVerbGET);
+    private IEnumerator TextureRequestCoroutine(UnityWebRequest request, TypedObjectCallback<Texture2D> callback) {
         DownloadHandlerTexture downloadHandlerTexture = new DownloadHandlerTexture(true); // TODO Does the texture need to be readable?
         request.downloadHandler = downloadHandlerTexture;
         yield return request.SendWebRequest();
@@ -95,6 +103,14 @@ public abstract class WebService {
         else {
             callback?.Invoke(downloadHandlerTexture.texture);
         }
+    }
+
+    private bool RequestAlreadySent(UnityWebRequest request) {
+        if (!request.isModifiable) {
+            Debug.LogWarning("Request was already sent. Please create a new UnityWebRequest to resend the request.");
+            return true;
+        }
+        return false;
     }
 
 }

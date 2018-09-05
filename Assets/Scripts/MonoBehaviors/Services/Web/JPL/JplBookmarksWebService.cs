@@ -15,7 +15,8 @@ public class JplBookmarksWebService : BookmarksWebService {
             callback(new List<Bookmark>(_bookmarks));
         }
         else {
-            BufferRequest(WebRequestUtils.Get(_webServiceManager.BookmarksUrl), (DownloadHandler res) => {
+            UnityWebRequest request = WebRequestUtils.Get(_webServiceManager.BookmarksUrl);
+            BufferRequest(request, (DownloadHandler res) => {
                 ResponseContainer<BookmarksResponse> response = JsonConvert.DeserializeObject<ResponseContainer<BookmarksResponse>>(res.text);
                 _bookmarks = response.response.docs;
                 callback(new List<Bookmark>(_bookmarks));
