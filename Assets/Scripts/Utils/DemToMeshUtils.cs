@@ -7,7 +7,7 @@ public class DemToMeshUtils {
 
     // TODO Use a struct or class to pass DEM metadata (ie. scale) to the GenerateMesh methods.
 
-    public static void GenerateMesh(String filePath, Mesh mesh, SurfaceGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+    public static void GenerateMesh(String filePath, Mesh mesh, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
 
         if (String.IsNullOrEmpty(filePath)) {
             Debug.LogError("No TIFF file specified for " + typeof(DemToMeshUtils).Name);
@@ -29,7 +29,7 @@ public class DemToMeshUtils {
 
     }
 
-    public static void GenerateMesh(byte[] bytes, Mesh mesh, SurfaceGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+    public static void GenerateMesh(byte[] bytes, Mesh mesh, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
 
         using (Tiff tiff = Tiff.ClientOpen("in-memory", "r", new MemoryStream(bytes), new TiffStream())) {
 
@@ -44,7 +44,7 @@ public class DemToMeshUtils {
 
     }
 
-    public static void GenerateMesh(Tiff tiff, Mesh mesh, SurfaceGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+    public static void GenerateMesh(Tiff tiff, Mesh mesh, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
 
         FieldValue[] res = tiff.GetField(TiffTag.BITSPERSAMPLE);
         short bpp = res[0].ToShort();
@@ -76,7 +76,7 @@ public class DemToMeshUtils {
         byte[] scanline = new byte[tiff.ScanlineSize()];
 
         // Generate planar terrain mesh.
-        if (surfaceType == SurfaceGeometryType.Planar) {
+        if (surfaceType == TerrainGeometryType.Planar) {
 
             // Vertex counts in the horizontal and vertical directions are the
             // same as the downsampled texture width and height, respectively.
@@ -116,7 +116,7 @@ public class DemToMeshUtils {
         }
 
         // Generate spherical terrain mesh.
-        else if (surfaceType == SurfaceGeometryType.Spherical) {
+        else if (surfaceType == TerrainGeometryType.Spherical) {
 
             // Vertex count for the latitude is the same as the downsampled texture height.
             // However, we need to generate an extra set of vertices in the longitude

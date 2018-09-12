@@ -1,29 +1,42 @@
 ﻿using UnityEngine;
+using System;
+using System.Collections;
 
-public class TerrainGroupController : MonoBehaviour {
+public abstract class TerrainMesh : MonoBehaviour {
 
-    //[SerializeField] private string _filePath;
-    [SerializeField] private TextAsset _DEMFile;
-
-    [SerializeField] private SurfaceGeometryType _surfaceGeometryType = SurfaceGeometryType.Planar;
+    public TextAsset DEMFile;
 
     public float scale; // TODO Do get/set properly.
 
-    [SerializeField] private float _heightScale = 1.0f;
+    [SerializeField] protected float _heightScale = 1.0f;
 
-    [SerializeField] private int _baseDownsampleLevel = 2;
+    [SerializeField] protected int _baseDownsampleLevel = 2;
 
-    [SerializeField] private int _LODLevels = 2;
+    [SerializeField] protected int _LODLevels = 2;
 
-    [SerializeField] private Material _material;
+    [SerializeField] protected Material _material;
 
     // TODO Add option to use linear LOD downsampling.
 
+    public abstract TerrainGeometryType SurfaceGeometryType { get; }
+
+    protected bool _init = false;
+
     // Use this for initialization
     void Start() {
+        InitMesh();
+    }
 
-        if (_DEMFile == null) {
+    // Can only be called once.
+    public void InitMesh() {
+
+        // TerrrainMesh can only be initialized once.
+        if (_init) {
             return;
+        }
+
+        if (DEMFile == null) {
+            throw new Exception("Cannot create mesh. DEM file not definded.");
         }
 
         // Minimum base downsampling level should be 1.
@@ -58,7 +71,7 @@ public class TerrainGroupController : MonoBehaviour {
             }
 
             Mesh mesh = child.AddComponent<MeshFilter>().mesh;
-            DemToMeshUtils.GenerateMesh(_DEMFile.bytes, mesh, _surfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+            DemToMeshUtils.GenerateMesh(DEMFile.bytes, mesh, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
         }
 
@@ -66,12 +79,7 @@ public class TerrainGroupController : MonoBehaviour {
         lodGroup.SetLODs(lods);
         lodGroup.RecalculateBounds();
 
-        // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
-        if (_surfaceGeometryType == SurfaceGeometryType.Spherical) {
-            SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-            collider.radius = scale;
-        }
-
+        // Mark the TerrainMesh as already initialized.
+        _init = true;
     }
-
 }

@@ -12,7 +12,7 @@ public class BookmarkMenuTest : MonoBehaviour {
 
     public GameObject pinTemplate;
 
-    public TerrainGroupController planet;
+    public SphericalTerrainMesh planet;
 
     void OnEnable() {
         if (_bookmarks == null) {
