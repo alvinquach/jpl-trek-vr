@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using static System.Exception;
-using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -51,7 +49,8 @@ public abstract class WebService {
     ///     The URL to the API resource.
     /// </param>
     /// <param name="filePath">
-    ///     The path where the response will be saved, relative to the persistent data path.
+    ///     The path where the response will be saved.
+    ///     This will typically be a folder inside the persistent data directory.
     /// </param>
     /// <param name="callback">
     ///     The callback function that is executed when the request is sucessful.
@@ -64,13 +63,13 @@ public abstract class WebService {
     }
 
     private IEnumerator FileRequestCoroutine(UnityWebRequest request, string filePath, VoidCallback callback) {
-        string path = Path.Combine(Application.persistentDataPath, filePath);
-        request.downloadHandler = new DownloadHandlerFile(path);
+        request.downloadHandler = new DownloadHandlerFile(filePath);
         yield return request.SendWebRequest();
         if (request.isNetworkError || request.isHttpError) {
             Debug.LogError(request.error);
         }
         else {
+            Debug.Log("Response data saved to " + filePath);
             callback?.Invoke();
         }
     }

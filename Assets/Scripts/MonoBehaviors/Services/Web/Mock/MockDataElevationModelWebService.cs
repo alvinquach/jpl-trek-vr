@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
@@ -16,7 +17,8 @@ public class MockDataElevationModelWebService : DataElevationModelWebService {
 
     public override void GetDEM(string resourceUrl, VoidCallback callback) {
         UnityWebRequest request = WebRequestUtils.Post("localhost:8080/rest/files/download", "C:/Users/Alvin/Desktop/temp/asdfasdf.png");
-        FileRequest(request, "C:/Users/Alvin/Desktop/temp/dl", callback);
+        string dest = Path.Combine(CachePath.PersistentRoot, CachePath.Test, "test.png");
+        FileRequest(request, dest, callback);
     }
 
 }
