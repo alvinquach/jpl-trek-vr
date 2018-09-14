@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System;
+using System.IO;
 using System.Collections;
 
 public abstract class TerrainMesh : MonoBehaviour {
 
-    public TextAsset DEMFile;
+    public string DEMFilePath;
+
+    public string AlbedoFilePath;
 
     public float scale; // TODO Do get/set properly.
 
@@ -35,9 +38,9 @@ public abstract class TerrainMesh : MonoBehaviour {
             return;
         }
 
-        if (DEMFile == null) {
-            throw new Exception("Cannot create mesh. DEM file not definded.");
-        }
+        //if (DEMFile == null) {
+        //    throw new Exception("Cannot create mesh. DEM file not definded.");
+        //}
 
         // Minimum base downsampling level should be 1.
         _baseDownsampleLevel = _baseDownsampleLevel < 1 ? 1 : _baseDownsampleLevel;
@@ -71,7 +74,7 @@ public abstract class TerrainMesh : MonoBehaviour {
             }
 
             Mesh mesh = child.AddComponent<MeshFilter>().mesh;
-            DemToMeshUtils.GenerateMesh(DEMFile.bytes, mesh, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+            DemToMeshUtils.GenerateMesh(DEMFilePath, mesh, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
         }
 

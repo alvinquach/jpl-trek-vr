@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 public class TerrainMeshController : MonoBehaviour {
@@ -20,6 +21,16 @@ public class TerrainMeshController : MonoBehaviour {
 
     void Awake() {
         if (_defaultPlanetMesh != null) {
+
+            // TEMPORARY -- DO THIS PROPERLY
+            _defaultPlanetMesh.DEMFilePath = Path.Combine(
+                FilePath.StreamingAssetsRoot,
+                //FilePath.JetPropulsionLaboratory,
+                FilePath.Texture,
+                FilePath.DataElevationModel,
+                _defaultPlanetMesh.DEMFilePath
+            );
+
             _defaultPlanetMesh.gameObject.SetActive(true);
         }
         Create(null); // For testing -- delete after.
