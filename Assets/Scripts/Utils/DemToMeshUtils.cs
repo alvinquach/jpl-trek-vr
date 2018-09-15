@@ -7,11 +7,21 @@ public class DemToMeshUtils {
 
     // TODO Use a struct or class to pass DEM metadata (ie. scale) to the GenerateMesh methods.
 
-    public static void GenerateMesh(String filePath, Mesh mesh, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+    /// <summary>
+    ///     Generates a 3D mesh using the provided TIFF data elevation model (DEM) file and the provided parameters. 
+    /// </summary>
+    /// <param name="filePath">
+    ///     Path to the TIFF DEM file. File extension can be anything as long as the file is in TIFF format.
+    /// </param>
+    /// <returns>
+    ///     A Mesh object that can be attached to a MeshFilter.
+    /// </returns>
+    public static Mesh GenerateMesh(String filePath, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+
+        // TODO Check if mesh is null
 
         if (String.IsNullOrEmpty(filePath)) {
-            Debug.LogError("No TIFF file specified for " + typeof(DemToMeshUtils).Name);
-            return;
+            throw new DataElevationModelNotFoundException("No TIFF file specified for " + typeof(DemToMeshUtils).Name);
         }
 
         // TODO Maybe support other image types?
@@ -19,32 +29,37 @@ public class DemToMeshUtils {
         using (Tiff tiff = Tiff.Open(filePath, "r")) {
 
             if (tiff == null) {
-                Debug.LogError("Cannot open TIFF from " + filePath);
-                return;
+                throw new DataElevationModelReadException("Cannot open TIFF from " + filePath);
             }
 
-            GenerateMesh(tiff, mesh, surfaceType, scale, heightScale, downsample);
-
+            return GenerateMesh(tiff, surfaceType, scale, heightScale, downsample);
         }
 
     }
 
-    public static void GenerateMesh(byte[] bytes, Mesh mesh, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+    /// <summary>
+    ///     Generates a 3D mesh using the provided TIFF data elevation model (DEM) file and the provided parameters. 
+    /// </summary>
+    /// <param name="bytes">
+    ///     The raw bytes of the TIFF DEM file.
+    /// </param>
+    /// <returns>
+    ///     A Mesh object that can be attached to a MeshFilter.
+    /// </returns>
+    public static Mesh GenerateMesh(byte[] bytes, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
 
         using (Tiff tiff = Tiff.ClientOpen("in-memory", "r", new MemoryStream(bytes), new TiffStream())) {
 
             if (tiff == null) {
-                Debug.LogError("Cannot open TIFF from memory.");
-                return;
+                throw new DataElevationModelReadException("Cannot open TIFF from memory.");
             }
 
-            GenerateMesh(tiff, mesh, surfaceType, scale, heightScale, downsample);
-
+            return GenerateMesh(tiff, surfaceType, scale, heightScale, downsample);
         }
 
     }
 
-    public static void GenerateMesh(Tiff tiff, Mesh mesh, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
+    public static Mesh GenerateMesh(Tiff tiff, TerrainGeometryType surfaceType, float scale, float heightScale, int downsample = 1) {
 
         FieldValue[] res = tiff.GetField(TiffTag.BITSPERSAMPLE);
         short bpp = res[0].ToShort();
@@ -54,8 +69,7 @@ public class DemToMeshUtils {
 
         // Currently, only 16-bit and 32-bit grayscale files are supported.
         if (bpp != 32 && bpp != 16 || spp != 1) {
-            Debug.LogError("Invalid TIFF format. Only 16-bit and 32-bit grayscale files are supported.");
-            return;
+            throw new DataElevationModelFormatException("Invalid TIFF format. Only 16-bit and 32-bit grayscale files are supported.");
         }
 
         res = tiff.GetField(TiffTag.IMAGELENGTH);
@@ -66,11 +80,13 @@ public class DemToMeshUtils {
 
         Debug.Log(width + "x" + height + "@" + bpp);
 
+        Mesh mesh = new Mesh();
+
         // Set the index format of the mesh to 32-bits, so that the mesh can have more than 65k vertices.
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 
-        // Clear any existing mesh data.
-        mesh.Clear();
+        // TODO Check if the TIFF file is tiled instead of stripped by calling tiff.isTiled().
+        // If it is tiled, then use ReadEncodedTile instead of ReadScanline.
 
         // Init the byte array for holding the data read from each TIFF scanline.
         byte[] scanline = new byte[tiff.ScanlineSize()];
@@ -171,6 +187,7 @@ public class DemToMeshUtils {
 
         }
 
+        return mesh;
     }
 
     private static float[] Scanline32ToFloat(byte[] scanline) {

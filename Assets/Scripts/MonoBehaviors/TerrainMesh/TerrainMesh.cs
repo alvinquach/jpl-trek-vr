@@ -73,8 +73,8 @@ public abstract class TerrainMesh : MonoBehaviour {
                 meshRenderer.material = _material;
             }
 
-            Mesh mesh = child.AddComponent<MeshFilter>().mesh;
-            DemToMeshUtils.GenerateMesh(DEMFilePath, mesh, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+            MeshFilter meshFilter = child.AddComponent<MeshFilter>();
+            meshFilter.mesh = DemToMeshUtils.GenerateMesh(DEMFilePath, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
         }
 
