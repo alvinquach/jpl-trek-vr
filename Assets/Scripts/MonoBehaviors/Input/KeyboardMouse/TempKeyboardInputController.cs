@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class TempKeyboardInputController : MonoBehaviour {
@@ -12,7 +13,13 @@ public class TempKeyboardInputController : MonoBehaviour {
         }
 
         if (Input.GetKeyUp(KeyCode.F)) {
-            WebServiceManager.Instance?.DataElevationModelWebService.GetDEM(null, null);
+            string destFileName = $"test{++count}.data";
+            WebServiceManager.Instance?.DataElevationModelWebService.GetDEM(null, destFileName, () => {
+                string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
+                TerrainMeshController terrainMeshController = TerrainMeshController.Instance;
+                TerrainMesh terrainMesh = terrainMeshController.Create(destFilePath);
+                terrainMeshController.ShowTerrainMesh(terrainMesh);
+            });
         }
 
     }

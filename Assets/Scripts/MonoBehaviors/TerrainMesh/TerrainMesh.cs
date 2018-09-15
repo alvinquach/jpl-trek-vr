@@ -85,4 +85,14 @@ public abstract class TerrainMesh : MonoBehaviour {
         // Mark the TerrainMesh as already initialized.
         _init = true;
     }
+
+    // TODO Set parameters properly.
+    public void InitMesh(string file) {
+        scale = 0.0069f;
+        _heightScale = 10;
+        _LODLevels = 0;
+        DEMFilePath = file;
+        InitMesh();
+    }
+
 }

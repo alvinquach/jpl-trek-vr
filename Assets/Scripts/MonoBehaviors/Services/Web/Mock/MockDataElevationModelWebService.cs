@@ -15,9 +15,9 @@ public class MockDataElevationModelWebService : DataElevationModelWebService {
         // TODO Implement this
     }
 
-    public override void GetDEM(string resourceUrl, VoidCallback callback) {
-        UnityWebRequest request = WebRequestUtils.Post("localhost:8080/rest/files/download", "C:/Users/Alvin/Desktop/temp/asdfasdf.png");
-        string dest = Path.Combine(FilePath.PersistentRoot, FilePath.Test, "test.png");
+    public override void GetDEM(string resourceUrl, string destPath, VoidCallback callback) {
+        UnityWebRequest request = WebRequestUtils.Post("localhost:8080/rest/files/download", "D:/Alvin/Downloads/Trek DEMs/mola128_mola64_merge_90Nto90S_SimpleC_clon0_small.tif");
+        string dest = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destPath);
         FileRequest(request, dest, callback);
     }
 
