@@ -25,8 +25,7 @@ public class TerrainMeshController : MonoBehaviour {
             // TEMPORARY -- DO THIS PROPERLY
             _defaultPlanetMesh.DEMFilePath = Path.Combine(
                 FilePath.StreamingAssetsRoot,
-                //FilePath.JetPropulsionLaboratory,
-                FilePath.Texture,
+                FilePath.JetPropulsionLaboratory,
                 FilePath.DataElevationModel,
                 _defaultPlanetMesh.DEMFilePath
             );

@@ -1,6 +1,3 @@
 [submodule "Assets/External"]
 	path = Assets/External
 	url = https://github.com/alvinquach/jpl-trek-vr-ext-assets.git
-[submodule "Assets/StreamingAssets/Textures"]
-	path = Assets/StreamingAssets/Textures
-	url = https://github.com/alvinquach/jpl-trek-vr-textures.git
