@@ -27,7 +27,7 @@ This section contains instructions on how to clone and setup the project for dev
 ### Prerequisites
 The following hardware/software is required:
 * All of the requirments as listed in the [requirements](https://github.com/alvinquach/jpl-trek-vr/blob/master/README.md#requirements) section.
-* [Unity Editor](https://unity3d.com/get-unity/download/archive) (currently being developed on 2018.2.0f2)
+* [Unity Editor](https://unity3d.com/get-unity/download/archive) (currently being developed on 2018.2.6f1)
 * Git and [Git LFS](https://git-lfs.github.com/)
 ### Repository Setup
 1. Clone this repository.
@@ -37,7 +37,7 @@ The following hardware/software is required:
    git clone https://github.com/alvinquach/jpl-trek-vr.git
    ```
 
-2. Init the submodules. This repository contains two submodules: [jpl-trek-vr-ext-assets](https://github.com/alvinquach/jpl-trek-vr-ext-assets) and [jpl-trek-vr-textures](https://github.com/alvinquach/jpl-trek-vr-textures).
+2. Init the submodules. This repository contains one submodule: [jpl-trek-vr-ext-assets](https://github.com/alvinquach/jpl-trek-vr-ext-assets)
 
    Example:
    ```
