@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Collections;
+using BitMiracle.LibTiff.Classic;
 
 public abstract class TerrainMesh : MonoBehaviour {
 
@@ -50,32 +51,38 @@ public abstract class TerrainMesh : MonoBehaviour {
         LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
         LOD[] lods = new LOD[_LODLevels + 1];
 
-        // Create a child GameObject containing a mesh for each LOD level.
-        for (int i = 0; i <= _LODLevels; i++) {
+        // Get Tiff file from the file path.
+        using (Tiff tiff = TiffUtils.FromFilePath(DEMFilePath)) {
 
-            GameObject child = new GameObject();
-            child.transform.SetParent(transform);
+            TiffUtils.PrintInfo(tiff, $"TIFF loaded from {DEMFilePath}");
 
-            // Name the LOD game object.
-            child.name = "LOD_" + i;
+            // Create a child GameObject containing a mesh for each LOD level.
+            for (int i = 0; i <= _LODLevels; i++) {
 
-            // Use the parent's tranformations.
-            child.transform.localPosition = Vector3.zero;
-            child.transform.localScale = Vector3.one;
-            child.transform.localEulerAngles = Vector3.zero;
+                GameObject child = new GameObject();
+                child.transform.SetParent(transform);
 
-            // Add MeshRenderer to child, and to the LOD group.
-            MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
-            lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _LODLevels, 2), new Renderer[] { meshRenderer });
+                // Name the LOD game object.
+                child.name = "LOD_" + i;
 
-            // Add material to the MeshRenderer.
-            if (_material != null) {
-                meshRenderer.material = _material;
+                // Use the parent's tranformations.
+                child.transform.localPosition = Vector3.zero;
+                child.transform.localScale = Vector3.one;
+                child.transform.localEulerAngles = Vector3.zero;
+
+                // Add MeshRenderer to child, and to the LOD group.
+                MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
+                lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _LODLevels, 2), new Renderer[] { meshRenderer });
+
+                // Add material to the MeshRenderer.
+                if (_material != null) {
+                    meshRenderer.material = _material;
+                }
+
+                MeshFilter meshFilter = child.AddComponent<MeshFilter>();
+                meshFilter.mesh = DemToMeshUtils.GenerateMesh(tiff, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+
             }
-
-            MeshFilter meshFilter = child.AddComponent<MeshFilter>();
-            meshFilter.mesh = DemToMeshUtils.GenerateMesh(DEMFilePath, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
-
         }
 
         // Assign LOD meshes to LOD group, and then recalculate bounds.
