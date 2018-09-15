@@ -21,7 +21,7 @@ public class DemToMeshUtils {
         // TODO Check if mesh is null
 
         if (String.IsNullOrEmpty(filePath)) {
-            throw new DataElevationModelNotFoundException("No TIFF file specified for " + typeof(DemToMeshUtils).Name);
+            throw new FileNotSpecifiedException("No TIFF file specified for " + typeof(DemToMeshUtils).Name);
         }
 
         // TODO Maybe support other image types?
@@ -29,7 +29,7 @@ public class DemToMeshUtils {
         using (Tiff tiff = Tiff.Open(filePath, "r")) {
 
             if (tiff == null) {
-                throw new DataElevationModelReadException("Cannot open TIFF from " + filePath);
+                throw new FileReadException("Cannot open TIFF from " + filePath);
             }
 
             return GenerateMesh(tiff, surfaceType, scale, heightScale, downsample);
@@ -51,7 +51,7 @@ public class DemToMeshUtils {
         using (Tiff tiff = Tiff.ClientOpen("in-memory", "r", new MemoryStream(bytes), new TiffStream())) {
 
             if (tiff == null) {
-                throw new DataElevationModelReadException("Cannot open TIFF from memory.");
+                throw new FileReadException("Cannot open TIFF from memory.");
             }
 
             return GenerateMesh(tiff, surfaceType, scale, heightScale, downsample);
@@ -69,7 +69,7 @@ public class DemToMeshUtils {
 
         // Currently, only 16-bit and 32-bit grayscale files are supported.
         if (bpp != 32 && bpp != 16 || spp != 1) {
-            throw new DataElevationModelFormatException("Invalid TIFF format. Only 16-bit and 32-bit grayscale files are supported.");
+            throw new FileFormatException("Invalid TIFF format. Only 16-bit and 32-bit grayscale files are supported.");
         }
 
         res = tiff.GetField(TiffTag.IMAGELENGTH);
