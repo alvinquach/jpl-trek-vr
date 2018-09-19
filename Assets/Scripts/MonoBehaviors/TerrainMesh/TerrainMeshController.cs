@@ -125,6 +125,13 @@ public class TerrainMeshController : MonoBehaviour {
     }
 
     /// <summary>
+    ///     Whether the default planet mesh is currently visible as per this controller.
+    /// </summary>
+    public bool DefaultPlanetMeshIsVisible() {
+        return _defaultPlanetMesh.gameObject.activeSelf;
+    }
+
+    /// <summary>
     ///     Shows the default planet mesh and hides the other TerrainMesh objects that
     ///     are managed by this controller.
     /// </summary>
