@@ -88,14 +88,14 @@ public abstract class TerrainMesh : MonoBehaviour {
         // Assign LOD meshes to LOD group.
         lodGroup.SetLODs(lods);
 
-        // Calculate bounds if there are more than one LOD level.
-        // If there is only one LOD level, then we can just 
-        // disable LOD, so there is no need to calculate bounds.
-        if (_LODLevels <= 1) {
-            lodGroup.enabled = false;
+        // Calculate bounds if there are one or more LOD level.
+        // If there are no LOD levels, then we can just disable
+        // LOD, so there is no need to calculate bounds.
+        if (_LODLevels > 0) {
+            lodGroup.RecalculateBounds();
         }
         else {
-            lodGroup.RecalculateBounds();
+            lodGroup.enabled = false;
         }
 
         // Mark the TerrainMesh as already initialized.
