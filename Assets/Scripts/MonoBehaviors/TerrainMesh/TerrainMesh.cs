@@ -32,7 +32,7 @@ public abstract class TerrainMesh : MonoBehaviour {
     }
 
     // Can only be called once.
-    public void InitMesh() {
+    public virtual void InitMesh() {
 
         // TerrrainMesh can only be initialized once.
         if (_init) {
