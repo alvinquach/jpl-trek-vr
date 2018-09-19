@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.IO;
 using System.Collections;
@@ -85,9 +85,18 @@ public abstract class TerrainMesh : MonoBehaviour {
             }
         }
 
-        // Assign LOD meshes to LOD group, and then recalculate bounds.
+        // Assign LOD meshes to LOD group.
         lodGroup.SetLODs(lods);
-        lodGroup.RecalculateBounds();
+
+        // Calculate bounds if there are more than one LOD level.
+        // If there is only one LOD level, then we can just 
+        // disable LOD, so there is no need to calculate bounds.
+        if (_LODLevels <= 1) {
+            lodGroup.enabled = false;
+        }
+        else {
+            lodGroup.RecalculateBounds();
+        }
 
         // Mark the TerrainMesh as already initialized.
         _init = true;
