@@ -35,6 +35,8 @@ public class DemToMeshUtils {
         // Init the byte array for holding the data read from each TIFF scanline.
         byte[] scanline = new byte[tiff.ScanlineSize()];
 
+        // TODO Separate this method into smaller methods for different surface types and/or scanline/tiled files.
+
         // Generate planar terrain mesh.
         if (surfaceType == TerrainGeometryType.Planar) {
 
@@ -46,26 +48,35 @@ public class DemToMeshUtils {
             Vector3[] vertices = new Vector3[hVertCount * vVertCount];
             Vector2[] uvs = new Vector2[hVertCount * vVertCount];
 
+            // For now, the scaling factor is based on the width of the DEM file.
+            float dimScale = scale / (hVertCount - 1);
+
             // Vertex counter
             int vertexIndex = 0;
 
             // Lowest height value
             float min = float.MaxValue;
 
+            float hOffset = scale / 2;
+            float vOffset = dimScale * (vVertCount - 1) / 2;
+
             for (int y = 0; y < vVertCount; y++) {
                 tiff.ReadScanline(scanline, y * downsample);
                 float[] values = bpp == 32 ? Scanline32ToFloat(scanline) : Scanline16ToFloat(scanline);
                 for (int x = 0; x < hVertCount; x++) {
-                    float value = values[x * downsample];
-                    vertices[vertexIndex] = new Vector3(x * scale, value * heightScale, y * scale);
+                    float value = values[x * downsample] * heightScale;
+                    vertices[vertexIndex] = new Vector3(x * dimScale - hOffset, value, y * dimScale - vOffset);
                     uvs[vertexIndex] = GenerateStandardUV(x, y, hVertCount, vVertCount);
                     min = value < min ? value : min;
                     vertexIndex++;
                 }
             }
 
-            // TODO Find a way to output the min value so that the mesh can be positioned correctly.
-            // transform.position -= min * heightScale * Vector3.up;
+            // TODO Is there a better way to do this?
+            for (int i = 0; i < vertices.Length; i++) {
+
+                vertices[i].y -= min;
+            }
 
             mesh.vertices = vertices;
             mesh.uv = uvs;
@@ -133,7 +144,6 @@ public class DemToMeshUtils {
 
         return mesh;
     }
-
 
     #region Bit Conversion Methods
 
