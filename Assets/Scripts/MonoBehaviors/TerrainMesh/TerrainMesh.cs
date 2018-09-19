@@ -18,7 +18,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     [SerializeField] protected int _LODLevels = 2;
 
-    [SerializeField] protected Material _material;
+    public Material Material;
 
     // TODO Add option to use linear LOD downsampling.
 
@@ -75,8 +75,8 @@ public abstract class TerrainMesh : MonoBehaviour {
                 lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _LODLevels, 2), new Renderer[] { meshRenderer });
 
                 // Add material to the MeshRenderer.
-                if (_material != null) {
-                    meshRenderer.material = _material;
+                if (Material != null) {
+                    meshRenderer.material = Material;
                 }
 
                 MeshFilter meshFilter = child.AddComponent<MeshFilter>();

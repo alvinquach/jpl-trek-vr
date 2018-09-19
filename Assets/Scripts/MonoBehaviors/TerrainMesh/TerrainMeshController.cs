@@ -52,6 +52,8 @@ public class TerrainMeshController : MonoBehaviour {
     /// </summary>
     public static TerrainMeshController Instance { get; private set; }
 
+    public Material DefaultMaterial;
+
     // TODO Generate this instead of drag and drop from Unity.
     // Also store it inside a wrapper?
     [SerializeField]
@@ -91,6 +93,7 @@ public class TerrainMeshController : MonoBehaviour {
 
         PlanarTerrainMesh terrainMesh = newMesh.AddComponent<PlanarTerrainMesh>();
         try {
+            terrainMesh.Material = DefaultMaterial;
             terrainMesh.InitMesh(demPath);
         }
         catch (Exception e) {
