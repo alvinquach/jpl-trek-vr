@@ -13,7 +13,7 @@ public class SphericalTerrainMesh : TerrainMesh {
 
         // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
         SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-        collider.radius = scale;
+        collider.radius = _scale;
     }
 
 }

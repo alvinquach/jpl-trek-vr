@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.IO;
 using System.Collections;
@@ -10,13 +10,37 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public string AlbedoFilePath;
 
-    public float scale; // TODO Do get/set properly.
+    [SerializeField]
+    protected float _scale;
 
-    [SerializeField] protected float _heightScale = 1.0f;
+    public float Scale {
+        get { return _scale; }
+        set { if (!_init) _scale = value; }
+    }   
 
-    [SerializeField] protected int _baseDownsampleLevel = 2;
+    [SerializeField]
+    protected float _heightScale = 1.0f;
 
-    [SerializeField] protected int _LODLevels = 2;
+    public float HeightScale {
+        get { return _heightScale; }
+        set { if (!_init) _heightScale = value; }
+    }
+
+    [SerializeField]
+    protected int _baseDownsampleLevel = 2;
+
+    public int BaseDownSampleLevel {
+        get { return _baseDownsampleLevel; }
+        set { if (!_init) _baseDownsampleLevel = value; }
+    }
+
+    [SerializeField]
+    protected int _LODLevels = 2;
+
+    public int LodLevels {
+        get { return _LODLevels; }
+        set { if (!_init) _LODLevels = value; }
+    }
 
     public Material Material;
 
@@ -80,7 +104,7 @@ public abstract class TerrainMesh : MonoBehaviour {
                 }
 
                 MeshFilter meshFilter = child.AddComponent<MeshFilter>();
-                meshFilter.mesh = DemToMeshUtils.GenerateMesh(tiff, SurfaceGeometryType, scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+                meshFilter.mesh = DemToMeshUtils.GenerateMesh(tiff, SurfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
             }
         }
@@ -100,15 +124,6 @@ public abstract class TerrainMesh : MonoBehaviour {
 
         // Mark the TerrainMesh as already initialized.
         _init = true;
-    }
-
-    // TODO Set parameters properly.
-    public void InitMesh(string file) {
-        scale = 1;
-        _heightScale = 0.000001f;
-        _LODLevels = 0;
-        DEMFilePath = file;
-        InitMesh();
     }
 
 }

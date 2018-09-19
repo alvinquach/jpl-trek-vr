@@ -52,7 +52,8 @@ public class TerrainMeshController : MonoBehaviour {
     /// </summary>
     public static TerrainMeshController Instance { get; private set; }
 
-    public Material DefaultMaterial;
+    [SerializeField]
+    private Material _defaultMaterial;
 
     // TODO Generate this instead of drag and drop from Unity.
     // Also store it inside a wrapper?
@@ -93,8 +94,13 @@ public class TerrainMeshController : MonoBehaviour {
 
         PlanarTerrainMesh terrainMesh = newMesh.AddComponent<PlanarTerrainMesh>();
         try {
-            terrainMesh.Material = DefaultMaterial;
-            terrainMesh.InitMesh(demPath);
+            terrainMesh.Scale = 1.5f;
+            terrainMesh.HeightScale = 0.000002f;
+            terrainMesh.LodLevels = 0;
+            terrainMesh.BaseDownSampleLevel = 8;
+            terrainMesh.Material = _defaultMaterial;
+            terrainMesh.DEMFilePath = demPath;
+            terrainMesh.InitMesh();
         }
         catch (Exception e) {
             Debug.LogError(e.Message);
