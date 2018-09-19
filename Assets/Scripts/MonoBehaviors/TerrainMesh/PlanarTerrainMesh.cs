@@ -10,7 +10,7 @@ public class PlanarTerrainMesh : TerrainMesh {
         base.InitMesh();
 
         // TEMPORARY
-        transform.localPosition = new Vector3(0, 0.1f, 0);
+        transform.localPosition = new Vector3(0, 0.31f, 0);
     }
 
 }
