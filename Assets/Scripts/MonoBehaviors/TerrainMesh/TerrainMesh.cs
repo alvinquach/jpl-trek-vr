@@ -104,7 +104,8 @@ public abstract class TerrainMesh : MonoBehaviour {
                 }
 
                 MeshFilter meshFilter = child.AddComponent<MeshFilter>();
-                meshFilter.mesh = DemToMeshUtils.GenerateMesh(tiff, SurfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
+                meshFilter.mesh = GenerateMesh(tiff);
+                //meshFilter.mesh = DemToMeshUtils.GenerateMesh(tiff, SurfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
             }
         }
@@ -125,5 +126,11 @@ public abstract class TerrainMesh : MonoBehaviour {
         // Mark the TerrainMesh as already initialized.
         _init = true;
     }
+
+    /// <summary>
+    ///     The implementing subclass should make a call to the correct method
+    ///     in DemToMeshUtils for generating the corresponding mesh type.
+    /// </summary>
+    protected abstract Mesh GenerateMesh(Tiff tiff);
 
 }
