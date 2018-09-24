@@ -53,7 +53,16 @@ public class TerrainMeshController : MonoBehaviour {
     public static TerrainMeshController Instance { get; private set; }
 
     [SerializeField]
+    [Tooltip("The default material that is used as a base for new terrain meshes.")]
     private Material _defaultMaterial;
+
+    /// <summary>
+    ///     The default material that is used as a base for new terrain meshes.
+    /// </summary>
+    public Material DefaultMaterial {
+        get { return _defaultMaterial; }
+        set { _defaultMaterial = value; }
+    }
 
     // TODO Generate this instead of drag and drop from Unity.
     // Also store it inside a wrapper?
@@ -72,11 +81,19 @@ public class TerrainMeshController : MonoBehaviour {
         if (_defaultPlanetMesh != null) {
 
             // TEMPORARY -- DO THIS PROPERLY
-            _defaultPlanetMesh.DEMFilePath = Path.Combine(
+            _defaultPlanetMesh.DemFilePath = Path.Combine(
                 FilePath.StreamingAssetsRoot,
                 FilePath.JetPropulsionLaboratory,
                 FilePath.DataElevationModel,
-                _defaultPlanetMesh.DEMFilePath
+                _defaultPlanetMesh.DemFilePath
+            );
+
+            // ALSO TEMPORARY
+            _defaultPlanetMesh.AlbedoFilePath = Path.Combine(
+                FilePath.StreamingAssetsRoot,
+                FilePath.JetPropulsionLaboratory,
+                FilePath.Texture,
+                _defaultPlanetMesh.AlbedoFilePath
             );
 
             _defaultPlanetMesh.gameObject.SetActive(true);
@@ -98,8 +115,7 @@ public class TerrainMeshController : MonoBehaviour {
             terrainMesh.HeightScale = 0.000002f;
             terrainMesh.LodLevels = 0;
             terrainMesh.BaseDownSampleLevel = 8;
-            terrainMesh.Material = _defaultMaterial;
-            terrainMesh.DEMFilePath = demPath;
+            terrainMesh.DemFilePath = demPath;
             terrainMesh.InitMesh();
         }
         catch (Exception e) {

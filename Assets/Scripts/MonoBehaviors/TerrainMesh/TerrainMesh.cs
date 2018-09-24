@@ -6,9 +6,21 @@ using BitMiracle.LibTiff.Classic;
 
 public abstract class TerrainMesh : MonoBehaviour {
 
-    public string DEMFilePath;
+    [SerializeField]
+    protected string _demFilePath;
 
-    public string AlbedoFilePath;
+    public string DemFilePath {
+        get { return _demFilePath; }
+        set { if (!_init) _demFilePath = value; }
+    }
+
+    [SerializeField]
+    protected string _albedoFilePath;
+
+    public string AlbedoFilePath {
+        get { return _albedoFilePath; }
+        set { if (!_init) _albedoFilePath = value; }
+    }
 
     // TODO Split this into 'radius' and 'size' for spherical 
     // and planar meshes, respectively.
@@ -37,14 +49,14 @@ public abstract class TerrainMesh : MonoBehaviour {
     }
 
     [SerializeField]
-    protected int _LODLevels = 2;
+    protected int _lodLevels = 2;
 
     public int LodLevels {
-        get { return _LODLevels; }
-        set { if (!_init) _LODLevels = value; }
+        get { return _lodLevels; }
+        set { if (!_init) _lodLevels = value; }
     }
 
-    public Material Material;
+    public Material Material { get; set; }
 
     // TODO Add option to use linear LOD downsampling.
 
@@ -65,9 +77,14 @@ public abstract class TerrainMesh : MonoBehaviour {
             return;
         }
 
-        //if (DEMFile == null) {
-        //    throw new Exception("Cannot create mesh. DEM file not definded.");
-        //}
+        // If material was not set, then generate a meterial for the mesh,
+        // or use the default material if it failed to generate.
+        if (Material == null) {
+            Material = GenerateMaterial();
+            if (Material == null) {
+                Material = TerrainMeshController.Instance.DefaultMaterial;
+            }
+        }
 
         // Minimum base downsampling level should be 1.
         _baseDownsampleLevel = _baseDownsampleLevel < 1 ? 1 : _baseDownsampleLevel;
@@ -75,15 +92,15 @@ public abstract class TerrainMesh : MonoBehaviour {
         // Add LOD group manager.
         // TODO Make this a class member variable.
         LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
-        LOD[] lods = new LOD[_LODLevels + 1];
+        LOD[] lods = new LOD[_lodLevels + 1];
 
         // Get Tiff file from the file path.
-        using (Tiff tiff = TiffUtils.FromFilePath(DEMFilePath)) {
+        using (Tiff tiff = TiffUtils.FromFilePath(_demFilePath)) {
 
-            TiffUtils.PrintInfo(tiff, $"TIFF loaded from {DEMFilePath}");
+            TiffUtils.PrintInfo(tiff, $"TIFF loaded from {_demFilePath}");
 
             // Create a child GameObject containing a mesh for each LOD level.
-            for (int i = 0; i <= _LODLevels; i++) {
+            for (int i = 0; i <= _lodLevels; i++) {
 
                 GameObject child = new GameObject();
                 child.transform.SetParent(transform);
@@ -98,7 +115,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
                 // Add MeshRenderer to child, and to the LOD group.
                 MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
-                lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _LODLevels, 2), new Renderer[] { meshRenderer });
+                lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _lodLevels, 2), new Renderer[] { meshRenderer });
 
                 // Add material to the MeshRenderer.
                 if (Material != null) {
@@ -118,7 +135,7 @@ public abstract class TerrainMesh : MonoBehaviour {
         // Calculate bounds if there are one or more LOD level.
         // If there are no LOD levels, then we can just disable
         // LOD, so there is no need to calculate bounds.
-        if (_LODLevels > 0) {
+        if (_lodLevels > 0) {
             lodGroup.RecalculateBounds();
         }
         else {
@@ -134,5 +151,16 @@ public abstract class TerrainMesh : MonoBehaviour {
     ///     in DemToMeshUtils for generating the corresponding mesh type.
     /// </summary>
     protected abstract Mesh GenerateMesh(Tiff tiff);
+
+    protected virtual Material GenerateMaterial() {
+        Material defaultMaterial = TerrainMeshController.Instance.DefaultMaterial;
+        Texture2D texture = TextureUtils.GenereateTextureFromTiff(_albedoFilePath);
+        if (texture == null || defaultMaterial == null) {
+            return null; // TODO Throw exception
+        }
+        Material material = new Material(defaultMaterial);
+        material.SetTexture("_MainTex", texture);
+        return material;
+    }
 
 }
