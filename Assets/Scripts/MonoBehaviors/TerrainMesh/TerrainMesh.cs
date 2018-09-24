@@ -95,9 +95,7 @@ public abstract class TerrainMesh : MonoBehaviour {
         LOD[] lods = new LOD[_lodLevels + 1];
 
         // Get Tiff file from the file path.
-        using (Tiff tiff = TiffUtils.FromFilePath(_demFilePath)) {
-
-            TiffUtils.PrintInfo(tiff, $"TIFF loaded from {_demFilePath}");
+        using (TiffTerrainMeshGenerator meshGenerator = new TiffTerrainMeshGenerator(_demFilePath)) {
 
             // Create a child GameObject containing a mesh for each LOD level.
             for (int i = 0; i <= _lodLevels; i++) {
@@ -123,7 +121,7 @@ public abstract class TerrainMesh : MonoBehaviour {
                 }
 
                 MeshFilter meshFilter = child.AddComponent<MeshFilter>();
-                meshFilter.mesh = GenerateMesh(tiff);
+                meshFilter.mesh = GenerateMesh(meshGenerator, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
                 //meshFilter.mesh = DemToMeshUtils.GenerateMesh(tiff, SurfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
 
             }
@@ -150,7 +148,7 @@ public abstract class TerrainMesh : MonoBehaviour {
     ///     The implementing subclass should make a call to the correct method
     ///     in DemToMeshUtils for generating the corresponding mesh type.
     /// </summary>
-    protected abstract Mesh GenerateMesh(Tiff tiff);
+    protected abstract Mesh GenerateMesh(TiffTerrainMeshGenerator meshGenerator, int downsample);
 
     protected virtual Material GenerateMaterial() {
         Material defaultMaterial = TerrainMeshController.Instance.DefaultMaterial;

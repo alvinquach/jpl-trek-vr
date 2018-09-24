@@ -17,8 +17,8 @@ public class SphericalTerrainMesh : TerrainMesh {
         collider.radius = _scale;
     }
 
-    protected override Mesh GenerateMesh(Tiff tiff) {
-        return DemToMeshUtils.GenerateSphericalMesh(tiff, _scale, _heightScale, _baseDownsampleLevel);
+    protected override Mesh GenerateMesh(TiffTerrainMeshGenerator meshGenerator, int downsample) {
+        return meshGenerator.GenerateSphericalMesh(_scale, _heightScale, downsample);
     }
 
 }

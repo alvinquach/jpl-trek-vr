@@ -14,8 +14,8 @@ public class PlanarTerrainMesh : TerrainMesh {
         transform.localPosition = new Vector3(0, 0.31f, 0);
     }
 
-    protected override Mesh GenerateMesh(Tiff tiff) {
-        return DemToMeshUtils.GeneratePlanarMesh(tiff, _scale, _heightScale, _baseDownsampleLevel);
+    protected override Mesh GenerateMesh(TiffTerrainMeshGenerator meshGenerator, int downsample) {
+        return meshGenerator.GeneratePlanarMesh(_scale, _heightScale, downsample);
     }
 
 }
