@@ -12,6 +12,8 @@ public abstract class WebService {
 
     // TODO Convert IEnumerator coroutines to async-await functions.
 
+    // TODO We need to keep grack of all web requests that have to be
+    // sent so that we can abort the requests at any time.
 
     /// <summary>
     ///     Starts the coroutine for asynchronously making an HTTP request.

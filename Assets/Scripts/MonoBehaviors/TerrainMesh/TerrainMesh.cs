@@ -10,6 +10,8 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public string AlbedoFilePath;
 
+    // TODO Split this into 'radius' and 'size' for spherical 
+    // and planar meshes, respectively.
     [SerializeField]
     protected float _scale;
 
