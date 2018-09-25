@@ -116,7 +116,7 @@ public class TerrainMeshController : MonoBehaviour {
             terrainMesh.LodLevels = 0;
             terrainMesh.BaseDownSampleLevel = 8;
             terrainMesh.DemFilePath = demPath;
-            terrainMesh.InitMesh();
+            terrainMesh.GenerateMeshData();
         }
         catch (Exception e) {
             Debug.LogError(e.Message);

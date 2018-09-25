@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Collections;
+using System.Threading;
 using BitMiracle.LibTiff.Classic;
 
 public abstract class TerrainMesh : MonoBehaviour {
@@ -11,7 +12,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public string DemFilePath {
         get { return _demFilePath; }
-        set { if (!_init) _demFilePath = value; }
+        set { if (!_initStarted) _demFilePath = value; }
     }
 
     [SerializeField]
@@ -19,7 +20,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public string AlbedoFilePath {
         get { return _albedoFilePath; }
-        set { if (!_init) _albedoFilePath = value; }
+        set { if (!_initStarted) _albedoFilePath = value; }
     }
 
     // TODO Split this into 'radius' and 'size' for spherical 
@@ -29,7 +30,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public float Scale {
         get { return _scale; }
-        set { if (!_init) _scale = value; }
+        set { if (!_initStarted) _scale = value; }
     }   
 
     [SerializeField]
@@ -37,7 +38,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public float HeightScale {
         get { return _heightScale; }
-        set { if (!_init) _heightScale = value; }
+        set { if (!_initStarted) _heightScale = value; }
     }
 
     [SerializeField]
@@ -45,37 +46,49 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public int BaseDownSampleLevel {
         get { return _baseDownsampleLevel; }
-        set { if (!_init) _baseDownsampleLevel = value; }
+        set { if (!_initStarted) _baseDownsampleLevel = value; }
     }
+
+    // TODO Add option to use linear LOD downsampling.
 
     [SerializeField]
     protected int _lodLevels = 2;
 
     public int LodLevels {
         get { return _lodLevels; }
-        set { if (!_init) _lodLevels = value; }
+        set { if (!_initStarted) _lodLevels = value; }
     }
 
     public Material Material { get; set; }
 
-    // TODO Add option to use linear LOD downsampling.
+    protected bool _initStarted = false;
+    protected bool _initCompleted = false;
 
-    public abstract TerrainGeometryType SurfaceGeometryType { get; }
-
-    protected bool _init = false;
+    protected abstract TiffTerrainMeshGenerator MeshGenerator { get; }
 
     // Use this for initialization
     void Start() {
-        InitMesh();
+        GenerateMeshData();
+    }
+
+    void Update() {
+        if (!_initCompleted && MeshGenerator.Complete) {
+            ProcessMeshData();
+            _initCompleted = true;
+        }
     }
 
     // Can only be called once.
-    public virtual void InitMesh() {
-
-        // TerrrainMesh can only be initialized once.
-        if (_init) {
+    public virtual void GenerateMeshData() {
+        if (_initStarted) {
             return;
         }
+
+        MeshGenerator.GenerateAsync(_scale, _heightScale, _lodLevels, _baseDownsampleLevel);
+        _initStarted = true;
+    }
+
+    protected virtual void ProcessMeshData() {
 
         // If material was not set, then generate a meterial for the mesh,
         // or use the default material if it failed to generate.
@@ -95,36 +108,49 @@ public abstract class TerrainMesh : MonoBehaviour {
         LOD[] lods = new LOD[_lodLevels + 1];
 
         // Get Tiff file from the file path.
-        using (TiffTerrainMeshGenerator meshGenerator = new TiffTerrainMeshGenerator(_demFilePath)) {
 
-            // Create a child GameObject containing a mesh for each LOD level.
-            for (int i = 0; i <= _lodLevels; i++) {
+        // Create a child GameObject containing a mesh for each LOD level.
+        for (int i = 0; i <= _lodLevels; i++) {
 
-                GameObject child = new GameObject();
-                child.transform.SetParent(transform);
+            GameObject child = new GameObject();
+            child.transform.SetParent(transform);
 
-                // Name the LOD game object.
-                child.name = "LOD_" + i;
+            // Name the LOD game object.
+            child.name = "LOD_" + i;
 
-                // Use the parent's tranformations.
-                child.transform.localPosition = Vector3.zero;
-                child.transform.localScale = Vector3.one;
-                child.transform.localEulerAngles = Vector3.zero;
+            // Use the parent's tranformations.
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localScale = Vector3.one;
+            child.transform.localEulerAngles = Vector3.zero;
 
-                // Add MeshRenderer to child, and to the LOD group.
-                MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
-                lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _lodLevels, 2), new Renderer[] { meshRenderer });
+            // Add MeshRenderer to child, and to the LOD group.
+            MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
+            lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _lodLevels, 2), new Renderer[] { meshRenderer });
 
-                // Add material to the MeshRenderer.
-                if (Material != null) {
-                    meshRenderer.material = Material;
-                }
-
-                MeshFilter meshFilter = child.AddComponent<MeshFilter>();
-                meshFilter.mesh = GenerateMesh(meshGenerator, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
-                //meshFilter.mesh = DemToMeshUtils.GenerateMesh(tiff, SurfaceGeometryType, _scale, _heightScale, _baseDownsampleLevel * (int)Mathf.Pow(2, i));
-
+            // Add material to the MeshRenderer.
+            if (Material != null) {
+                meshRenderer.material = Material;
             }
+
+            MeshFilter meshFilter = child.AddComponent<MeshFilter>();
+
+            Mesh mesh = new Mesh();
+
+            // Set the index format of the mesh to 32-bits, so that the mesh can have more than 65k vertices.
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+
+            // Assign mesh data
+            MeshData meshData = MeshGenerator.MeshData[i];
+            mesh.vertices = meshData.Vertices;
+            mesh.uv = meshData.TexCoords;
+            mesh.triangles = meshData.Triangles;
+
+            // This is a time consuming operation, and may cause the app to pause
+            // for a couple of miliseconds since it runs on the main thread.
+            mesh.RecalculateNormals();
+
+            meshFilter.mesh = mesh;
+
         }
 
         // Assign LOD meshes to LOD group.
@@ -140,15 +166,7 @@ public abstract class TerrainMesh : MonoBehaviour {
             lodGroup.enabled = false;
         }
 
-        // Mark the TerrainMesh as already initialized.
-        _init = true;
     }
-
-    /// <summary>
-    ///     The implementing subclass should make a call to the correct method
-    ///     in DemToMeshUtils for generating the corresponding mesh type.
-    /// </summary>
-    protected abstract Mesh GenerateMesh(TiffTerrainMeshGenerator meshGenerator, int downsample);
 
     protected virtual Material GenerateMaterial() {
         Material defaultMaterial = TerrainMeshController.Instance.DefaultMaterial;

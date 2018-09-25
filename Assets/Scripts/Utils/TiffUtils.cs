@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class TiffUtils {
 
+    #region Tiff Object Constructors
+
     public static Tiff FromFilePath(string filePath) {
 
         if (String.IsNullOrEmpty(filePath)) {
@@ -30,6 +32,40 @@ public class TiffUtils {
 
         return tiff;
     }
+
+    #endregion
+
+    #region Bit Conversion Methods
+
+    public static float[] Scanline32ToFloat(byte[] scanline) {
+        if (scanline.Length % 4 != 0) {
+            return null;
+        }
+        int length = scanline.Length / 4;
+        float[] result = new float[length];
+        for (int i = 0; i < length; i++) {
+            // TODO Check if CPU uses little endian.
+            result[i] = BitConverter.ToSingle(scanline, 4 * i);
+        }
+        return result;
+    }
+
+    public static float[] Scanline16ToFloat(byte[] scanline) {
+        if (scanline.Length % 2 != 0) {
+            return null;
+        }
+        int length = scanline.Length / 2;
+        float[] result = new float[length];
+        for (int i = 0; i < length; i++) {
+            // TODO Check if CPU uses little endian.
+            result[i] = BitConverter.ToInt16(scanline, 2 * i);
+        }
+        return result;
+    }
+
+    #endregion
+
+    #region Metadata Methods
 
     public static void PrintInfo(Tiff tiff, string header = "TIFF Info:") {
 
@@ -60,5 +96,7 @@ public class TiffUtils {
             Tiled = tiff.IsTiled(),
         };
     }
+
+    #endregion
 
 }

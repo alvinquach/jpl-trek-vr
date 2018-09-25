@@ -3,19 +3,22 @@ using UnityEngine;
 
 public class PlanarTerrainMesh : TerrainMesh {
 
-    public override TerrainGeometryType SurfaceGeometryType {
-        get { return TerrainGeometryType.Planar; }
+    private TiffTerrainMeshGenerator _meshGenerator;
+
+    protected override TiffTerrainMeshGenerator MeshGenerator {
+        get {
+            if (_meshGenerator == null) {
+                _meshGenerator = new TiffPlanarTerrainMeshGenerator(_demFilePath);
+            }
+            return _meshGenerator;
+        }
     }
 
-    public override void InitMesh() {
-        base.InitMesh();
+    protected override void ProcessMeshData() {
+        base.ProcessMeshData();
 
         // TEMPORARY
         transform.localPosition = new Vector3(0, 0.31f, 0);
-    }
-
-    protected override Mesh GenerateMesh(TiffTerrainMeshGenerator meshGenerator, int downsample) {
-        return meshGenerator.GeneratePlanarMesh(_scale, _heightScale, downsample);
     }
 
 }

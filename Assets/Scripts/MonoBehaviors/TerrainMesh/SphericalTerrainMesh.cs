@@ -3,22 +3,23 @@ using BitMiracle.LibTiff.Classic;
 
 public class SphericalTerrainMesh : TerrainMesh {
 
-    //[SerializeField] private string _filePath;
+    private TiffTerrainMeshGenerator _meshGenerator;
 
-    public override TerrainGeometryType SurfaceGeometryType {
-        get { return TerrainGeometryType.Spherical; }
+    protected override TiffTerrainMeshGenerator MeshGenerator {
+        get {
+            if (_meshGenerator == null) {
+                _meshGenerator = new TiffSphericalTerrainMeshGenerator(_demFilePath);
+            }
+            return _meshGenerator;
+        }
     }
 
-    public override void InitMesh() {
-        base.InitMesh();
+    protected override void ProcessMeshData() {
+        base.ProcessMeshData();
 
         // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
         SphereCollider collider = gameObject.AddComponent<SphereCollider>();
         collider.radius = _scale;
-    }
-
-    protected override Mesh GenerateMesh(TiffTerrainMeshGenerator meshGenerator, int downsample) {
-        return meshGenerator.GenerateSphericalMesh(_scale, _heightScale, downsample);
     }
 
 }
