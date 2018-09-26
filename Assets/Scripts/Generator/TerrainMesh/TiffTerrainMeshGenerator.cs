@@ -1,4 +1,4 @@
-﻿using BitMiracle.LibTiff.Classic;
+using BitMiracle.LibTiff.Classic;
 using System;
 using System.Threading;
 using UnityEngine;
@@ -52,15 +52,6 @@ public abstract class TiffTerrainMeshGenerator {
             throw new FileFormatException("Invalid TIFF format. Only 16-bit and 32-bit grayscale files are supported.");
         }
 
-    }
-
-    private Mesh CreateNewMesh() {
-        Mesh mesh = new Mesh();
-
-        // Set the index format of the mesh to 32-bits, so that the mesh can have more than 65k vertices.
-        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-
-        return mesh;
     }
 
     protected int[] GenerateTriangles(int hVertCount, int vVertCount) {
