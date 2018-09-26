@@ -59,17 +59,16 @@ public class TiffSphericalTerrainMeshGenerator : TiffTerrainMeshGenerator {
             }
         }
 
-        int[] tris = GenerateTriangles(lonVertCount, latVertCount);
-
         return new MeshData() {
             Vertices = verts,
             TexCoords = uvs,
-            Triangles = tris
+            Triangles = GenerateTriangles(lonVertCount, latVertCount)
         };
 
     }
 
     protected override MeshData GenerateForTiles(Tiff tiffImage, TiffInfo info, int downsample) {
+        // TODO Implement this
         throw new System.NotImplementedException();
     }
 
