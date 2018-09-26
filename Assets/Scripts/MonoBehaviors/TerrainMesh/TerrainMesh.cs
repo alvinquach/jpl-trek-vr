@@ -23,16 +23,6 @@ public abstract class TerrainMesh : MonoBehaviour {
         set { if (!_initStarted) _albedoFilePath = value; }
     }
 
-    // TODO Split this into 'radius' and 'size' for spherical 
-    // and planar meshes, respectively.
-    [SerializeField]
-    protected float _scale;
-
-    public float Scale {
-        get { return _scale; }
-        set { if (!_initStarted) _scale = value; }
-    }   
-
     [SerializeField]
     protected float _heightScale = 1.0f;
 
@@ -84,7 +74,7 @@ public abstract class TerrainMesh : MonoBehaviour {
             return;
         }
 
-        MeshGenerator.GenerateAsync(_scale, _heightScale, _lodLevels, _baseDownsampleLevel);
+        MeshGenerator.GenerateAsync();
         _initStarted = true;
     }
 

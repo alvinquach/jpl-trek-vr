@@ -111,7 +111,7 @@ public class TerrainMeshController : MonoBehaviour {
 
         PlanarTerrainMesh terrainMesh = newMesh.AddComponent<PlanarTerrainMesh>();
         try {
-            terrainMesh.Scale = 1.5f;
+            terrainMesh.Size = 1.5f;
             terrainMesh.HeightScale = 0.000002f;
             terrainMesh.LodLevels = 0;
             terrainMesh.BaseDownSampleLevel = 8;

@@ -1,4 +1,4 @@
-using BitMiracle.LibTiff.Classic;
+﻿using BitMiracle.LibTiff.Classic;
 using System;
 using System.Threading;
 using UnityEngine;
@@ -6,6 +6,12 @@ using UnityEngine;
 public abstract class TiffTerrainMeshGenerator {
 
     protected string _filepath;
+
+    protected float _heightScale;
+
+    protected int _lodLevels;
+
+    protected int _baseDownsample;
 
     public MeshData[] MeshData { get; protected set; }
 
@@ -15,25 +21,64 @@ public abstract class TiffTerrainMeshGenerator {
 
     public float Progress { get; protected set; } = 0f;
 
-    public TiffTerrainMeshGenerator(string filepath) {
+    public TiffTerrainMeshGenerator(string filepath, float heightScale, int lodLevels, int baseDownsample) {
         _filepath = filepath;
+        _heightScale = heightScale;
+        _lodLevels = lodLevels;
+        _baseDownsample = baseDownsample;
     }
 
     // TODO Use a struct or class to pass DEM metadata (ie. scale) to the GenerateMesh methods.
     // TODO Maybe support other image types?
 
-    public abstract MeshData[] Generate(float scale, float heightScale, int lodLevels, int baseDownsample);
+    public void Generate() {
 
-    public void GenerateAsync(float scale, float heightScale, int lodLevels, int baseDownsample) {
+        using (Tiff tiffImage = TiffUtils.FromFilePath(_filepath)) {
+
+            // Extract info from TIFF data.
+            TiffInfo info = TiffUtils.GetInfo(tiffImage);
+
+            // Check if the TIFF data is valid for mesh generation.
+            // Exceptions are thrown if the TIFF is not valid.
+            ValidateTiff(info);
+
+            MeshData[] meshData = new MeshData[_lodLevels + 1];
+
+            // Init the byte array for holding the data read from each TIFF scanline.
+            // byte[] scanline = new byte[tiffImage.ScanlineSize()];
+
+            for (int lodLevel = 0; lodLevel <= _lodLevels; lodLevel++) {
+                int downsample = lodLevel + _baseDownsample;
+
+                meshData[lodLevel] = info.Tiled?
+                    GenerateForTiles(tiffImage, info, downsample):
+                    GenerateForScanlines(tiffImage, info, downsample);
+            }
+
+            InProgress = false;
+            Complete = true;
+            Progress = 1f;
+            MeshData = meshData;
+        }
+
+    }
+
+    public void GenerateAsync() {
 
         Thread meshGenerationThread = new Thread(
-            new ThreadStart(() => {
-                Generate(scale, heightScale, lodLevels, baseDownsample);
-            })
+            new ThreadStart(Generate)
         );
 
         meshGenerationThread.Start();
     }
+
+    // TODO Modify the implementations of the functions below such
+    // that they generate all the LODs at the same time, instead of
+    // having to read the image data once for each LOD.
+
+    protected abstract MeshData GenerateForScanlines(Tiff tiffImage, TiffInfo info, int downsample);
+
+    protected abstract MeshData GenerateForTiles(Tiff tiffImage, TiffInfo info, int downsample);
 
     /// <summary>
     ///     Checks of the Tiff image can be used as a height map for generating meshes.

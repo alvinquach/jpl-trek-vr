@@ -54,7 +54,7 @@ public class BookmarkMenuTest : MonoBehaviour {
                 pin.transform.Rotate(planet.transform.right, -centerCoords.x, Space.World);
                 pin.transform.Rotate(planet.transform.up, -centerCoords.y, Space.World);
 
-                pin.transform.position = planet.transform.position + planet.transform.localScale.x * planet.Scale * pin.transform.forward;
+                pin.transform.position = planet.transform.position + planet.transform.localScale.x * planet.Radius * pin.transform.forward;
 
                 pin.transform.forward = planet.transform.position - pin.transform.position;
 
