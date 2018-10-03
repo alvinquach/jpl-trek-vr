@@ -159,13 +159,25 @@ public abstract class TerrainMesh : MonoBehaviour {
     }
 
     protected virtual Material GenerateMaterial() {
-        Material defaultMaterial = TerrainMeshController.Instance.DefaultMaterial;
-        Texture2D texture = TextureUtils.GenereateTextureFromTiff(_albedoFilePath);
-        if (texture == null || defaultMaterial == null) {
+
+        // TODO This is temporary
+        TiffTexture2DConverter textureConverter = new TiffTexture2DConverter(null, 256, 256);
+        textureConverter.Convert();
+
+        Texture2D texture = new Texture2D(256, 256);
+        Debug.Log(texture.format);
+        texture.SetPixels32(textureConverter.Pixels);
+        texture.Apply();
+        texture.Compress(true);
+        Debug.Log(texture.format);
+
+        if (texture == null) {
             return null; // TODO Throw exception
         }
-        Material material = new Material(defaultMaterial);
-        material.SetTexture("_MainTex", texture);
+
+        Material material = new Material(Shader.Find("Standard"));
+        material.SetColor("_Color", Color.white); // Set color to white so it doesn't tint the albedo.
+        material.SetTexture("_MainTex", texture); // Set albedo texture.
         return material;
     }
 
