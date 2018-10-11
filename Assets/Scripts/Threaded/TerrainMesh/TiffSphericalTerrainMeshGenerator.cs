@@ -39,7 +39,7 @@ public class TiffSphericalTerrainMeshGenerator : TiffTerrainMeshGenerator {
 
         for (int y = 0; y < latVertCount; y++) {
             tiffImage.ReadScanline(scanline, y * downsample);
-            float[] values = info.BPP == 32 ? TiffUtils.Scanline32ToFloat(scanline) : TiffUtils.Scanline16ToFloat(scanline);
+            float[] values = info.BPP == 32 ? TiffUtils.Array32ToFloat(scanline) : TiffUtils.Array16ToFloat(scanline);
 
             // Calculate the actual angle of the latitude.
             float latAng = latStepSize * y + Mathf.PI / 2;

@@ -38,7 +38,7 @@ public class TiffPlanarTerrainMeshGenerator : TiffTerrainMeshGenerator {
 
         for (int y = 0; y < vVertCount; y++) {
             tiffImage.ReadScanline(scanline, y * downsample);
-            float[] values = info.BPP == 32 ? TiffUtils.Scanline32ToFloat(scanline) : TiffUtils.Scanline16ToFloat(scanline);
+            float[] values = info.BPP == 32 ? TiffUtils.Array32ToFloat(scanline) : TiffUtils.Array16ToFloat(scanline);
             for (int x = 0; x < hVertCount; x++) {
                 float value = values[x * downsample] * _heightScale;
                 verts[vertexIndex] = new Vector3(x * dimScale - hOffset, value, y * dimScale - vOffset);
@@ -95,14 +95,16 @@ public class TiffPlanarTerrainMeshGenerator : TiffTerrainMeshGenerator {
         float hOffset = _size / 2;
         float vOffset = dimScale * (vVertCount - 1) / 2;
 
-
         for (int ty = 0; ty < info.Height; ty += tileHeight) {
-            float[,] blockValues = new float[tileHeight, tileWidth * tilesAcrossImage];
+
+            // An array containing the valuse for a section or block of the entire iamge.
+            float[,] imageBlock = new float[tileWidth * tilesAcrossImage, tileHeight];
+
+            byte[] tileBytes = new byte[tileSize];
             for (int tx = 0; tx < info.Width; tx += tileWidth) {
-                byte[] tile = new byte[tileSize];
-                tiffImage.ReadTile(tile, 0, tx, ty, 0, 0);
-                float[] tileValues = info.BPP == 32 ? TiffUtils.Scanline32ToFloat(tile) : TiffUtils.Scanline16ToFloat(tile);
-                CopyValues(blockValues, tileValues, tileWidth, tileHeight, tx);
+                tiffImage.ReadTile(tileBytes, 0, tx, ty, 0, 0);
+                TiffSampleFormat format = info.BPP == 32 ? TiffSampleFormat.SinglePrecisionFloat : TiffSampleFormat.SignedShort;
+                TiffUtils.IntensityTileToFloat(tileBytes, format, imageBlock, tileWidth, new Vector2Int(tx, 0));
             }
 
             for (int y = ty / downsample; y < (ty + tileHeight) / downsample; y++) {
@@ -112,7 +114,7 @@ public class TiffPlanarTerrainMeshGenerator : TiffTerrainMeshGenerator {
                 }
 
                 for (int x = 0; x < hVertCount; x++) {
-                    float value = blockValues[y * downsample - ty, x * downsample] * _heightScale;
+                    float value = imageBlock[x * downsample, y * downsample - ty] * _heightScale;
                     verts[vertexIndex] = new Vector3(x * dimScale - hOffset, value, y * dimScale - vOffset);
                     uvs[vertexIndex] = GenerateStandardUV(x, y, hVertCount, vVertCount);
                     min = value < min ? value : min;
@@ -133,21 +135,6 @@ public class TiffPlanarTerrainMeshGenerator : TiffTerrainMeshGenerator {
             TexCoords = uvs,
             Triangles = GenerateTriangles(hVertCount, vVertCount)
         };
-    }
-
-    private void CopyValues(float[,] dest, float[] src, int tileWidth, int tileHeight, int offset) {
-
-        if (src.Length != tileWidth * tileHeight) {
-            throw new System.Exception("Incorrect data size");
-        }
-
-        int index = 0;
-        for (int y = 0; y < tileHeight; y++) {
-            for (int x = 0; x < tileWidth; x++) {
-                dest[y, x + offset] = src[index++];
-            }
-        }
-
     }
 
 }
