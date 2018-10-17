@@ -94,7 +94,11 @@ public abstract class TerrainMesh : MonoBehaviour {
 
         // Add LOD group manager.
         // TODO Make this a class member variable.
-        LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
+        GameObject lodGroupContainer = new GameObject();
+        lodGroupContainer.transform.SetParent(transform, false);
+        lodGroupContainer.name = GameObjectName.LODGroupContainer;
+
+        LODGroup lodGroup = lodGroupContainer.AddComponent<LODGroup>();
         LOD[] lods = new LOD[_lodLevels + 1];
 
         // Get Tiff file from the file path.
@@ -103,7 +107,7 @@ public abstract class TerrainMesh : MonoBehaviour {
         for (int i = 0; i <= _lodLevels; i++) {
 
             GameObject child = new GameObject();
-            child.transform.SetParent(transform);
+            child.transform.SetParent(lodGroupContainer.transform);
 
             // Name the LOD game object.
             child.name = "LOD_" + i;

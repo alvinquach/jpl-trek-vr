@@ -1,9 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEditor;
 
 public class XRInteractablePlanet : XRInteractableObject {
+
+    // TODO Move these somewhere else?
+    private const int CoordinateIndicatorSegmentCount = 72;
+    private const float CoordinateIndicatorThickness = 0.0069f;
+    private const float CoordinateIndicatorActiveThickness = 0.01337f;
 
     private XRInteractablePlanetMode _interactionMode = XRInteractablePlanetMode.Navigate;
     public XRInteractablePlanetMode InteractionMode {
@@ -11,7 +17,11 @@ public class XRInteractablePlanet : XRInteractableObject {
             return _interactionMode;
         }
         set {
-            if (value != XRInteractablePlanetMode.Select) {
+            if (value == XRInteractablePlanetMode.Select) {
+                _lonSelectionStartIndicator.startWidth = CoordinateIndicatorActiveThickness;
+                _lonSelectionStartIndicator.enabled = true;
+            }
+            else {
                 CancelSelection(true);
             }
             _interactionMode = value;
@@ -59,6 +69,11 @@ public class XRInteractablePlanet : XRInteractableObject {
     }
 
     private byte _selectionIndex = 0;
+
+    private LineRenderer _lonSelectionStartIndicator;
+    private LineRenderer _latSelectionStartIndicator;
+    private LineRenderer _lonSelectionEndIndicator;
+    private LineRenderer _latSelectionEndIndicator;
 
     #endregion
 
@@ -114,7 +129,10 @@ public class XRInteractablePlanet : XRInteractableObject {
                 Debug.Log($"Lat selection: {angle} degrees");
             }
 
-            _selectionBoundingBox[_selectionIndex++] = angle;
+            _selectionBoundingBox[_selectionIndex] = angle;
+
+            GetCurrentSelectionIndicator().startWidth = CoordinateIndicatorThickness;
+            _selectionIndex++;
 
             // Check if selection is finished.
             if (_selectionIndex == 4) {
@@ -124,18 +142,87 @@ public class XRInteractablePlanet : XRInteractableObject {
                 terrainMeshController.ShowTerrainMesh(terrainMesh, true);
                 ExitSelectionMode();
             }
+            else {
+                LineRenderer nextCoordinateIndicator = GetCurrentSelectionIndicator();
+                nextCoordinateIndicator.startWidth = CoordinateIndicatorActiveThickness;
+                nextCoordinateIndicator.enabled = true;
+            }
         }
     }
 
     public override void OnCursorOver(CustomControllerBehavior sender, Vector3 point) {
         if (_interactionMode == XRInteractablePlanetMode.Select) {
+            LineRenderer currentCoordinateIndicator = GetCurrentSelectionIndicator();
 
+            Vector3 direction = transform.InverseTransformPoint(point);
+            Vector3 flattened = new Vector3(direction.x, 0, direction.z);
+
+            // Longitude selection
+            if (_selectionIndex % 2 == 0) {
+                float angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
+                if (Vector3.Cross(flattened, Vector3.up).y > 0) {
+                    angle = -angle;
+                }
+                currentCoordinateIndicator.transform.localEulerAngles = new Vector3(0, -angle, 0);
+            }
+
+            // Latitude selection
+            else {
+                float angle = Vector3.Angle(direction, flattened);
+                if (direction.y < 0) {
+                    angle = -angle;
+                }
+                Vector2 offsetAndScale = CalculateLatitudeIndicatorOffsetAndScale(angle);
+                float adjustedScale = offsetAndScale.x * 3.39f + 0.01f;
+                currentCoordinateIndicator.transform.localPosition = new Vector3(0, 3.39f * offsetAndScale.y, 0);
+                currentCoordinateIndicator.transform.localScale = adjustedScale * Vector3.one;
+                //currentCoordinateIndicator.transform.localScale = new Vector3(adjustedScale, 1, adjustedScale);
+            }
         }
     }
 
     #endregion
 
     #region Unity lifecycle methods
+
+    private void Awake() {
+
+        // Create the latitude and longitude selection indicators.
+        GameObject selectionIndicatorsContainer = new GameObject();
+        selectionIndicatorsContainer.transform.SetParent(transform, false);
+        selectionIndicatorsContainer.name = GameObjectName.PlanetSelectionIndicatorContainer;
+
+        GameObject lonSelectionStartIndicator = new GameObject();
+        lonSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
+        lonSelectionStartIndicator.name = "Lon" + GameObjectName.PlanetSelectionIndicator + "1";
+        lonSelectionStartIndicator.transform.localScale = (3.39f + 0.01f) * Vector3.one; // TODO Un-hardcode the radius.
+        _lonSelectionStartIndicator = InitCoordinateIndicator(lonSelectionStartIndicator);
+        _lonSelectionStartIndicator.enabled = false;
+        GeneratePointsForLongitudeIndicator(_lonSelectionStartIndicator);
+
+        GameObject latSelectionStartIndicator = new GameObject();
+        latSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
+        latSelectionStartIndicator.name = "Lat" + GameObjectName.PlanetSelectionIndicator + "1";
+        _latSelectionStartIndicator = InitCoordinateIndicator(latSelectionStartIndicator);
+        _latSelectionStartIndicator.enabled = false;
+        GeneratePointsForLatitudeIndicator(_latSelectionStartIndicator);
+
+        GameObject lonSelectionEndIndicator = new GameObject();
+        lonSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
+        lonSelectionEndIndicator.name = "Lon" + GameObjectName.PlanetSelectionIndicator + "2";
+        lonSelectionEndIndicator.transform.localScale = (3.39f + 0.01f) * Vector3.one; // TODO Un-hardcode the radius.
+        _lonSelectionEndIndicator = InitCoordinateIndicator(lonSelectionEndIndicator);
+        _lonSelectionEndIndicator.enabled = false;
+        GeneratePointsForLongitudeIndicator(_lonSelectionEndIndicator);
+
+        GameObject latSelectionEndIndicator = new GameObject();
+        latSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
+        latSelectionEndIndicator.name = "Lat" + GameObjectName.PlanetSelectionIndicator + "2";
+        _latSelectionEndIndicator = InitCoordinateIndicator(latSelectionEndIndicator);
+        _latSelectionEndIndicator.enabled = false;
+        GeneratePointsForLatitudeIndicator(_latSelectionEndIndicator);
+
+    }
 
     // Use this for initialization
     void Start () {
@@ -280,7 +367,82 @@ public class XRInteractablePlanet : XRInteractableObject {
     private void ExitSelectionMode() {
         ResetSelectionBoundingBox();
         _selectionIndex = 0;
+        _lonSelectionStartIndicator.enabled = false;
+        _latSelectionStartIndicator.enabled = false;
+        _lonSelectionEndIndicator.enabled = false;
+        _latSelectionEndIndicator.enabled = false;
         _interactionMode = XRInteractablePlanetMode.Navigate;
+    }
+
+    private LineRenderer GetCurrentSelectionIndicator() {
+        if (_interactionMode != XRInteractablePlanetMode.Select) {
+            return null;
+        }
+        switch (_selectionIndex) {
+            case 0:
+                return _lonSelectionStartIndicator;
+            case 1:
+                return _latSelectionStartIndicator;
+            case 2:
+                return _lonSelectionEndIndicator;
+            case 3:
+                return _latSelectionEndIndicator;
+            default:
+                return null;
+        }
+    }
+
+    #endregion
+
+    #region Coordinate indicator methods
+
+    private LineRenderer InitCoordinateIndicator(GameObject gameObject, bool loop = true) {
+        LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.useWorldSpace = false;
+        lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        lineRenderer.receiveShadows = false;
+        lineRenderer.startWidth = CoordinateIndicatorThickness;
+        lineRenderer.loop = loop;
+        return lineRenderer;
+    }
+
+    private void GeneratePointsForLongitudeIndicator(LineRenderer lineRenderer, float longitude = float.NaN) {
+        lineRenderer.positionCount = CoordinateIndicatorSegmentCount;
+        float angleIncrement = 2 * Mathf.PI / CoordinateIndicatorSegmentCount;
+        for (int i = 0; i < CoordinateIndicatorSegmentCount; i++) {
+            float angle = i * angleIncrement;
+            Vector3 basePosition = new Vector3(0, Mathf.Sin(angle), Mathf.Cos(angle));
+            if (float.IsNaN(longitude)) {
+                lineRenderer.SetPosition(i, basePosition);
+            }
+            else {
+                lineRenderer.SetPosition(i, Quaternion.AngleAxis(longitude, Vector3.up) * basePosition);
+            }
+        }
+    }
+
+    private void GeneratePointsForLatitudeIndicator(LineRenderer lineRenderer, float latitude = float.NaN) {
+        lineRenderer.positionCount = CoordinateIndicatorSegmentCount;
+        float angleIncrement = 2 * Mathf.PI / CoordinateIndicatorSegmentCount;
+        Vector2 offsetAndScale = CalculateLatitudeIndicatorOffsetAndScale(float.IsNaN(latitude) ? 0.0f : latitude);
+        for (int i = 0; i < CoordinateIndicatorSegmentCount; i++) {
+            float angle = i * angleIncrement;
+            Vector3 basePosition = new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
+            if (float.IsNaN(latitude)) {
+                lineRenderer.SetPosition(i, basePosition);
+            }
+            else {
+                lineRenderer.SetPosition(i, offsetAndScale.x * basePosition + offsetAndScale.y * Vector3.one);
+            }
+        }
+    }
+
+    private Vector2 CalculateLatitudeIndicatorOffsetAndScale(float latitude) {
+        latitude *= Mathf.Deg2Rad;
+        return new Vector2(
+            Mathf.Cos(latitude),    // Horizontal scale
+            Mathf.Sin(latitude)     // Vertical offset
+        );
     }
 
     #endregion

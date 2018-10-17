@@ -2,4 +2,10 @@
 
     public const string Services = "Services";
 
+    public const string PlanetSelectionIndicator = "SelectionIndicator";
+
+    public const string PlanetSelectionIndicatorContainer = "SelectionIndicatorContainer";
+
+    public const string LODGroupContainer = "LodGroupContainer";
+
 }
