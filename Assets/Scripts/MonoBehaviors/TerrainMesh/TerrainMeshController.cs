@@ -103,7 +103,7 @@ public class TerrainMeshController : MonoBehaviour {
     // TEMPORARY
     private int _counter = 0;
 
-    public TerrainMesh Create(string demPath) {
+    public TerrainMesh Create(string demPath, string albedoPath = null) {
         GameObject newMesh = new GameObject();
         newMesh.transform.SetParent(transform);
         newMesh.name = $"Mesh {++_counter}";
@@ -116,6 +116,7 @@ public class TerrainMeshController : MonoBehaviour {
             terrainMesh.LodLevels = 0;
             terrainMesh.BaseDownSampleLevel = 8;
             terrainMesh.DemFilePath = demPath;
+            terrainMesh.AlbedoFilePath = albedoPath;
             terrainMesh.GenerateMeshData();
         }
         catch (Exception e) {

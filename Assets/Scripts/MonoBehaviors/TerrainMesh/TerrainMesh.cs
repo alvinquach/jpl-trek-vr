@@ -54,7 +54,7 @@ public abstract class TerrainMesh : MonoBehaviour {
     protected bool _initStarted = false;
     protected bool _initCompleted = false;
 
-    protected abstract TiffTerrainMeshGenerator MeshGenerator { get; }
+    protected abstract TerrainMeshGenerator MeshGenerator { get; }
 
     // Use this for initialization
     void Start() {
@@ -160,15 +160,23 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     protected virtual Material GenerateMaterial() {
 
-        // TODO This is temporary
-        TiffTexture2DConverter textureConverter = new TiffTexture2DConverter(null, 256, 256);
-        textureConverter.Convert();
 
-        Texture2D texture = new Texture2D(256, 256);
-        Debug.Log(texture.format);
-        texture.SetPixels32(textureConverter.Pixels);
-        texture.Apply();
-        texture.Compress(true);
+        Texture2D texture;
+        if (!String.IsNullOrEmpty(_albedoFilePath)) {
+            texture = new Texture2D(1024, 1024, TextureFormat.DXT5, true);
+            byte[] imageData = File.ReadAllBytes(_albedoFilePath);
+            texture.LoadImage(imageData);
+        }
+        else {
+            // TODO This is temporary
+            TiffTexture2DConverter textureConverter = new TiffTexture2DConverter(null, 1024, 1024);
+            textureConverter.Convert();
+
+            texture = new Texture2D(1024, 1024);
+            texture.SetPixels32(textureConverter.Pixels);
+            texture.Apply();
+            texture.Compress(true);
+        }
         Debug.Log(texture.format);
 
         if (texture == null) {

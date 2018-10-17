@@ -11,9 +11,9 @@ public class PlanarTerrainMesh : TerrainMesh {
         set { if (!_initStarted) _size = value; }
     }
 
-    private TiffTerrainMeshGenerator _meshGenerator;
+    private TerrainMeshGenerator _meshGenerator;
 
-    protected override TiffTerrainMeshGenerator MeshGenerator {
+    protected override TerrainMeshGenerator MeshGenerator {
         get {
             if (_meshGenerator == null) {
                 _meshGenerator = new TiffPlanarTerrainMeshGenerator(

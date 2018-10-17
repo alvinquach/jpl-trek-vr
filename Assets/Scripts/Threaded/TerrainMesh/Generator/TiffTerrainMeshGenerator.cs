@@ -1,37 +1,20 @@
 ﻿using BitMiracle.LibTiff.Classic;
 using System;
-using System.Threading;
-using UnityEngine;
 
-public abstract class TiffTerrainMeshGenerator {
-
-    protected string _filepath;
-
-    protected float _heightScale;
-
-    protected int _lodLevels;
+public abstract class TiffTerrainMeshGenerator : TerrainMeshGenerator {
 
     protected int _baseDownsample;
 
-    public MeshData[] MeshData { get; protected set; }
+    public TiffTerrainMeshGenerator(string filepath, float heightScale, int lodLevels, int baseDownsample) :
+        base(filepath, heightScale, lodLevels) {
 
-    public bool InProgress { get; protected set; } = false;
-
-    public bool Complete { get; protected set; } = false;
-
-    public float Progress { get; protected set; } = 0f;
-
-    public TiffTerrainMeshGenerator(string filepath, float heightScale, int lodLevels, int baseDownsample) {
-        _filepath = filepath;
-        _heightScale = heightScale;
-        _lodLevels = lodLevels;
         _baseDownsample = baseDownsample;
     }
 
     // TODO Use a struct or class to pass DEM metadata (ie. scale) to the GenerateMesh methods.
     // TODO Maybe support other image types?
 
-    public void Generate() {
+    public override void Generate() {
 
         using (Tiff tiffImage = TiffUtils.FromFilePath(_filepath)) {
 
@@ -61,15 +44,6 @@ public abstract class TiffTerrainMeshGenerator {
             MeshData = meshData;
         }
 
-    }
-
-    public void GenerateAsync() {
-
-        Thread meshGenerationThread = new Thread(
-            new ThreadStart(Generate)
-        );
-
-        meshGenerationThread.Start();
     }
 
     // TODO Modify the implementations of the functions below such
@@ -129,10 +103,6 @@ public abstract class TiffTerrainMeshGenerator {
             }
         }
         return result;
-    }
-
-    protected Vector2 GenerateStandardUV(int x, int y, int width, int height) {
-        return new Vector2(x / (width - 1f), -y / (height - 1f));
     }
 
 }
