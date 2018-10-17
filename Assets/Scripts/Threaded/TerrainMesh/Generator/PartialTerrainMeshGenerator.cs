@@ -38,8 +38,8 @@ public class PartialTerrainMeshGenerator : TerrainMeshGenerator {
         Vector3[] verts = new Vector3[LatLongVertCount * LatLongVertCount];
         Vector2[] uvs = new Vector2[LatLongVertCount * LatLongVertCount];
 
-        int yIndex = 0, vertexIndex = 0; ;
-        for (float y = latStart; y < latStop; y += latIncrement) {
+        int yIndex = 0, vertexIndex = 0;
+        for (float y = latStart; yIndex < LatLongVertCount; y += latIncrement) {
 
             int xIndex = 0;
 
@@ -49,10 +49,11 @@ public class PartialTerrainMeshGenerator : TerrainMeshGenerator {
 
             // Loop traverses backwards in order to get correct orientation of texture and normals.
             //for (float x = lonStop; x > lonStart; x -= lonIncrement) {
-            for (float x = lonStart; x < lonStop; x += lonIncrement) {
+            for (float x = lonStart; xIndex < LatLongVertCount; x += lonIncrement) {
 
                 // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
                 verts[vertexIndex] = Quaternion.Euler(0, -90 - x, 0) * (_radius * baseLatVertex);
+                //Debug.Log($"({xIndex}, {yIndex}) -> ({xIndex / (LatLongVertCount - 1f)}, {-yIndex / (LatLongVertCount - 1f)})");
                 uvs[vertexIndex] = GenerateStandardUV(xIndex, yIndex, LatLongVertCount, LatLongVertCount);
                 xIndex++;
                 vertexIndex++;

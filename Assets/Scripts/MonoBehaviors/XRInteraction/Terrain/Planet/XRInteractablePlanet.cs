@@ -5,6 +5,20 @@ using UnityEditor;
 
 public class XRInteractablePlanet : XRInteractableObject {
 
+    private XRInteractablePlanetMode _interactionMode = XRInteractablePlanetMode.Navigate;
+    public XRInteractablePlanetMode InteractionMode {
+        get {
+            return _interactionMode;
+        }
+        set {
+            if (value != XRInteractablePlanetMode.Select) {
+                CancelSelection(true);
+            }
+            _interactionMode = value;
+            Debug.Log($"Interaction mode changed to {value}.");
+        }
+    }
+
     #region Grab Variables
 
     [SerializeField]
@@ -35,6 +49,21 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #endregion
 
+    #region Planet "Select Area" Variables
+
+    private Vector4 _selectionBoundingBox;
+    public Vector4 SelectionBoundingBox {
+        get {
+            return _selectionBoundingBox;
+        }
+    }
+
+    private byte _selectionIndex = 0;
+
+    #endregion
+
+    #region Event Handlers
+
     public override void OnGripDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
         if (Vector3.Distance(sender.transform.position, point) > _maxGrabDistance) {
             return;
@@ -53,13 +82,64 @@ public class XRInteractablePlanet : XRInteractableObject {
     }
 
     public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
-        Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
-        NavigateTo(point - transform.position, eye.transform.position);
+
+        if (_interactionMode == XRInteractablePlanetMode.Navigate) {
+            Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
+            NavigateTo(point - transform.position, eye.transform.position);
+        }
+
+        else if (_interactionMode == XRInteractablePlanetMode.Select) {
+
+            Vector3 direction = transform.InverseTransformPoint(point);
+            Vector3 flattened = new Vector3(direction.x, 0, direction.z);
+            float angle;
+
+            // Longitude selection
+            if (_selectionIndex % 2 == 0) {
+
+                angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
+
+                if (Vector3.Cross(flattened, Vector3.up).y > 0) {
+                    angle = -angle;
+                }
+                Debug.Log($"Lon selection: {angle} degrees");
+            }
+
+            // Latitude selection
+            else {
+                angle = Vector3.Angle(direction, flattened);
+                if (direction.y < 0) {
+                    angle = -angle;
+                }
+                Debug.Log($"Lat selection: {angle} degrees");
+            }
+
+            _selectionBoundingBox[_selectionIndex++] = angle;
+
+            // Check if selection is finished.
+            if (_selectionIndex == 4) {
+                Debug.Log("Selection Complete: " + _selectionBoundingBox);
+                TerrainMeshController terrainMeshController = TerrainMeshController.Instance;
+                TerrainMesh terrainMesh = terrainMeshController.CreatePartial(_selectionBoundingBox, null);
+                terrainMeshController.ShowTerrainMesh(terrainMesh, true);
+                ExitSelectionMode();
+            }
+        }
     }
+
+    public override void OnCursorOver(CustomControllerBehavior sender, Vector3 point) {
+        if (_interactionMode == XRInteractablePlanetMode.Select) {
+
+        }
+    }
+
+    #endregion
+
+    #region Unity lifecycle methods
 
     // Use this for initialization
     void Start () {
-		
+        ResetSelectionBoundingBox();
 	}
 	
 	// Update is called once per frame
@@ -103,6 +183,10 @@ public class XRInteractablePlanet : XRInteractableObject {
             }
         }
     }
+
+    #endregion
+
+    #region Naviation methods
 
     public void NavigateTo(Vector2 coords, Vector3 cameraPosition) {
         // TODO Find a better way to do this without having to
@@ -167,6 +251,39 @@ public class XRInteractablePlanet : XRInteractableObject {
         return Quaternion.FromToRotation(projectedUp, relativeUp) * transform.rotation;
 
     }
+
+    #endregion
+
+    #region Selection methods
+
+    public void CancelSelection(bool cancelAll = false) {
+        if (_interactionMode != XRInteractablePlanetMode.Select) {
+            return;
+        }
+        if (cancelAll) {
+            ExitSelectionMode();
+        }
+        else {
+            if (_selectionIndex > 0) {
+                _selectionBoundingBox[_selectionIndex--] = float.NaN;
+            }
+            else {
+                _interactionMode = XRInteractablePlanetMode.Navigate;
+            }
+        }
+    }
+
+    private void ResetSelectionBoundingBox() {
+        _selectionBoundingBox = new Vector4(float.NaN, float.NaN, float.NaN, float.NaN);
+    }
+
+    private void ExitSelectionMode() {
+        ResetSelectionBoundingBox();
+        _selectionIndex = 0;
+        _interactionMode = XRInteractablePlanetMode.Navigate;
+    }
+
+    #endregion
 
     /// <summary>
     /// This function uses the law of cosines formula to find the distance

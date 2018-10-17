@@ -143,6 +143,7 @@ public class CustomControllerBehavior : MonoBehaviour {
         if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
             XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
             if (obj != null) {
+                obj.OnCursorOver(this, hit.point);
                 cursor.transform.position = hit.point;
                 cursor.SetActive(true);
             }

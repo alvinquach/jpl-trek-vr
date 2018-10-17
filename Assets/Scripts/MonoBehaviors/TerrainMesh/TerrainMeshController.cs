@@ -109,27 +109,15 @@ public class TerrainMeshController : MonoBehaviour {
         newMesh.name = $"Mesh {++_counter}";
         newMesh.SetActive(false);
 
-        //PlanarTerrainMesh terrainMesh = newMesh.AddComponent<PlanarTerrainMesh>();
-        //try {
-        //    terrainMesh.Size = 1.5f;
-        //    terrainMesh.HeightScale = 0.000002f;
-        //    terrainMesh.LodLevels = 0;
-        //    terrainMesh.BaseDownSampleLevel = 8;
-        //    terrainMesh.DemFilePath = demPath;
-        //    terrainMesh.AlbedoFilePath = albedoPath;
-        //    terrainMesh.GenerateMeshData();
-        //}
-        PartialTerrainMesh terrainMesh = newMesh.AddComponent<PartialTerrainMesh>();
+        PlanarTerrainMesh terrainMesh = newMesh.AddComponent<PlanarTerrainMesh>();
         try {
-            terrainMesh.Radius = 3.39f;
-            terrainMesh.HeightScale = 0f;
-            // Bounding box is in the format (lonStart, latStart, lonEnd, latEnd)
-            terrainMesh.BoundingBox = new Vector4(-87.8906f, -21.4453f, -55.5469f, 1.4062f);
+            terrainMesh.Size = 1.5f;
+            terrainMesh.HeightScale = 0.000002f;
             terrainMesh.LodLevels = 0;
+            terrainMesh.BaseDownSampleLevel = 8;
+            terrainMesh.DemFilePath = demPath;
+            terrainMesh.AlbedoFilePath = albedoPath;
             terrainMesh.GenerateMeshData();
-
-            newMesh.transform.localPosition = Vector3.up;
-            newMesh.transform.localScale = 0.25f * Vector3.one;
         }
         catch (Exception e) {
             Debug.LogError(e.Message);
@@ -142,6 +130,46 @@ public class TerrainMeshController : MonoBehaviour {
         // one with the oldest LastActive time.
         if (_terrainMeshes.Count >= MaxMeshes) {
             
+            // TODO Test this
+            TerrainMeshWrapper wrapper = _terrainMeshes.OrderByDescending(w => w.LastVisible).Last();
+
+            Destroy(wrapper.TerrainMesh.gameObject);
+            _terrainMeshes.Remove(wrapper);
+        }
+
+        _terrainMeshes.Add(new TerrainMeshWrapper(terrainMesh));
+        return terrainMesh;
+    }
+
+    public TerrainMesh CreatePartial(Vector4 boundingBox, string demPath, string albedoPath = null) {
+        GameObject newMesh = new GameObject();
+        newMesh.transform.SetParent(transform);
+        newMesh.name = $"Mesh {++_counter}";
+        newMesh.SetActive(false);
+
+        PartialTerrainMesh terrainMesh = newMesh.AddComponent<PartialTerrainMesh>();
+        try {
+            terrainMesh.Radius = 3.39f;
+            terrainMesh.HeightScale = 0f;
+            // Bounding box is in the format (lonStart, latStart, lonEnd, latEnd)
+            terrainMesh.BoundingBox = boundingBox;
+            terrainMesh.LodLevels = 0;
+            terrainMesh.GenerateMeshData();
+
+            newMesh.transform.localPosition = Vector3.up;
+            newMesh.transform.localScale = 0.25f * Vector3.one;
+        }
+        catch (Exception e) {
+            Debug.LogError(e.Message);
+            Destroy(newMesh);
+            return null;
+        }
+
+        // If the number of terrain meshes being managed already exceeds the max limit,
+        // then we have to remove one to make space for the new one. We will remove the
+        // one with the oldest LastActive time.
+        if (_terrainMeshes.Count >= MaxMeshes) {
+
             // TODO Test this
             TerrainMeshWrapper wrapper = _terrainMeshes.OrderByDescending(w => w.LastVisible).Last();
 
@@ -178,7 +206,8 @@ public class TerrainMeshController : MonoBehaviour {
     ///     True if the visiblity of the TerrainMesh objects in this
     ///     controller was changed. Otherwise, returns false.
     /// </returns>
-    public bool ShowTerrainMesh(TerrainMesh terrainMesh) {
+    // TODO Write a separate method to clone the rotation.
+    public bool ShowTerrainMesh(TerrainMesh terrainMesh, bool cloneRotation = false) {
         if (terrainMesh == null || terrainMesh.gameObject.activeSelf) {
             return false; // Retun false if the terrain mesh is already visible.
         }
@@ -186,6 +215,9 @@ public class TerrainMeshController : MonoBehaviour {
         if (wrapper != null) {
             HideAll();
             wrapper.SetVisible(true);
+            if (cloneRotation) {
+                terrainMesh.transform.rotation = _defaultPlanetMesh.transform.rotation;
+            }
             return true;
         }
         return false;
@@ -200,6 +232,11 @@ public class TerrainMeshController : MonoBehaviour {
         _terrainMeshes.ForEach(w => w.SetVisible(false));
     }
 
+    public T GetComponentFromCurrentMesh<T>() {
 
+        // FIXME Change this so that it actually gets the component
+        // fro the current mesh instead of the default mesh.
+        return _defaultPlanetMesh.GetComponent<T>();
+    }
     
 }
