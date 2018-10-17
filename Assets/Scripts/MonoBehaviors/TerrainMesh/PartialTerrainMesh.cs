@@ -23,7 +23,10 @@ public class PartialTerrainMesh : TerrainMesh {
     protected override TerrainMeshGenerator MeshGenerator {
         get {
             if (_meshGenerator == null) {
-
+                _meshGenerator = new PartialTerrainMeshGenerator(
+                    _radius,
+                    _boundingBox
+                );
             }
             return _meshGenerator;
         }

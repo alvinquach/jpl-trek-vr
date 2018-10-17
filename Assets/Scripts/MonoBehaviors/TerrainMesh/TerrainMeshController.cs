@@ -109,15 +109,27 @@ public class TerrainMeshController : MonoBehaviour {
         newMesh.name = $"Mesh {++_counter}";
         newMesh.SetActive(false);
 
-        PlanarTerrainMesh terrainMesh = newMesh.AddComponent<PlanarTerrainMesh>();
+        //PlanarTerrainMesh terrainMesh = newMesh.AddComponent<PlanarTerrainMesh>();
+        //try {
+        //    terrainMesh.Size = 1.5f;
+        //    terrainMesh.HeightScale = 0.000002f;
+        //    terrainMesh.LodLevels = 0;
+        //    terrainMesh.BaseDownSampleLevel = 8;
+        //    terrainMesh.DemFilePath = demPath;
+        //    terrainMesh.AlbedoFilePath = albedoPath;
+        //    terrainMesh.GenerateMeshData();
+        //}
+        PartialTerrainMesh terrainMesh = newMesh.AddComponent<PartialTerrainMesh>();
         try {
-            terrainMesh.Size = 1.5f;
-            terrainMesh.HeightScale = 0.000002f;
+            terrainMesh.Radius = 3.39f;
+            terrainMesh.HeightScale = 0f;
+            // Bounding box is in the format (lonStart, latStart, lonEnd, latEnd)
+            terrainMesh.BoundingBox = new Vector4(-87.8906f, -21.4453f, -55.5469f, 1.4062f);
             terrainMesh.LodLevels = 0;
-            terrainMesh.BaseDownSampleLevel = 8;
-            terrainMesh.DemFilePath = demPath;
-            terrainMesh.AlbedoFilePath = albedoPath;
             terrainMesh.GenerateMeshData();
+
+            newMesh.transform.localPosition = Vector3.up;
+            newMesh.transform.localScale = 0.25f * Vector3.one;
         }
         catch (Exception e) {
             Debug.LogError(e.Message);

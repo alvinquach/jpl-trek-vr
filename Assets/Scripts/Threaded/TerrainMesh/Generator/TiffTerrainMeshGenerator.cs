@@ -3,11 +3,18 @@ using System;
 
 public abstract class TiffTerrainMeshGenerator : TerrainMeshGenerator {
 
+    protected string _filepath;
+
+    protected int _lodLevels;
+
     protected int _baseDownsample;
 
-    public TiffTerrainMeshGenerator(string filepath, float heightScale, int lodLevels, int baseDownsample) :
-        base(filepath, heightScale, lodLevels) {
+    protected float _heightScale;
 
+    public TiffTerrainMeshGenerator(string filepath, float heightScale, int lodLevels, int baseDownsample) {
+        _filepath = filepath;
+        _lodLevels = lodLevels;
+        _heightScale = heightScale;
         _baseDownsample = baseDownsample;
     }
 
@@ -71,38 +78,6 @@ public abstract class TiffTerrainMeshGenerator : TerrainMeshGenerator {
             throw new FileFormatException("Invalid TIFF format. Only 16-bit and 32-bit grayscale files are supported.");
         }
 
-    }
-
-    protected int[] GenerateTriangles(int hVertCount, int vVertCount) {
-
-        // The number of quads (triangle pairs) in each dimension is 
-        // one less than the vertex counts in the respective dimensions.
-        int hQuadCount = hVertCount - 1, vQuadCount = vVertCount - 1;
-
-        int[] result = new int[6 * hQuadCount * vQuadCount];
-
-        int startIndex = 0;
-        for (int y = 0; y < vQuadCount; y++) {
-            for (int x = 0; x < hQuadCount; x++) {
-
-                int lt = x + y * hVertCount;
-                int rt = lt + 1;
-                int lb = lt + hVertCount;
-                int rb = lb + 1;
-
-                // TODO Alternate the triangle orientation of each consecutive quad.
-
-                result[startIndex] = lt;
-                result[startIndex + 1] = lb;
-                result[startIndex + 2] = rb;
-                result[startIndex + 3] = rb;
-                result[startIndex + 4] = rt;
-                result[startIndex + 5] = lt;
-
-                startIndex += 6;
-            }
-        }
-        return result;
     }
 
 }
