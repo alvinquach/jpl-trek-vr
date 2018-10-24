@@ -8,8 +8,9 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     // TODO Move these somewhere else?
     private const int CoordinateIndicatorSegmentCount = 72;
-    private const float CoordinateIndicatorThickness = 0.0069f;
-    private const float CoordinateIndicatorActiveThickness = 0.01337f;
+    private const float CoordinateIndicatorThickness = 0.001337f;
+    private const float CoordinateIndicatorActiveThickness = 0.0069f;
+    private const float CoordinateIndicatorRadiusOffset = 0.01337f;
 
     private XRInteractablePlanetMode _interactionMode = XRInteractablePlanetMode.Navigate;
     public XRInteractablePlanetMode InteractionMode {
@@ -29,7 +30,9 @@ public class XRInteractablePlanet : XRInteractableObject {
         }
     }
 
-    #region Grab Variables
+    private Material _coordinateIndicatorMaterial;
+
+    #region Grab variables
 
     [SerializeField]
     private float _maxGrabDistance = 10.0f;
@@ -50,7 +53,7 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #endregion
 
-    #region Planet "Navigate To" Variables
+    #region Planet "Navigate To" variables
 
     private Quaternion _initRotation;
     private Quaternion _destRotation;
@@ -59,7 +62,7 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #endregion
 
-    #region Planet "Select Area" Variables
+    #region Planet "Select Area" variables
 
     private Vector4 _selectionBoundingBox;
     public Vector4 SelectionBoundingBox {
@@ -77,7 +80,7 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #endregion
 
-    #region Event Handlers
+    #region Event handlers
 
     public override void OnGripDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
         if (Vector3.Distance(sender.transform.position, point) > _maxGrabDistance) {
@@ -173,10 +176,10 @@ public class XRInteractablePlanet : XRInteractableObject {
                     angle = -angle;
                 }
                 Vector2 offsetAndScale = CalculateLatitudeIndicatorOffsetAndScale(angle);
-                float adjustedScale = offsetAndScale.x * 3.39f + 0.01f;
+
+                // TODO Un-hardcode the radius
                 currentCoordinateIndicator.transform.localPosition = new Vector3(0, 3.39f * offsetAndScale.y, 0);
-                currentCoordinateIndicator.transform.localScale = adjustedScale * Vector3.one;
-                //currentCoordinateIndicator.transform.localScale = new Vector3(adjustedScale, 1, adjustedScale);
+                currentCoordinateIndicator.transform.localScale = (offsetAndScale.x * 3.39f + CoordinateIndicatorRadiusOffset) * Vector3.one;
             }
         }
     }
@@ -187,6 +190,10 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     private void Awake() {
 
+        // Create material for coordinate indicators
+        _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));
+        _coordinateIndicatorMaterial.SetColor("_Color", new Color32(0, 224, 255, 255));
+
         // Create the latitude and longitude selection indicators.
         GameObject selectionIndicatorsContainer = new GameObject();
         selectionIndicatorsContainer.transform.SetParent(transform, false);
@@ -195,7 +202,7 @@ public class XRInteractablePlanet : XRInteractableObject {
         GameObject lonSelectionStartIndicator = new GameObject();
         lonSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
         lonSelectionStartIndicator.name = "Lon" + GameObjectName.PlanetSelectionIndicator + "1";
-        lonSelectionStartIndicator.transform.localScale = (3.39f + 0.01f) * Vector3.one; // TODO Un-hardcode the radius.
+        lonSelectionStartIndicator.transform.localScale = (3.39f + CoordinateIndicatorRadiusOffset) * Vector3.one; // TODO Un-hardcode the radius.
         _lonSelectionStartIndicator = InitCoordinateIndicator(lonSelectionStartIndicator);
         _lonSelectionStartIndicator.enabled = false;
         GeneratePointsForLongitudeIndicator(_lonSelectionStartIndicator);
@@ -210,7 +217,7 @@ public class XRInteractablePlanet : XRInteractableObject {
         GameObject lonSelectionEndIndicator = new GameObject();
         lonSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
         lonSelectionEndIndicator.name = "Lon" + GameObjectName.PlanetSelectionIndicator + "2";
-        lonSelectionEndIndicator.transform.localScale = (3.39f + 0.01f) * Vector3.one; // TODO Un-hardcode the radius.
+        lonSelectionEndIndicator.transform.localScale = (3.39f + CoordinateIndicatorRadiusOffset) * Vector3.one; // TODO Un-hardcode the radius.
         _lonSelectionEndIndicator = InitCoordinateIndicator(lonSelectionEndIndicator);
         _lonSelectionEndIndicator.enabled = false;
         GeneratePointsForLongitudeIndicator(_lonSelectionEndIndicator);
@@ -403,6 +410,7 @@ public class XRInteractablePlanet : XRInteractableObject {
         lineRenderer.receiveShadows = false;
         lineRenderer.startWidth = CoordinateIndicatorThickness;
         lineRenderer.loop = loop;
+        lineRenderer.material = _coordinateIndicatorMaterial;
         return lineRenderer;
     }
 
