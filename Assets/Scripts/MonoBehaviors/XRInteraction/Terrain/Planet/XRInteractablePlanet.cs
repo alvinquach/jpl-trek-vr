@@ -114,10 +114,8 @@ public class XRInteractablePlanet : XRInteractableObject {
 
             // Longitude selection
             if (_selectionIndex % 2 == 0) {
-
                 angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
-
-                if (Vector3.Cross(flattened, Vector3.up).y > 0) {
+                if (Vector3.Cross(flattened, Vector3.forward).y > 0) {
                     angle = -angle;
                 }
                 Debug.Log($"Lon selection: {angle} degrees");
@@ -163,7 +161,7 @@ public class XRInteractablePlanet : XRInteractableObject {
             // Longitude selection
             if (_selectionIndex % 2 == 0) {
                 float angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
-                if (Vector3.Cross(flattened, Vector3.up).y > 0) {
+                if (Vector3.Cross(flattened, Vector3.forward).y > 0) {
                     angle = -angle;
                 }
                 currentCoordinateIndicator.transform.localEulerAngles = new Vector3(0, -angle, 0);
