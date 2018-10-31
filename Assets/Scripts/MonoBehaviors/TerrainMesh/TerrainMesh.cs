@@ -54,15 +54,17 @@ public abstract class TerrainMesh : MonoBehaviour {
     protected bool _initStarted = false;
     protected bool _initCompleted = false;
 
+    // This should be implemented in a way such that a TerrainMeshGenerator
+    // object is always available (not null) while _initStarted is true, and
+    // always null if _initStarted is false.
     protected abstract TerrainMeshGenerator MeshGenerator { get; }
 
-    // Use this for initialization
-    void Start() {
+    protected virtual void Start() {
         GenerateMeshData();
     }
 
-    void Update() {
-        if (!_initCompleted && MeshGenerator.Complete) {
+    protected virtual void Update() {
+        if (_initStarted && !_initCompleted && MeshGenerator.Complete) {
             ProcessMeshData();
             _initCompleted = true;
         }
@@ -74,11 +76,15 @@ public abstract class TerrainMesh : MonoBehaviour {
             return;
         }
 
-        MeshGenerator.GenerateAsync();
         _initStarted = true;
+        MeshGenerator.GenerateAsync();
     }
 
-    protected virtual void ProcessMeshData() {
+    protected virtual void ProcessMeshData(TerrainMeshGenerator meshGenerator = null) {
+
+        if (meshGenerator == null) {
+            meshGenerator = MeshGenerator;
+        }
 
         // If material was not set, then generate a meterial for the mesh,
         // or use the default material if it failed to generate.
@@ -134,7 +140,7 @@ public abstract class TerrainMesh : MonoBehaviour {
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 
             // Assign mesh data
-            MeshData meshData = MeshGenerator.MeshData[i];
+            MeshData meshData = meshGenerator.MeshData[i];
             mesh.vertices = meshData.Vertices;
             mesh.uv = meshData.TexCoords;
             mesh.triangles = meshData.Triangles;

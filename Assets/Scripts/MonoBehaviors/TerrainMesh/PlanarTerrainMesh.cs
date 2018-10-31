@@ -11,11 +11,11 @@ public class PlanarTerrainMesh : TerrainMesh {
         set { if (!_initStarted) _size = value; }
     }
 
-    private TerrainMeshGenerator _meshGenerator;
+    private TiffPlanarTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {
-            if (_meshGenerator == null) {
+            if (!_meshGenerator && _initStarted) {
                 _meshGenerator = new TiffPlanarTerrainMeshGenerator(
                     _demFilePath,
                     _size,
@@ -28,8 +28,8 @@ public class PlanarTerrainMesh : TerrainMesh {
         }
     }
 
-    protected override void ProcessMeshData() {
-        base.ProcessMeshData();
+    protected override void ProcessMeshData(TerrainMeshGenerator meshGenerator = null) {
+        base.ProcessMeshData(meshGenerator);
 
         // TEMPORARY
         transform.localPosition = new Vector3(0, 0.31f, 0);

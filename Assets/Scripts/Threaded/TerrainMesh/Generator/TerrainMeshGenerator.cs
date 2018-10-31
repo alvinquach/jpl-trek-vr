@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using UnityEngine;
 
 public abstract class TerrainMeshGenerator {
@@ -56,6 +56,18 @@ public abstract class TerrainMeshGenerator {
 
     protected Vector2 GenerateStandardUV(int x, int y, int width, int height) {
         return new Vector2(x / (width - 1f), -y / (height - 1f));
+    }
+
+    public static bool operator true(TerrainMeshGenerator o) {
+        return o != null;
+    }
+
+    public static bool operator false(TerrainMeshGenerator o) {
+        return o == null;
+    }
+
+    public static bool operator !(TerrainMeshGenerator o) {
+        return o ? false : true;
     }
 
 }

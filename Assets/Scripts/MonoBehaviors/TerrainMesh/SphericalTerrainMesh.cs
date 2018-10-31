@@ -11,11 +11,11 @@ public class SphericalTerrainMesh : TerrainMesh {
         set { if (!_initStarted) _radius = value; }
     }
 
-    private TerrainMeshGenerator _meshGenerator;
+    private TiffSphericalTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {
-            if (_meshGenerator == null) {
+            if (!_meshGenerator && _initStarted) {
                 _meshGenerator = new TiffSphericalTerrainMeshGenerator(
                     _demFilePath,
                     _radius,
@@ -28,8 +28,8 @@ public class SphericalTerrainMesh : TerrainMesh {
         }
     }
 
-    protected override void ProcessMeshData() {
-        base.ProcessMeshData();
+    protected override void ProcessMeshData(TerrainMeshGenerator meshGenerator = null) {
+        base.ProcessMeshData(meshGenerator);
 
         // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
         SphereCollider collider = gameObject.AddComponent<SphereCollider>();

@@ -18,17 +18,44 @@ public class PartialTerrainMesh : TerrainMesh {
         set { if (!_initStarted) _boundingBox = value; }
     }
 
-    private TerrainMeshGenerator _meshGenerator;
+    /// <summary>
+    ///     For generating a mesh without any height data. The gernated mesh will be
+    ///     temporarily displayed while the DEM and textures are retrieved, and a new
+    ///     mesh with height data is generated.
+    /// </summary>
+    private BasePartialTerrainMeshGenerator _baseMeshGenerator;
+
+    /// <summary>
+    ///     For generating generates the mesh with height data.
+    /// </summary>
+    private TiffPartialTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {
-            if (_meshGenerator == null) {
-                _meshGenerator = new PartialTerrainMeshGenerator(
+            if (_meshGenerator) {
+                return _meshGenerator;
+            }
+            else if (!_baseMeshGenerator && _initStarted) {
+                _baseMeshGenerator = new BasePartialTerrainMeshGenerator(
                     _radius,
                     _boundingBox
                 );
             }
-            return _meshGenerator;
+            return _baseMeshGenerator;
+        }
+    }
+
+    private float _tabletopTransitionProgress = 0.0f;
+
+    protected override void Start() {
+        base.Start();
+        // TODO Call method to download DEM and textures here.
+    }
+
+    protected override void Update() {
+        if (_initStarted && !_initCompleted && _baseMeshGenerator.Complete) {
+            ProcessMeshData(_baseMeshGenerator);
+            _initCompleted = true;
         }
     }
 

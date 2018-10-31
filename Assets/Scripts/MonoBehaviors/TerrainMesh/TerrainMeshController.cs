@@ -165,20 +165,7 @@ public class TerrainMeshController : MonoBehaviour {
             return null;
         }
 
-        // If the number of terrain meshes being managed already exceeds the max limit,
-        // then we have to remove one to make space for the new one. We will remove the
-        // one with the oldest LastActive time.
-        if (_terrainMeshes.Count >= MaxMeshes) {
-
-            // TODO Test this
-            TerrainMeshWrapper wrapper = _terrainMeshes.OrderByDescending(w => w.LastVisible).Last();
-
-            Destroy(wrapper.TerrainMesh.gameObject);
-            _terrainMeshes.Remove(wrapper);
-        }
-
-        _terrainMeshes.Add(new TerrainMeshWrapper(terrainMesh));
-        return terrainMesh;
+        return AddTerrainMesh(terrainMesh);
     }
 
     /// <summary>
@@ -237,6 +224,24 @@ public class TerrainMeshController : MonoBehaviour {
         // FIXME Change this so that it actually gets the component
         // fro the current mesh instead of the default mesh.
         return _defaultPlanetMesh.GetComponent<T>();
+    }
+
+    private TerrainMesh AddTerrainMesh(TerrainMesh terrainMesh) {
+
+        // If the number of terrain meshes being managed already exceeds the max limit,
+        // then we have to remove one to make space for the new one. We will remove the
+        // one with the oldest LastActive time.
+        if (_terrainMeshes.Count >= MaxMeshes) {
+
+            // TODO Test this
+            TerrainMeshWrapper wrapper = _terrainMeshes.OrderByDescending(w => w.LastVisible).Last();
+
+            Destroy(wrapper.TerrainMesh.gameObject);
+            _terrainMeshes.Remove(wrapper);
+        }
+
+        _terrainMeshes.Add(new TerrainMeshWrapper(terrainMesh));
+        return terrainMesh;
     }
     
 }
