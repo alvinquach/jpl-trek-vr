@@ -3,7 +3,9 @@ using System;
 using System.IO;
 using UnityEngine;
 
-public class TiffUtils {
+public sealed class TiffUtils {
+
+    private TiffUtils() { }
 
     #region Tiff Object Constructors
 

@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using UnityEngine.Networking;
 
-public class WebRequestUtils {
+public sealed class WebRequestUtils {
+
+    private WebRequestUtils() { }
 
     /// <summary>
     ///     Creates a GET web request. SendWebRequest() can only be
