@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -280,13 +280,17 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #region Naviation methods
 
-    public void NavigateTo(Vector2 coords, Vector3 cameraPosition) {
-        // TODO Find a better way to do this without having to
-        // rotate the planet to get the new direction.
-        Quaternion originalRotation = transform.rotation;
-        transform.Rotate(-coords.x, -coords.y, 0, Space.Self);
-        Vector3 direction = transform.forward;
-        transform.rotation = originalRotation;
+    public void NavigateTo(Vector2 latLon, Vector3 cameraPosition) {
+
+        // Calculate vector representing the latitude and longitude.
+        // This is a vector pointing from the cetner of the planet towards
+        // the surface where the coordinate is located.
+        Vector3 latLonDirection = CoordinateUtils.LatLonToDirection(latLon);
+
+        // Convert the lat-long direction vector to a vector that is relative
+        // to the current orientation/rotation of the planet.
+        Vector3 direction = transform.TransformDirection(latLonDirection);
+
         NavigateTo(direction, cameraPosition);
     }
 
