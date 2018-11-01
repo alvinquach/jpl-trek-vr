@@ -8,14 +8,14 @@ public class PlanarTerrainMesh : TerrainMesh {
 
     public float Size {
         get { return _size; }
-        set { if (!_initStarted) _size = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _size = value; }
     }
 
     private TiffPlanarTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {
-            if (!_meshGenerator && _initStarted) {
+            if (!_meshGenerator && _initTaskStatus > ThreadedTaskStatus.NotStarted) {
                 _meshGenerator = new TiffPlanarTerrainMeshGenerator(
                     _demFilePath,
                     _size,

@@ -8,14 +8,14 @@ public class SphericalTerrainMesh : TerrainMesh {
 
     public float Radius {
         get { return _radius; }
-        set { if (!_initStarted) _radius = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _radius = value; }
     }
 
     private TiffSphericalTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {
-            if (!_meshGenerator && _initStarted) {
+            if (!_meshGenerator && _initTaskStatus > ThreadedTaskStatus.NotStarted) {
                 _meshGenerator = new TiffSphericalTerrainMeshGenerator(
                     _demFilePath,
                     _radius,

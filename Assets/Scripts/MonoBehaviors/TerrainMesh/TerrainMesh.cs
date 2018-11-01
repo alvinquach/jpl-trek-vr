@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using BitMiracle.LibTiff.Classic;
 
 public abstract class TerrainMesh : MonoBehaviour {
 
@@ -12,7 +9,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public string DemFilePath {
         get { return _demFilePath; }
-        set { if (!_initStarted) _demFilePath = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _demFilePath = value; }
     }
 
     [SerializeField]
@@ -20,7 +17,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public string AlbedoFilePath {
         get { return _albedoFilePath; }
-        set { if (!_initStarted) _albedoFilePath = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _albedoFilePath = value; }
     }
 
     [SerializeField]
@@ -28,7 +25,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public float HeightScale {
         get { return _heightScale; }
-        set { if (!_initStarted) _heightScale = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _heightScale = value; }
     }
 
     [SerializeField]
@@ -36,7 +33,7 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public int BaseDownSampleLevel {
         get { return _baseDownsampleLevel; }
-        set { if (!_initStarted) _baseDownsampleLevel = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _baseDownsampleLevel = value; }
     }
 
     // TODO Add option to use linear LOD downsampling.
@@ -46,17 +43,18 @@ public abstract class TerrainMesh : MonoBehaviour {
 
     public int LodLevels {
         get { return _lodLevels; }
-        set { if (!_initStarted) _lodLevels = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _lodLevels = value; }
     }
 
     public Material Material { get; set; }
 
-    protected bool _initStarted = false;
-    protected bool _initCompleted = false;
+    protected ThreadedTaskStatus _initTaskStatus = ThreadedTaskStatus.NotStarted;
 
-    // This should be implemented in a way such that a TerrainMeshGenerator
-    // object is always available (not null) while _initStarted is true, and
-    // always null if _initStarted is false.
+    /// <summary>
+    ///     This should be implemented in a way such that a TerrainMeshGenerator
+    ///     object is always available (not null) while _initTaskStatus is Started
+    ///     or completed, and always null if _initTaskStatus is NotStarted.
+    /// </summary>
     protected abstract TerrainMeshGenerator MeshGenerator { get; }
 
     protected virtual void Start() {
@@ -64,19 +62,21 @@ public abstract class TerrainMesh : MonoBehaviour {
     }
 
     protected virtual void Update() {
-        if (_initStarted && !_initCompleted && MeshGenerator.Complete) {
-            ProcessMeshData();
-            _initCompleted = true;
+
+        if (_initTaskStatus == ThreadedTaskStatus.Started) {
+            if (MeshGenerator.Complete) {
+                ProcessMeshData();
+                _initTaskStatus = ThreadedTaskStatus.Completed;
+            }
         }
     }
 
     // Can only be called once.
     public virtual void GenerateMeshData() {
-        if (_initStarted) {
+        if (_initTaskStatus > ThreadedTaskStatus.NotStarted) {
             return;
         }
-
-        _initStarted = true;
+        _initTaskStatus = ThreadedTaskStatus.Started;
         MeshGenerator.GenerateAsync();
     }
 

@@ -7,7 +7,7 @@ public class PartialTerrainMesh : TerrainMesh {
 
     public float Radius {
         get { return _radius; }
-        set { if (!_initStarted) _radius = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _radius = value; }
     }
 
     [SerializeField]
@@ -15,7 +15,7 @@ public class PartialTerrainMesh : TerrainMesh {
 
     public Vector4 BoundingBox {
         get { return _boundingBox; }
-        set { if (!_initStarted) _boundingBox = value; }
+        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _boundingBox = value; }
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class PartialTerrainMesh : TerrainMesh {
             if (_meshGenerator) {
                 return _meshGenerator;
             }
-            else if (!_baseMeshGenerator && _initStarted) {
+            else if (!_baseMeshGenerator && _initTaskStatus > ThreadedTaskStatus.NotStarted) {
                 _baseMeshGenerator = new BasePartialTerrainMeshGenerator(
                     _radius,
                     _boundingBox
@@ -53,9 +53,9 @@ public class PartialTerrainMesh : TerrainMesh {
     }
 
     protected override void Update() {
-        if (_initStarted && !_initCompleted && _baseMeshGenerator.Complete) {
+        if (_initTaskStatus == ThreadedTaskStatus.Started && _baseMeshGenerator.Complete) {
             ProcessMeshData(_baseMeshGenerator);
-            _initCompleted = true;
+            _initTaskStatus = ThreadedTaskStatus.Completed;
         }
     }
 
