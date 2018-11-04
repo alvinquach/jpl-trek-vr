@@ -138,9 +138,9 @@ public class XRInteractablePlanet : XRInteractableObject {
             // Check if selection is finished.
             if (_selectionIndex == 4) {
                 Debug.Log("Selection Complete: " + _selectionBoundingBox);
-                TerrainMeshController terrainMeshController = TerrainMeshController.Instance;
-                TerrainMesh terrainMesh = terrainMeshController.CreatePartial(_selectionBoundingBox, null);
-                terrainMeshController.ShowTerrainMesh(terrainMesh, true);
+                TerrainModelService terrainModelService = TerrainModelService.Instance;
+                TerrainModelBase terrainModel = terrainModelService.CreatePartial(_selectionBoundingBox, null);
+                terrainModelService.ShowTerrainModel(terrainModel, true);
                 ExitSelectionMode();
             }
             else {

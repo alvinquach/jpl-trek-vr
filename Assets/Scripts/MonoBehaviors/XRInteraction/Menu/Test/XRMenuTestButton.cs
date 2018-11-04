@@ -9,17 +9,17 @@ using UnityEngine;
 public class XRMenuTestButton : XRMenuElement {
 
     public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
-        TerrainMeshController terrainMeshController = TerrainMeshController.Instance;
-        if (terrainMeshController.DefaultPlanetMeshIsVisible()) {
+        TerrainModelService terrainModelService = TerrainModelService.Instance;
+        if (terrainModelService.DefaultPlanetModelIsVisible()) {
             string destFileName = $"test1.data";
             WebServiceManager.Instance?.DataElevationModelWebService.GetDEM(null, destFileName, () => {
                 string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
-                TerrainMesh terrainMesh = terrainMeshController.Create(destFilePath);
-                terrainMeshController.ShowTerrainMesh(terrainMesh);
+                TerrainModelBase terrainMesh = terrainModelService.Create(destFilePath);
+                terrainModelService.ShowTerrainModel(terrainMesh);
             });
         }
         else {
-            terrainMeshController.ShowDefaultPlanetMesh();
+            terrainModelService.ShowDefaultPlanetModel();
         }
     }
 

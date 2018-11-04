@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 ///     Button script for testing various functionality.
@@ -9,9 +6,9 @@ using UnityEngine;
 public class XRMenuTestSelectionButton : XRMenuElement {
 
     public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
-        TerrainMeshController terrainMeshController = TerrainMeshController.Instance;
-        if (terrainMeshController.DefaultPlanetMeshIsVisible()) {
-            XRInteractablePlanet planet = terrainMeshController.GetComponentFromCurrentMesh<XRInteractablePlanet>();
+        TerrainModelService terrainModelController = TerrainModelService.Instance;
+        if (terrainModelController.DefaultPlanetModelIsVisible()) {
+            XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
             if (planet.InteractionMode == XRInteractablePlanetMode.Navigate) {
                 planet.InteractionMode = XRInteractablePlanetMode.Select;
             } else {
@@ -19,7 +16,7 @@ public class XRMenuTestSelectionButton : XRMenuElement {
             }
         }
         else {
-            terrainMeshController.ShowDefaultPlanetMesh();
+            terrainModelController.ShowDefaultPlanetModel();
         }
     }
 
