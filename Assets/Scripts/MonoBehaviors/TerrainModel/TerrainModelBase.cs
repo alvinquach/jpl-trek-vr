@@ -9,7 +9,7 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
     public string DemFilePath {
         get { return _demFilePath; }
-        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _demFilePath = value; }
+        set { if (_initTaskStatus == TaskStatus.NotStarted) _demFilePath = value; }
     }
 
     [SerializeField]
@@ -17,7 +17,7 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
     public string AlbedoFilePath {
         get { return _albedoFilePath; }
-        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _albedoFilePath = value; }
+        set { if (_initTaskStatus == TaskStatus.NotStarted) _albedoFilePath = value; }
     }
 
     [SerializeField]
@@ -25,7 +25,7 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
     public float HeightScale {
         get { return _heightScale; }
-        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _heightScale = value; }
+        set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
     }
 
     [SerializeField]
@@ -33,7 +33,7 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
     public int BaseDownSampleLevel {
         get { return _baseDownsampleLevel; }
-        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _baseDownsampleLevel = value; }
+        set { if (_initTaskStatus == TaskStatus.NotStarted) _baseDownsampleLevel = value; }
     }
 
     // TODO Add option to use linear LOD downsampling.
@@ -43,12 +43,12 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
     public int LodLevels {
         get { return _lodLevels; }
-        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _lodLevels = value; }
+        set { if (_initTaskStatus == TaskStatus.NotStarted) _lodLevels = value; }
     }
 
     public Material Material { get; set; }
 
-    protected ThreadedTaskStatus _initTaskStatus = ThreadedTaskStatus.NotStarted;
+    protected TaskStatus _initTaskStatus = TaskStatus.NotStarted;
 
     /// <summary>
     ///     This should be implemented in a way such that a TerrainMeshGenerator
@@ -82,20 +82,20 @@ public abstract class TerrainModelBase : MonoBehaviour {
     }
 
     protected virtual void Update() {
-        if (_initTaskStatus == ThreadedTaskStatus.Started) {
+        if (_initTaskStatus == TaskStatus.Started) {
             if (MeshGenerator.Complete) {
                 ProcessMeshData();
-                _initTaskStatus = ThreadedTaskStatus.Completed;
+                _initTaskStatus = TaskStatus.Completed;
             }
         }
     }
 
     // Can only be called once.
     public virtual void GenerateMeshData() {
-        if (_initTaskStatus > ThreadedTaskStatus.NotStarted) {
+        if (_initTaskStatus > TaskStatus.NotStarted) {
             return;
         }
-        _initTaskStatus = ThreadedTaskStatus.Started;
+        _initTaskStatus = TaskStatus.Started;
         MeshGenerator.GenerateAsync();
     }
 

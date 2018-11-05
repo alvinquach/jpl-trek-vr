@@ -42,6 +42,8 @@ public class BasePartialTerrainMeshGenerator : TerrainMeshGenerator {
         Vector3[] verts = new Vector3[LatLongVertCount * LatLongVertCount];
         Vector2[] uvs = new Vector2[LatLongVertCount * LatLongVertCount];
 
+        Vector3 offset = BoundingBoxUtils.MedianDirection(_boundingBox);
+
         int yIndex = 0, vertexIndex = 0;
         for (float y = latStart; yIndex < LatLongVertCount; y += latIncrement) {
 
@@ -56,7 +58,7 @@ public class BasePartialTerrainMeshGenerator : TerrainMeshGenerator {
             for (float x = lonStart; xIndex < LatLongVertCount; x += lonIncrement) {
 
                 // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
-                verts[vertexIndex] = Quaternion.Euler(0, -90 - x, 0) * (_radius * baseLatVertex);
+                verts[vertexIndex] = _radius * (Quaternion.Euler(0, -90 - x, 0) * baseLatVertex - offset);
                 //Debug.Log($"({xIndex}, {yIndex}) -> ({xIndex / (LatLongVertCount - 1f)}, {-yIndex / (LatLongVertCount - 1f)})");
                 uvs[vertexIndex] = GenerateStandardUV(xIndex, yIndex, LatLongVertCount, LatLongVertCount);
                 xIndex++;

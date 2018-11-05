@@ -142,7 +142,7 @@ public class XRInteractablePlanet : XRInteractableObject {
                 Debug.Log("Selection Complete: " + _selectionBoundingBox);
                 TerrainModelService terrainModelService = TerrainModelService.Instance;
                 TerrainModelBase terrainModel = terrainModelService.CreatePartial(_selectionBoundingBox, null);
-                terrainModelService.ShowTerrainModel(terrainModel, true);
+                terrainModelService.ShowTerrainModel(terrainModel, false);
                 ExitSelectionMode();
             }
             else {

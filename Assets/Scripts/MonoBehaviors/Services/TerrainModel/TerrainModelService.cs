@@ -187,6 +187,10 @@ public class TerrainModelService : MonoBehaviour {
         return _defaultPlanetModel.GetComponent<T>();
     }
 
+    public Transform GetDefaultPlanetModelTransform() {
+        return _defaultPlanetModel.transform;
+    }
+
     private TerrainModelBase AddTerrainModel(TerrainModelBase terrainModel) {
 
         // If the number of terrain models being managed already exceeds the max limit,

@@ -1,4 +1,4 @@
-﻿public enum ThreadedTaskStatus {
+﻿public enum TaskStatus {
 
     NotStarted,
     Started,

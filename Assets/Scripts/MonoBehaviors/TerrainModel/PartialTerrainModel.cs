@@ -7,7 +7,7 @@ public class PartialTerrainModel : TerrainModelBase {
 
     public float Radius {
         get { return _radius; }
-        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _radius = value; }
+        set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
     }
 
     [SerializeField]
@@ -15,8 +15,16 @@ public class PartialTerrainModel : TerrainModelBase {
 
     public Vector4 BoundingBox {
         get { return _boundingBox; }
-        set { if (_initTaskStatus == ThreadedTaskStatus.NotStarted) _boundingBox = value; }
+        set { if (_initTaskStatus == TaskStatus.NotStarted) _boundingBox = value; }
     }
+
+    private TaskStatus _viewTransitionTaskStatus = TaskStatus.NotStarted;
+    private float _viewTransitionProgress = 0.0f;
+    private Vector3 _startPosition;
+    private Quaternion _startRotation;
+    private Quaternion _targetRotation;
+    private float _targetScale;
+
 
     /// <summary>
     ///     For generating a mesh without any height data. The gernated mesh will be
@@ -35,7 +43,7 @@ public class PartialTerrainModel : TerrainModelBase {
             if (_meshGenerator) {
                 return _meshGenerator;
             }
-            else if (!_baseMeshGenerator && _initTaskStatus > ThreadedTaskStatus.NotStarted) {
+            else if (!_baseMeshGenerator && _initTaskStatus > TaskStatus.NotStarted) {
                 _baseMeshGenerator = new BasePartialTerrainMeshGenerator(
                     _radius,
                     _boundingBox
@@ -45,18 +53,41 @@ public class PartialTerrainModel : TerrainModelBase {
         }
     }
 
-    private float _tabletopTransitionProgress = 0.0f;
-
     protected override void Start() {
         base.Start();
         // TODO Call method to download DEM and textures here.
     }
 
     protected override void Update() {
-        if (_initTaskStatus == ThreadedTaskStatus.Started && _baseMeshGenerator.Complete) {
+
+        if (_initTaskStatus == TaskStatus.Started && _baseMeshGenerator.Complete) {
             ProcessMeshData(_baseMeshGenerator);
-            _initTaskStatus = ThreadedTaskStatus.Completed;
+
+            transform.rotation = TerrainModelService.Instance.GetDefaultPlanetModelTransform().rotation;
+            transform.position = transform.rotation * (0.25f * 3.39f * BoundingBoxUtils.MedianDirection(_boundingBox)) + Vector3.up;
+
+            _initTaskStatus = TaskStatus.Completed;
+
+            // Start the view transition.
+            _startPosition = transform.position;
+            _startRotation = transform.rotation;
+            _targetRotation = Quaternion.FromToRotation(BoundingBoxUtils.MedianDirection(_boundingBox), Vector3.up);
+            _targetScale = 0.5f / BoundingBoxUtils.LargestDimension(_boundingBox);
+            _viewTransitionTaskStatus = TaskStatus.Started;
         }
+
+        if (_viewTransitionTaskStatus == TaskStatus.Started) {
+            // TODO Un-hardcode these values
+            _viewTransitionProgress += Time.deltaTime / 1.337f;
+            transform.rotation = Quaternion.Lerp(_startRotation, _targetRotation, _viewTransitionProgress);
+            transform.position = Vector3.Lerp(_startPosition, 0.69f * Vector3.up, _viewTransitionProgress);
+            transform.localScale = Vector3.Lerp(0.25f * Vector3.one, _targetScale * Vector3.one, _viewTransitionProgress);
+            if (_viewTransitionProgress >= 1.0f) {
+                _viewTransitionTaskStatus = TaskStatus.Completed;
+            } 
+        }
+
     }
+
 
 }
