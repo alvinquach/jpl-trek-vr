@@ -11,8 +11,8 @@ public class XRMenuPlanetNavigationButton : XRMenuElement {
 
     public float longitude;
 
-    //public override void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
-    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
+    //public override void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
 
         if (_planet != null) {
             Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();

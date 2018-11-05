@@ -8,13 +8,16 @@ public class BookmarkMenuTest : MonoBehaviour {
 
     private List<GameObject> pins = new List<GameObject>();
 
-    public GameObject buttonTemplate;
+    private GameObject _pinTemplate;
 
-    public GameObject pinTemplate;
+    public GameObject buttonTemplate;
 
     public GlobalTerrainModel planet;
 
     void OnEnable() {
+        if (!_pinTemplate) {
+            _pinTemplate = TemplateService.Instance.GetTemplate(GameObjectName.PinTemplate);
+        }
         if (_bookmarks == null) {
             WebServiceManager.Instance?.BookmarksWebService.GetBookmarks(OnGetBookmarks);
         }
@@ -45,9 +48,9 @@ public class BookmarkMenuTest : MonoBehaviour {
                 obj.SetActive(true);
             }
 
-            if (pinTemplate != null && planet != null) {
+            if (_pinTemplate && planet) {
 
-                GameObject pin = Instantiate(pinTemplate, planet.transform);
+                GameObject pin = Instantiate(_pinTemplate, planet.transform);
 
                 pin.transform.forward = planet.transform.forward;
 

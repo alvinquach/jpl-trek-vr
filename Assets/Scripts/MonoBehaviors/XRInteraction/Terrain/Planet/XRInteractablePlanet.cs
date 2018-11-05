@@ -21,6 +21,7 @@ public class XRInteractablePlanet : XRInteractableObject {
             if (value == XRInteractablePlanetMode.Select) {
                 _lonSelectionStartIndicator.startWidth = CoordinateIndicatorActiveThickness;
                 _lonSelectionStartIndicator.enabled = true;
+                _coordSelectionLabel.gameObject.SetActive(true);
             }
             else {
                 CancelSelection(true);
@@ -77,12 +78,13 @@ public class XRInteractablePlanet : XRInteractableObject {
     private LineRenderer _latSelectionStartIndicator;
     private LineRenderer _lonSelectionEndIndicator;
     private LineRenderer _latSelectionEndIndicator;
+    private POILabel _coordSelectionLabel;
 
     #endregion
 
     #region Event handlers
 
-    public override void OnGripDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
+    public override void OnGripDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
         if (Vector3.Distance(sender.transform.position, point) > _maxGrabDistance) {
             return;
         }
@@ -95,11 +97,11 @@ public class XRInteractablePlanet : XRInteractableObject {
         _grabber.cursor.transform.localScale *= 2;
     }
 
-    public override void OnGripUp(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
+    public override void OnGripUp(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
         Ungrab();
     }
 
-    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, ClickedEventArgs e) {
+    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
 
         if (_interactionMode == XRInteractablePlanetMode.Navigate) {
             Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
@@ -151,8 +153,25 @@ public class XRInteractablePlanet : XRInteractableObject {
         }
     }
 
-    public override void OnCursorOver(CustomControllerBehavior sender, Vector3 point) {
+    public override void OnCursorOver(CustomControllerBehavior sender, Vector3 point, Vector3 normal) {
+
+        /*
+         * Under select mode, there are currently two things that happen when the cursor
+         * is pointed somewhere within the planet model:
+         *
+         * 1. A line indicating where current longitude or latitude is, referred to as a
+         * coordinate indicator, moves along with the cursor position.
+         *
+         * 2. A text overlay at the cursor location indicatest the current longitude or 
+         * latitude angle.
+         */
         if (_interactionMode == XRInteractablePlanetMode.Select) {
+
+            // Update the position and angle of the coordinate selection label.
+            _coordSelectionLabel.transform.position = point;
+            _coordSelectionLabel.transform.forward = -normal;
+
+            // Get the current coordinate indicator to set its angles.
             LineRenderer currentCoordinateIndicator = GetCurrentSelectionIndicator();
 
             Vector3 direction = transform.InverseTransformPoint(point);
@@ -165,6 +184,8 @@ public class XRInteractablePlanet : XRInteractableObject {
                     angle = -angle;
                 }
                 currentCoordinateIndicator.transform.localEulerAngles = new Vector3(0, -angle, 0);
+
+                _coordSelectionLabel.Text = $"Lon: {angle.ToString("0.00")}°";
             }
 
             // Latitude selection
@@ -178,6 +199,8 @@ public class XRInteractablePlanet : XRInteractableObject {
                 // TODO Un-hardcode the radius
                 currentCoordinateIndicator.transform.localPosition = new Vector3(0, 3.39f * offsetAndScale.y, 0);
                 currentCoordinateIndicator.transform.localScale = (offsetAndScale.x * 3.39f + CoordinateIndicatorRadiusOffset) * Vector3.one;
+
+                _coordSelectionLabel.Text = $"Lat: {angle.ToString("0.00")}°";
             }
         }
     }
@@ -226,6 +249,14 @@ public class XRInteractablePlanet : XRInteractableObject {
         _latSelectionEndIndicator = InitCoordinateIndicator(latSelectionEndIndicator);
         _latSelectionEndIndicator.enabled = false;
         GeneratePointsForLatitudeIndicator(_latSelectionEndIndicator);
+
+        // Instantiate a copy of the coordinate template to display the coordiate values.
+        GameObject coordinateTemplate = TemplateService.Instance.GetTemplate(GameObjectName.CoordinateTemplate);
+        if (coordinateTemplate) {
+            GameObject copy = Instantiate(coordinateTemplate);
+            copy.transform.SetParent(selectionIndicatorsContainer.transform); // TODO Move this to a container for labels.
+            _coordSelectionLabel = copy.transform.GetComponent<POILabel>();
+        }
 
     }
 
@@ -380,6 +411,7 @@ public class XRInteractablePlanet : XRInteractableObject {
         _latSelectionStartIndicator.enabled = false;
         _lonSelectionEndIndicator.enabled = false;
         _latSelectionEndIndicator.enabled = false;
+        _coordSelectionLabel.gameObject.SetActive(false);
         _interactionMode = XRInteractablePlanetMode.Navigate;
     }
 
