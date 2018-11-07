@@ -15,14 +15,20 @@ public sealed class BoundingBoxUtils {
     /// <param name="boundingBox"></param>
     /// <returns>A Vector2 where x is the latitude and y is the longitude.</returns>
     public static Vector2 MedianLatLon(Vector4 boundingBox) {
-        return 0.5f * new Vector2(
-            boundingBox[1] + boundingBox[3],
-            boundingBox[0] + boundingBox[2]
-        );
+        float lon = (boundingBox[0] + boundingBox[2]) / 2;
+
+        // Handle case where the start and end longitudes have opposite signs.
+        if (ReverseLonOrder(boundingBox)) {
+            lon += (lon > 0 ? -180 : 180);
+        }
+
+        return new Vector2((boundingBox[1] + boundingBox[3]) / 2, lon);
     }
 
     public static Vector3 MedianDirection(Vector4 boundingBox) {
-        return CoordinateUtils.LatLonToDirection(MedianLatLon(boundingBox));
+        Vector2 medianLatLong = MedianLatLon(boundingBox);
+        Debug.Log(medianLatLong);
+        return CoordinateUtils.LatLonToDirection(medianLatLong);
     }
 
     /// <summary>
@@ -64,16 +70,20 @@ public sealed class BoundingBoxUtils {
         return Mathf.Max(width, height);
     }
 
+    public static bool ReverseLonOrder(Vector4 boundingBox) {
+        return boundingBox[0] * boundingBox[2] < 0 && Mathf.Abs(boundingBox[0] - boundingBox[2]) > 180.0f;
+    }
 
-    public static Vector4 ValidateBoundingBox(Vector4 boundingBox) {
-        Vector4 result = 1 * boundingBox; // Convert to radians
-        if (result.w < result.y) {
-            result.y = boundingBox.w;
-            result.w = boundingBox.y;
+
+    public static Vector4 SortBoundingBox(Vector4 boundingBox) {
+        Vector4 result = boundingBox;
+        if (result[3] < result[1]) {
+            result[1] = boundingBox[3];
+            result[3] = boundingBox[1];
         }
-        if (result.z < result.x) {
-            result.x = boundingBox.z;
-            result.z = boundingBox.x;
+        if (result[2] < result[0]) {
+            result[0] = boundingBox[2];
+            result[2] = boundingBox[0];
         }
         return result;
     }
