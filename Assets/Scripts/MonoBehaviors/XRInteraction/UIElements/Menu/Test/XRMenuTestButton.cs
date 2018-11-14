@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class XRMenuTestButton : XRMenuElement {
 
-    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+    public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
         TerrainModelService terrainModelService = TerrainModelService.Instance;
         if (terrainModelService.DefaultPlanetModelIsVisible()) {
             string destFileName = $"test1.data";

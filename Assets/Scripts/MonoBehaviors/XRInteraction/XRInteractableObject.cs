@@ -12,19 +12,19 @@ public abstract class XRInteractableObject : MonoBehaviour {
     public bool gripUp = true;
     public bool cursorOver = true;
 
-    public virtual void OnTriggerClick(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
+    public virtual void OnTriggerClick(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
 
-    public virtual void OnTriggerDoubleClick(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
+    public virtual void OnTriggerDoubleClick(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
 
-    public virtual void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
+    public virtual void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
 
-    public virtual void OnTriggerUp(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
+    public virtual void OnTriggerUp(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
 
-    public virtual void OnGripDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
+    public virtual void OnGripDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
 
-    public virtual void OnGripUp(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
+    public virtual void OnGripUp(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) { }
 
-    public virtual void OnCursorOver(CustomControllerBehavior sender, Vector3 point, Vector3 normal) { }
+    public virtual void OnCursorOver(XRController sender, Vector3 point, Vector3 normal) { }
 
     // Use this for initialization
     void Start () {

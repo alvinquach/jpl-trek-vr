@@ -50,7 +50,7 @@ public class XRInteractablePlanet : XRInteractableObject {
     private bool _grabbed = false;
     private Vector3 _grabPoint;
     private float _grabRadius;
-    private CustomControllerBehavior _grabber;
+    private XRController _grabber;
 
     #endregion
 
@@ -84,7 +84,7 @@ public class XRInteractablePlanet : XRInteractableObject {
 
     #region Event handlers
 
-    public override void OnGripDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+    public override void OnGripDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
         if (Vector3.Distance(sender.transform.position, point) > _maxGrabDistance) {
             return;
         }
@@ -97,14 +97,14 @@ public class XRInteractablePlanet : XRInteractableObject {
         _grabber.cursor.transform.localScale *= 2;
     }
 
-    public override void OnGripUp(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+    public override void OnGripUp(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
         Ungrab();
     }
 
-    public override void OnTriggerDown(CustomControllerBehavior sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+    public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
 
         if (_interactionMode == XRInteractablePlanetMode.Navigate) {
-            Camera eye = sender.cameraRig.GetComponentInChildren<Camera>();
+            Camera eye = sender.CameraRig.GetComponentInChildren<Camera>();
             NavigateTo(point - transform.position, eye.transform.position);
         }
 
@@ -153,7 +153,7 @@ public class XRInteractablePlanet : XRInteractableObject {
         }
     }
 
-    public override void OnCursorOver(CustomControllerBehavior sender, Vector3 point, Vector3 normal) {
+    public override void OnCursorOver(XRController sender, Vector3 point, Vector3 normal) {
 
         /*
          * Under select mode, there are currently two things that happen when the cursor
