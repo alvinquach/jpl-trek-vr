@@ -39,12 +39,12 @@ public class PrimaryXRController : XRController {
     }
 
     protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
-        Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
+        //Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
         _padClicked = true;
     }
 
     protected override void PadUnclickedHandler(object sender, ClickedEventArgs e) {
-        Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
+        //Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
         _padClicked = false;
     }
 
