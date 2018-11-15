@@ -23,4 +23,8 @@ public class SecondaryXRController : XRController {
         }
     }
 
+    protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
+        _flashlight?.CycleNextColor();
+    }
+
 }
