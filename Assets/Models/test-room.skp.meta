@@ -1,29 +1,27 @@
 fileFormatVersion: 2
 guid: 9493f76ddf70fe14090ec3ccb63f3314
-timeCreated: 1523950381
-licenseType: Free
 SketchUpImporter:
   generateBackFace: 0
   mergeCoplanarFaces: 0
   selectedNodes: 000000000100000002000000030000000400000005000000060000000700000008000000
   assetHash:
     serializedVersion: 2
-    Hash: e5d336c43da22dcb9137befd652006c0
+    Hash: 13305597936357e842896b4bc3e8cb27
   longitude: -105.242139
   latitude: 40.018309
   northCorrection: -0
   fileUnit: 0
   sketchUpImportData:
     defaultCamera:
-      position: {x: 23.792994, y: 16.032919, z: -35.593224}
-      lookAt: {x: 9.705399, y: 10.941107, z: -16.156303}
-      up: {x: -0.12176953, y: 0.97823596, z: 0.16800773}
+      position: {x: -2.285159, y: 1.3079445, z: -0.7776525}
+      lookAt: {x: 17.900446, y: -10.9810915, z: 5.8330774}
+      up: {x: 0.4759164, y: 0.86556965, z: 0.1558613}
       fov: 35
       aspectRatio: 0
       orthoSize: 1
       isPerspective: 1
     scenes: []
-  serializedVersion: 22
+  serializedVersion: 23
   fileIDToRecycleName:
     100000: //RootNode
     100002: Group 1
@@ -53,7 +51,7 @@ SketchUpImporter:
     4300008: Mesh Group 7
   externalObjects: {}
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 2
     materialSearch: 0
     materialLocation: 1
@@ -70,6 +68,7 @@ SketchUpImporter:
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
@@ -101,6 +100,8 @@ SketchUpImporter:
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
