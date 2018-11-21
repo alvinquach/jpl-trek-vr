@@ -8,6 +8,10 @@ using UnityEngine;
 
 public class HttpClient {
 
+    public static HttpClient Instance { get; } = new HttpClient();
+
+    private HttpClient() { }
+
     public void Get(string uri, Action<HttpWebResponse> callback = null, Action<HttpWebResponse> errorCallback = null) {
 
         ThreadPool.QueueUserWorkItem((state) => {
@@ -76,14 +80,14 @@ public class HttpClient {
 
     }
 
-    private static string ToJsonString(object data) {
+    private string ToJsonString(object data) {
         if (data is string) {
             return (string)data;
         }
         return JsonConvert.SerializeObject(data);
     }
 
-    private static string GetContentType(object data) {
+    private string GetContentType(object data) {
         if (data is string) {
             return "text/plain";
         }
