@@ -2,11 +2,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BookmarkMenuTest : MonoBehaviour {
+public class BookmarkMenuTest : MonoBehaviourWithTaskQueue {
+
+    private IBookmarksWebService _bookmarksWebService = JplBookmarksWebService.Instance;
 
     private IList<Bookmark> _bookmarks;
 
-    private List<GameObject> pins = new List<GameObject>();
+    private List<GameObject> _pins = new List<GameObject>();
 
     private GameObject _pinTemplate;
 
@@ -14,25 +16,27 @@ public class BookmarkMenuTest : MonoBehaviour {
 
     public GlobalTerrainModel planet;
 
-    void OnEnable() {
+    private void OnEnable() {
         if (!_pinTemplate) {
             _pinTemplate = TemplateService.Instance.GetTemplate(GameObjectName.PinTemplate);
         }
         if (_bookmarks == null) {
-            WebServiceManager.Instance?.BookmarksWebService.GetBookmarks(OnGetBookmarks);
+            _bookmarksWebService.GetBookmarks((bookmarks) => {
+                _bookmarks = bookmarks;
+                QueueTask(ProcessBookmarks);
+            });
         }
         ActivatePins(true);
     }
 
-    void OnDisable() {
+    private void OnDisable() {
         ActivatePins(false);
     }
 
-    private void OnGetBookmarks(IList<Bookmark> bookmarks) {
-        _bookmarks = bookmarks;
+    private void ProcessBookmarks() {
         for (int i = 0; i < _bookmarks.Count; i++) {
             Bookmark bookmark = _bookmarks[i];
-            Vector2 centerCoords = CalculateCenterCoordinates(bookmark.bbox);
+            Vector2 centerCoords = BoundingBoxUtils.ParseBoundingBox(bookmark.bbox);
 
             if (buttonTemplate != null) {
                 GameObject obj = Instantiate(buttonTemplate, transform);
@@ -66,7 +70,7 @@ public class BookmarkMenuTest : MonoBehaviour {
                 Text text = pin.GetComponentInChildren<Text>();
                 text.text = bookmark.title;
 
-                pins.Add(pin);
+                _pins.Add(pin);
             }
 
             ActivatePins(true);
@@ -74,17 +78,8 @@ public class BookmarkMenuTest : MonoBehaviour {
         }
     }
 
-    private Vector2 CalculateCenterCoordinates(string coords) {
-        // TODO Add sanity checks.
-        string[] split = coords.Split(',');
-        return new Vector2(
-            float.Parse(split[1]) + float.Parse(split[3]),
-            float.Parse(split[0]) + float.Parse(split[2])
-        ) / 2;
-    }
-
     private void ActivatePins(bool active) {
-        foreach (GameObject pin in pins) {
+        foreach (GameObject pin in _pins) {
             pin.SetActive(active);
         }
     }

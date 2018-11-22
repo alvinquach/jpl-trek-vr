@@ -8,6 +8,16 @@ public sealed class BoundingBoxUtils {
 
     private BoundingBoxUtils() { }
 
+    public static Vector4 ParseBoundingBox(string boundingBox) {
+        Vector4 result = Vector4.zero;
+        string[] split = boundingBox.Split(',');
+        // TODO Add sanity checks.
+        for (int i = 0; i < 4; i++) {
+            result[i] = float.Parse(split[i]);
+        }
+        return result;
+    }
+
     /// <summary>
     ///     Calculates the median latitude and longitude of a bounding box.
     ///     Returns a Vector2 where x is the latitude and y is the longitude.

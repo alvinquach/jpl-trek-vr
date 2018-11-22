@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using UnityEngine.Networking;
+using System;
 
+[Obsolete("Unity's web library is no longer used.")]
 public sealed class WebRequestUtils {
 
     private WebRequestUtils() { }
@@ -33,7 +35,6 @@ public sealed class WebRequestUtils {
         request.method = UnityWebRequest.kHttpVerbPOST;
         return request;
     }
-
 
     private static string ToJsonString(object data) {
         if (data is string) {

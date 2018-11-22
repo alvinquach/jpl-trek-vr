@@ -12,6 +12,13 @@ public class HttpClient {
 
     private HttpClient() { }
 
+    public static string GetReponseBody(HttpWebResponse response) {
+        Stream dataStream = response.GetResponseStream();
+        using (StreamReader reader = new StreamReader(dataStream)) {
+            return reader.ReadToEnd();
+        }
+    }
+
     public void Get(string uri, Action<HttpWebResponse> callback = null, Action<HttpWebResponse> errorCallback = null) {
 
         ThreadPool.QueueUserWorkItem((state) => {
