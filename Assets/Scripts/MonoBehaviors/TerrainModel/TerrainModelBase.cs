@@ -110,7 +110,7 @@ public abstract class TerrainModelBase : MonoBehaviour {
         if (Material == null) {
             Material = GenerateMaterial();
             if (Material == null) {
-                Material = TerrainModelService.Instance.DefaultMaterial;
+                Material = TerrainModelManager.Instance.DefaultMaterial;
             }
         }
 

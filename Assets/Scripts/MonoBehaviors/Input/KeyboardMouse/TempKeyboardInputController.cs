@@ -19,9 +19,9 @@ public class TempKeyboardInputController : MonoBehaviour {
             string destFileName = $"test{++count}.data";
            _dataElevationModelWebService.GetDEM(null, destFileName, () => {
                 string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
-                TerrainModelService terrainModelService = TerrainModelService.Instance;
-                TerrainModelBase terrainModel = terrainModelService.Create(destFilePath, "D:/Alvin/Downloads/Trek DEMs/exportImage.png");
-                terrainModelService.ShowTerrainModel(terrainModel);
+                TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+                TerrainModelBase terrainModel = terrainModelManager.Create(destFilePath, "D:/Alvin/Downloads/Trek DEMs/exportImage.png");
+                terrainModelManager.ShowTerrainModel(terrainModel);
             });
         }
 

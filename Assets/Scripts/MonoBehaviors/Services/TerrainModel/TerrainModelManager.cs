@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 [DisallowMultipleComponent]
-public class TerrainModelService : MonoBehaviour {
+public class TerrainModelManager : MonoBehaviour {
 
     /// <summary>
     ///     The maximum number of models that this controller can manage,
@@ -16,10 +16,10 @@ public class TerrainModelService : MonoBehaviour {
     private const int MaxModels = 5;
 
     /// <summary>
-    ///     The instance of the TerrainModelService that is present in the scene.
-    ///     There should only be one TerrainModelService in the entire scene.
+    ///     The instance of the TerrainModelManager that is present in the scene.
+    ///     There should only be one TerrainModelManager in the entire scene.
     /// </summary>
-    public static TerrainModelService Instance { get; private set; }
+    public static TerrainModelManager Instance { get; private set; }
 
     [SerializeField]
     [Tooltip("The default material that is used as a base for new terrain models.")]

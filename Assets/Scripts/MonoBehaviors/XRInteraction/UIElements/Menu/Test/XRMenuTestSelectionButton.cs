@@ -6,7 +6,7 @@
 public class XRMenuTestSelectionButton : XRMenuElement {
 
     public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
-        TerrainModelService terrainModelController = TerrainModelService.Instance;
+        TerrainModelManager terrainModelController = TerrainModelManager.Instance;
         if (terrainModelController.DefaultPlanetModelIsVisible()) {
             XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
             if (planet.InteractionMode == XRInteractablePlanetMode.Navigate) {

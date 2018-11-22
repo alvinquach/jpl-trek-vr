@@ -63,7 +63,7 @@ public class PartialTerrainModel : TerrainModelBase {
         if (_initTaskStatus == TaskStatus.Started && _baseMeshGenerator.Complete) {
             ProcessMeshData(_baseMeshGenerator);
 
-            transform.rotation = TerrainModelService.Instance.GetDefaultPlanetModelTransform().rotation;
+            transform.rotation = TerrainModelManager.Instance.GetDefaultPlanetModelTransform().rotation;
             transform.localPosition = transform.rotation * (0.25f * 3.39f * BoundingBoxUtils.MedianDirection(_boundingBox));
 
             _initTaskStatus = TaskStatus.Completed;
