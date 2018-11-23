@@ -218,7 +218,7 @@ public class TiffWrapper : IDisposable {
             Height = _tiff.GetField(TiffTag.IMAGELENGTH)[0].ToInt(),
             BPP = _tiff.GetField(TiffTag.BITSPERSAMPLE)[0].ToShort(),
             SPP = _tiff.GetField(TiffTag.SAMPLESPERPIXEL)[0].ToShort(),
-            SampleFormat = _tiff.GetField(TiffTag.SAMPLEFORMAT)[0].ToString(),
+            SampleFormat = _tiff.GetField(TiffTag.SAMPLEFORMAT)?[0].ToString(), // FIXME Handle null field properly (field can be null when TIFF is saved from Photoshop).
             Compression = (Compression)_tiff.GetField(TiffTag.COMPRESSION)[0].ToInt(),
             Tiled = tiled,
             TileSize = tiled ? _tiff.TileSize() : 0,

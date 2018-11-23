@@ -41,10 +41,14 @@ public class RGBAImage : Image<Color32> {
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
                 Color32 pixel = _pixels[x, y];
-                bytes[index] = pixel.r;
+
+                // This is ouput in BGRA format to work with NVTT.
+                // TODO Add option parametero to output in other formats.
+                bytes[index] = pixel.b;
                 bytes[index + 1] = pixel.g;
-                bytes[index + 2] = pixel.b;
+                bytes[index + 2] = pixel.r;
                 bytes[index + 3] = pixel.a;
+
                 index += 4;
             }
         }

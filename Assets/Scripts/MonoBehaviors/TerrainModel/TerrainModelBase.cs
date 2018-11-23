@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System;
 using System.IO;
+using Nvidia.TextureTools;
+using System.Runtime.InteropServices;
+using Unity.Collections;
 
 public abstract class TerrainModelBase : MonoBehaviour {
 
@@ -201,17 +204,74 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
     protected virtual Material GenerateMaterial() {
 
-
         Texture2D texture;
+
+        // TODO Also check if file exists.
         if (!String.IsNullOrEmpty(_albedoFilePath)) {
+
             float start = Time.realtimeSinceStartup;
-            texture = new Texture2D(1024, 1024, TextureFormat.DXT5, true);
-            byte[] imageData = File.ReadAllBytes(_albedoFilePath);
-            texture.LoadImage(imageData);
+
+            RGBAImage srcImage;
+
+            using (TiffWrapper tiff = new TiffWrapper(_albedoFilePath)) {
+                srcImage = tiff.ToRGBAImage();
+            }
+
+            byte[] srcBytes = srcImage.ToByteArray();
+
+            texture = new Texture2D(srcImage.Width, srcImage.Height, TextureFormat.DXT1, true);
+            NativeArray<byte> rawTextureData = texture.GetRawTextureData<byte>();
+            byte[] destBytes = new byte[rawTextureData.Length];
+
+            GCHandle pinnedArray = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
+            IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+
+            Debug.Log("Hello 0");
+
+            InputOptions inputOptions = new InputOptions();
+            inputOptions.SetTextureLayout(TextureType.Texture2D, srcImage.Width, srcImage.Height, 1);
+            inputOptions.SetMipmapData(pointer, srcImage.Width, srcImage.Height, 1, 0, 0);
+            inputOptions.SetMipmapGeneration(true);
+            inputOptions.SetMipmapFilter(MipmapFilter.Box);
+            inputOptions.SetAlphaMode(AlphaMode.None);
+
+            CompressionOptions compressionOptions = new CompressionOptions();
+            compressionOptions.SetFormat(Format.BC1);
+
+            OutputOptions outputOptions = new OutputOptions();
+
+            int mipIndex = -1;
+            int destIndex = 0;
+            outputOptions.SetOutputOptionsOutputHandler(
+                (size, width, height, depth, face, miplevel) => {
+                //Debug.Log($"Mip level: {miplevel}/nSize: {size}, Width: {width}, Height: {height}");
+                mipIndex = miplevel;
+                },
+                (data, size) => {
+                    if (mipIndex >= 0) {
+                        Marshal.Copy(data, destBytes, destIndex, size);
+                        destIndex += size;
+                    }
+                    return true;
+                },
+                () => { }
+            );
+
+            Compressor compressor = new Compressor();
+            compressor.Compress(inputOptions, compressionOptions, outputOptions);
+
+
+            pinnedArray.Free();
             Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to load texture.");
+
+            start = Time.realtimeSinceStartup;
+            rawTextureData.CopyFrom(destBytes);
+            texture.Apply();
+            Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
         }
+
+        // TODO This is temporary
         else {
-            // TODO This is temporary
             TiffTexture2DConverter textureConverter = new TiffTexture2DConverter(null, 1024, 1024);
             textureConverter.Convert();
 
@@ -220,7 +280,6 @@ public abstract class TerrainModelBase : MonoBehaviour {
             texture.Apply();
             texture.Compress(true);
         }
-        Debug.Log(texture.format);
 
         if (texture == null) {
             return null; // TODO Throw exception
