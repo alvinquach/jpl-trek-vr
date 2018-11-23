@@ -11,12 +11,12 @@ public class GlobalTerrainModel : TerrainModelBase {
         set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
     }
 
-    private TiffSphericalTerrainMeshGenerator _meshGenerator;
+    private DigitalElevationModelSphericalTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {
             if (!_meshGenerator && _initTaskStatus > TaskStatus.NotStarted) {
-                _meshGenerator = new TiffSphericalTerrainMeshGenerator(
+                _meshGenerator = new DigitalElevationModelSphericalTerrainMeshGenerator(
                     _demFilePath,
                     _radius,
                     _heightScale,

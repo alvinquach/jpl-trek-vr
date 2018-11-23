@@ -11,12 +11,12 @@ public class PlanarTerrainModel : TerrainModelBase {
         set { if (_initTaskStatus == TaskStatus.NotStarted) _size = value; }
     }
 
-    private TiffPlanarTerrainMeshGenerator _meshGenerator;
+    private DigitalElevationModelPlanarTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {
             if (!_meshGenerator && _initTaskStatus > TaskStatus.NotStarted) {
-                _meshGenerator = new TiffPlanarTerrainMeshGenerator(
+                _meshGenerator = new DigitalElevationModelPlanarTerrainMeshGenerator(
                     _demFilePath,
                     _size,
                     _heightScale,

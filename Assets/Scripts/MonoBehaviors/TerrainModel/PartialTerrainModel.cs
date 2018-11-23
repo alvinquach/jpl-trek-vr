@@ -36,7 +36,7 @@ public class PartialTerrainModel : TerrainModelBase {
     /// <summary>
     ///     For generating generates the mesh with height data.
     /// </summary>
-    private TiffPartialTerrainMeshGenerator _meshGenerator;
+    private DigitalElevationModelPartialTerrainMeshGenerator _meshGenerator;
 
     protected override TerrainMeshGenerator MeshGenerator {
         get {

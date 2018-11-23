@@ -38,4 +38,16 @@ public class TiffMetadata {
     /// <summary> Scanline size in bytes. </summary>
     public int ScanlineSize;
 
+    public static bool operator true(TiffMetadata o) {
+        return o != null;
+    }
+
+    public static bool operator false(TiffMetadata o) {
+        return o == null;
+    }
+
+    public static bool operator !(TiffMetadata o) {
+        return o ? false : true;
+    }
+
 }

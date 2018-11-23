@@ -155,4 +155,16 @@ public class TiffWrapper : IDisposable {
         };
     }
 
+    public static bool operator true(TiffWrapper o) {
+        return o != null;
+    }
+
+    public static bool operator false(TiffWrapper o) {
+        return o == null;
+    }
+
+    public static bool operator !(TiffWrapper o) {
+        return o ? false : true;
+    }
+
 }
