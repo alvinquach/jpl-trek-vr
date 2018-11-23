@@ -60,7 +60,7 @@ public class TerrainModelManager : MonoBehaviour {
             _defaultPlanetModel.DemFilePath = Path.Combine(
                 FilePath.StreamingAssetsRoot,
                 FilePath.JetPropulsionLaboratory,
-                FilePath.DataElevationModel,
+                FilePath.DigitalElevationModel,
                 _defaultPlanetModel.DemFilePath
             );
 

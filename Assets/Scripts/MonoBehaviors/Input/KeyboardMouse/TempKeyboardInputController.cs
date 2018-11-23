@@ -5,7 +5,7 @@ using UnityEngine;
 public class TempKeyboardInputController : MonoBehaviour {
 
     private IBookmarksWebService _bookmarksWebService = JplBookmarksWebService.Instance;
-    private IDataElevationModelWebService _dataElevationModelWebService = new MockDataElevationModelWebService();
+    private IDigitalElevationModelWebService _dataElevationModelWebService = new MockDigitalElevationModelWebService();
     //private IDataElevationModelWebService _dataElevationModelWebService = JplDataElevationModelWebService.Instance;
 
     private int count = 0;

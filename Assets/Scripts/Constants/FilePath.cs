@@ -28,7 +28,7 @@ public class FilePath {
 
     #region File Type Specific
 
-    public const string DataElevationModel = "dem";
+    public const string DigitalElevationModel = "dem";
 
     public const string Texture = "textures";
 

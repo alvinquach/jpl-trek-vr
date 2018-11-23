@@ -1,8 +1,8 @@
 ﻿using System;
 
-public class JplDataElevationModelWebService : IDataElevationModelWebService {
+public class JplDigitalElevationModelWebService : IDigitalElevationModelWebService {
 
-    public static JplDataElevationModelWebService Instance { get; } = new JplDataElevationModelWebService();
+    public static JplDigitalElevationModelWebService Instance { get; } = new JplDigitalElevationModelWebService();
 
     public void ClearCache() {
         // TODO Implement this

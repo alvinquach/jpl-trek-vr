@@ -4,7 +4,7 @@
 ///     For testing purposes only.
 ///     Remove this implementation when it is no longer needed.
 /// </summary>
-public class MockDataElevationModelWebService : IDataElevationModelWebService {
+public class MockDigitalElevationModelWebService : IDigitalElevationModelWebService {
 
     public void ClearCache() {
         // TODO Implement this

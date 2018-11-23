@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public class XRMenuTestButton : XRMenuElement {
 
-    private IDataElevationModelWebService _dataElevationModelWebService = new MockDataElevationModelWebService();
+    private IDigitalElevationModelWebService _dataElevationModelWebService = new MockDigitalElevationModelWebService();
 
     public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
         TerrainModelManager terrainModelManager = TerrainModelManager.Instance;

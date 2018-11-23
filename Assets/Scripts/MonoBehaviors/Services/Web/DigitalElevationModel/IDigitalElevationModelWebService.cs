@@ -1,6 +1,6 @@
 ﻿using System;
 
-public interface IDataElevationModelWebService {
+public interface IDigitalElevationModelWebService {
 
     void ClearCache();
 
