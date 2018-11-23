@@ -31,6 +31,7 @@
     }
 
     public override byte[] ToByteArray() {
+        // TODO Implement this
         throw new System.NotImplementedException();
     }
 

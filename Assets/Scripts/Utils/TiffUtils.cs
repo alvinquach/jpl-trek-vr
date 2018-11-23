@@ -159,6 +159,7 @@ public sealed class TiffUtils {
     ///     Takes an array of bytes containing contiguous RGB byte samples and separates it into 3 arrays,
     ///     each containing samples from a single channel.
     /// </summary>
+    [Obsolete]
     public static byte[,] SeparateContiguousSamples(byte[] bytes) {
         if (bytes.Length % 3 != 0) {
             return null; // TODO Throw exception
@@ -171,6 +172,26 @@ public sealed class TiffUtils {
             }
         }
         return result;
+    }
+
+    /// <summary>
+    ///     Takes an array of bytes representing RGB pixels and outputs the data into a Color32 array.
+    /// </summary>
+    public static void BytesToColor32(byte[] bytes, Color32[] buf) {
+        if (bytes.Length % 3 != 0) {
+            // TODO Throw exception
+            return;
+        }
+        int length = bytes.Length / 3;
+        if (buf.Length != length) {
+            // TODO Throw exception
+            return;
+        }
+        for (int i = 0; i < length; i++) {
+            int j = i * 3;
+            Color32 color = new Color32(bytes[j], bytes[j + 1], bytes[j + 2], 255);
+            buf[i] = color;
+        }
     }
 
     #endregion

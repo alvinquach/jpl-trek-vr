@@ -1,4 +1,4 @@
-﻿using BitMiracle.LibTiff.Classic;
+﻿using System;
 using UnityEngine;
 
 public class DigitalElevationModelSphericalTerrainMeshGenerator : DigitalElevationModelTerrainMeshGenerator {
@@ -13,7 +13,10 @@ public class DigitalElevationModelSphericalTerrainMeshGenerator : DigitalElevati
 
     protected override MeshData Generate(Image<float> image, int downsample = 1) {
 
-        // TODO Check if image dimensions and downsample rate are powers of 2.
+        // Downsampling rate must be a power of 2.
+        if (!MathUtils.IsPowerOfTwo(downsample)) {
+            throw new Exception($"Downsample rate of {downsample} is not a power of 2.");
+        }
 
         // Vertex count for the latitude is the same as the downsampled texture height.
         // However, we need to generate an extra set of vertices in the longitude
