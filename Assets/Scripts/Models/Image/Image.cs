@@ -65,4 +65,16 @@ public abstract class Image<T> {
         return x < 0 || y < 0 || x > Width - 1 || y > Height - 1;
     }
 
+    public static bool operator true(Image<T> o) {
+        return o != null;
+    }
+
+    public static bool operator false(Image<T> o) {
+        return o == null;
+    }
+
+    public static bool operator !(Image<T> o) {
+        return o ? false : true;
+    }
+
 }
