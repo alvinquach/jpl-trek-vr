@@ -135,7 +135,7 @@ public abstract class TerrainModelBase : MonoBehaviour {
             child.transform.SetParent(lodGroupContainer.transform);
 
             // Name the LOD game object.
-            child.name = "LOD_" + i;
+            child.name = $"LOD_{i}";
 
             // Use the parent's tranformations.
             child.transform.localPosition = Vector3.zero;
@@ -160,13 +160,25 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
             // Assign mesh data
             MeshData meshData = meshGenerator.MeshData[i];
+
+            float start = Time.realtimeSinceStartup;
             mesh.vertices = meshData.Vertices;
+            Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign vertices.");
+
+            start = Time.realtimeSinceStartup;
             mesh.uv = meshData.TexCoords;
+            Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign UVs.");
+
+
+            start = Time.realtimeSinceStartup;
             mesh.triangles = meshData.Triangles;
+            Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign triangles.");
 
             // This is a time consuming operation, and may cause the app to pause
             // for a couple of miliseconds since it runs on the main thread.
+            start = Time.realtimeSinceStartup;
             mesh.RecalculateNormals();
+            Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to recalculate normals.");
 
             meshFilter.mesh = mesh;
 
@@ -192,9 +204,11 @@ public abstract class TerrainModelBase : MonoBehaviour {
 
         Texture2D texture;
         if (!String.IsNullOrEmpty(_albedoFilePath)) {
+            float start = Time.realtimeSinceStartup;
             texture = new Texture2D(1024, 1024, TextureFormat.DXT5, true);
             byte[] imageData = File.ReadAllBytes(_albedoFilePath);
             texture.LoadImage(imageData);
+            Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to load texture.");
         }
         else {
             // TODO This is temporary

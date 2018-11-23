@@ -9,6 +9,7 @@ public sealed class TiffUtils {
 
     #region Tiff Object Constructors
 
+    [Obsolete]
     public static Tiff FromFilePath(string filePath) {
 
         if (String.IsNullOrEmpty(filePath)) {
@@ -24,6 +25,7 @@ public sealed class TiffUtils {
         return tiff;
     }
 
+    [Obsolete]
     public static Tiff FromBytes(byte[] bytes) {
 
         Tiff tiff = Tiff.ClientOpen("in-memory", "r", new MemoryStream(bytes), new TiffStream());
@@ -90,43 +92,67 @@ public sealed class TiffUtils {
     }
 
     /// <summary>
+    ///     Invokes either SingleToFloat() or Int16ToFloat() depending on the number of bits per pixel.
+    ///     The bits per pixel is automatically calculated from the buffer size and byte array size.
+    /// </summary>
+    /// <param name="bytes">The byte array to be converted to floating point values.</param>
+    /// <param name="buf">The array to store the converted floating point numbers.</param>
+    public static void BytesToFloat(byte[] bytes, float[] buf) {
+        if (bytes.Length % buf.Length != 0) {
+            // TODO Throw exception
+            return;
+        }
+        int bpp = (bytes.Length / buf.Length) << 3;
+        if (bpp == 32) {
+            SingleToFloat(bytes, buf);
+        }
+        else {
+            Int16ToFloat(bytes, buf);
+        }
+    }
+
+    /// <summary>
     ///     Takes an array of bytes where every four consecutive bytes represents a single-precision 
-    ///     floating point number, and outputs an array of single-precision floating point numbers.
+    ///     floating point number, and outputs the single-precision floating point numbers to an array.
     /// </summary>
     /// <param name="bytes">The bytes of an array of single-precision floating point numbers.</param>
-    /// <returns>An array of single-precision floating point numbers.</returns>
-    [Obsolete]
-    public static float[] Array32ToFloat(byte[] bytes) {
+    /// <param name="buf">The array to store the converted floating point numbers.</param>
+    public static void SingleToFloat(byte[] bytes, float[] buf) {
         if (bytes.Length % 4 != 0) {
-            return null;
+            // TODO Throw exception
+            return;
         }
         int length = bytes.Length / 4;
-        float[] result = new float[length];
+        if (buf.Length != length) {
+            // TODO Throw exception
+            return;
+        }
         for (int i = 0; i < length; i++) {
             // TODO Check if CPU uses little endian.
-            result[i] = BitConverter.ToSingle(bytes, 4 * i);
+            buf[i] = BitConverter.ToSingle(bytes, 4 * i);
         }
-        return result;
     }
 
     /// <summary>
     ///     Takes an array of bytes where every two consecutive bytes represents a signed integer,
-    ///     and outputs an array of single-precision floating point numbers.
+    ///     and outputs the single-precision floating point numbers to an array.
     /// </summary>
     /// <param name="bytes">The bytes of an array of signed integers.</param>
-    /// <returns>An array of single-precision floating point numbers.</returns>
-    [Obsolete]
-    public static float[] Array16ToFloat(byte[] bytes) {
+    /// <param name="buf">The array to store the converted floating point numbers.</param>
+    public static void Int16ToFloat(byte[] bytes, float[] buf) {
         if (bytes.Length % 2 != 0) {
-            return null;
+            // TODO Throw exception
+            return;
         }
         int length = bytes.Length / 2;
-        float[] result = new float[length];
+        if (buf.Length != length) {
+            // TODO Throw exception
+            return;
+        }
         for (int i = 0; i < length; i++) {
             // TODO Check if CPU uses little endian.
-            result[i] = BitConverter.ToInt16(bytes, 2 * i);
+            buf[i] = BitConverter.ToInt16(bytes, 2 * i);
         }
-        return result;
     }
 
     /// <summary>
@@ -151,9 +177,10 @@ public sealed class TiffUtils {
 
     #region Metadata Methods
 
+    [Obsolete]
     public static void PrintInfo(Tiff tiff, string header = "TIFF Info:") {
 
-        TiffInfo info = GetInfo(tiff);
+        TiffMetadata info = GetMetadata(tiff);
 
         Debug.Log(
             $"{header}\n" +
@@ -164,20 +191,26 @@ public sealed class TiffUtils {
 
     }
 
-    public static TiffInfo GetInfo(Tiff tiff) {
+    [Obsolete]
+    public static TiffMetadata GetMetadata(Tiff tiff) {
 
         if (tiff == null) {
             return null;
         }
 
-        return new TiffInfo() {
+        bool tiled = tiff.IsTiled();
+
+        return new TiffMetadata() {
             Width = tiff.GetField(TiffTag.IMAGEWIDTH)[0].ToInt(),
             Height = tiff.GetField(TiffTag.IMAGELENGTH)[0].ToInt(),
             BPP = tiff.GetField(TiffTag.BITSPERSAMPLE)[0].ToShort(),
             SPP = tiff.GetField(TiffTag.SAMPLESPERPIXEL)[0].ToShort(),
             SampleFormat = tiff.GetField(TiffTag.SAMPLEFORMAT)[0].ToString(),
             Compression = (Compression)tiff.GetField(TiffTag.COMPRESSION)[0].ToInt(),
-            Tiled = tiff.IsTiled(),
+            Tiled = tiled,
+            TileSize = tiled ? tiff.TileSize() : 0,
+            TileWidth = tiled ? tiff.GetField(TiffTag.TILEWIDTH)[0].ToInt() : 0,
+            TileHeight = tiled ? tiff.GetField(TiffTag.TILELENGTH)[0].ToInt() : 0
         };
     }
 

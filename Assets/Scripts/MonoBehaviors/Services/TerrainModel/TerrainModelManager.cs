@@ -92,7 +92,7 @@ public class TerrainModelManager : MonoBehaviour {
             terrainModel.Size = 1.5f;
             terrainModel.HeightScale = 0.000002f;
             terrainModel.LodLevels = 0;
-            terrainModel.BaseDownSampleLevel = 8;
+            terrainModel.BaseDownSampleLevel = 4;
             terrainModel.DemFilePath = demPath;
             terrainModel.AlbedoFilePath = albedoPath;
             terrainModel.GenerateMeshData();

@@ -3,7 +3,7 @@
 /// <summary>
 ///     A data transfer object containing the information about a TIFF image.
 /// </summary>
-public class TiffInfo {
+public class TiffMetadata {
 
     /// <summary> Width of the TIFF image in pixels. </summary>
     public int Width;
@@ -25,4 +25,17 @@ public class TiffInfo {
 
     /// <summary> Whether the TIFF is encoded with tiles rather than scanlines. </summary>
     public bool Tiled;
+
+    /// <summary> Tile size in bytes. </summary>
+    public int TileSize;
+
+    /// <summary> Tile width in pixels. </summary>
+    public int TileWidth;
+
+    /// <summary> Tile height in pixels. </summary>
+    public int TileHeight;
+
+    /// <summary> Scanline size in bytes. </summary>
+    public int ScanlineSize;
+
 }
