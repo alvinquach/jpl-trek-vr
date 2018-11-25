@@ -79,4 +79,4 @@ This projects uses assets libraries from third party sources.
 ### Assets Store
 Thrid party assets from the Unity Asset Store are located in an external repository ([jpl-trek-vr-ext-assets](https://github.com/alvinquach/jpl-trek-vr-ext-assets)). The list of assets can be found in the README of that repository.
 ### Thrid Party DLLs
-Third party .NET DLL files can be found in the `Assets/Plugins` folder of this repository. The list of thrid party DLLs can be found [here](https://github.com/alvinquach/jpl-trek-vr/new/master/Assets/Plugins/README.md).
+Third party .NET DLL files can be found in the `Assets/Plugins` folder of this repository. The list of thrid party DLLs can be found [here](https://github.com/alvinquach/jpl-trek-vr/blob/master/Assets/Plugins/README.md).
