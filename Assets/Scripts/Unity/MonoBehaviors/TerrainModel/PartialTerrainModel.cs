@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PartialTerrainModel : TerrainModelBase {
+public class PartialTerrainModel : TerrainModel {
 
     [SerializeField]
     private float _radius;
@@ -31,7 +31,7 @@ public class PartialTerrainModel : TerrainModelBase {
     ///     temporarily displayed while the DEM and textures are retrieved, and a new
     ///     mesh with height data is generated.
     /// </summary>
-    private BasePartialTerrainMeshGenerator _baseMeshGenerator;
+    private PartialTerrainMeshGenerator _baseMeshGenerator;
 
     /// <summary>
     ///     For generating generates the mesh with height data.
@@ -44,7 +44,7 @@ public class PartialTerrainModel : TerrainModelBase {
                 return _meshGenerator;
             }
             else if (!_baseMeshGenerator && _initTaskStatus > TaskStatus.NotStarted) {
-                _baseMeshGenerator = new BasePartialTerrainMeshGenerator(
+                _baseMeshGenerator = new PartialTerrainMeshGenerator(
                     _radius,
                     _boundingBox
                 );

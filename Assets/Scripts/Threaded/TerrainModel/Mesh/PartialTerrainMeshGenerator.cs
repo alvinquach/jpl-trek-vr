@@ -5,7 +5,7 @@
 ///     by bounding box coordinates. Does not use any height data;
 ///     as such, the resulting mesh will be a smooth surface.
 /// </summary>
-public class BasePartialTerrainMeshGenerator : TerrainMeshGenerator {
+public class PartialTerrainMeshGenerator : TerrainMeshGenerator {
 
     // TEMPORARY
     private static readonly int LatLongVertCount = 50;
@@ -14,7 +14,7 @@ public class BasePartialTerrainMeshGenerator : TerrainMeshGenerator {
 
     protected Vector4 _boundingBox;
 
-    public BasePartialTerrainMeshGenerator(float radius, Vector4 boundingBox) {
+    public PartialTerrainMeshGenerator(float radius, Vector4 boundingBox) {
         _radius = radius;
         _boundingBox = BoundingBoxUtils.SortBoundingBox(boundingBox);
     }

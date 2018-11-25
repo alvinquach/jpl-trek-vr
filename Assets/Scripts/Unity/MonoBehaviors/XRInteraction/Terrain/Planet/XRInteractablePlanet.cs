@@ -141,7 +141,7 @@ public class XRInteractablePlanet : XRInteractableObject {
             if (_selectionIndex == 4) {
                 Debug.Log("Selection Complete: " + _selectionBoundingBox);
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                TerrainModelBase terrainModel = terrainModelManager.CreatePartial(_selectionBoundingBox, null);
+                TerrainModel terrainModel = terrainModelManager.CreatePartial(_selectionBoundingBox, null);
                 terrainModelManager.ShowTerrainModel(terrainModel, false);
                 ExitSelectionMode();
             }

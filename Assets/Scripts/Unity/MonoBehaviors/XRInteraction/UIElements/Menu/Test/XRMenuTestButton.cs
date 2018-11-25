@@ -14,8 +14,8 @@ public class XRMenuTestButton : XRMenuElement {
             string destFileName = $"test1.data";
             _dataElevationModelWebService.GetDEM(null, destFileName, () => {
                 string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
-                TerrainModelBase terrainMesh = terrainModelManager.Create(destFilePath);
-                terrainModelManager.ShowTerrainModel(terrainMesh);
+                TerrainModel terrainModel = terrainModelManager.Create(destFilePath);
+                terrainModelManager.ShowTerrainModel(terrainModel);
             });
         }
         else {

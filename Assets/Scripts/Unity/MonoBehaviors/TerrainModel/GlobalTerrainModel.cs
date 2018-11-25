@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using BitMiracle.LibTiff.Classic;
 
-public class GlobalTerrainModel : TerrainModelBase {
+public class GlobalTerrainModel : TerrainModel {
 
     [SerializeField]
     private float _radius;

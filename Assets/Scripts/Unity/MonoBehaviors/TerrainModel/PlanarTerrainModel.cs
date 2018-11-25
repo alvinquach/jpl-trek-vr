@@ -1,7 +1,7 @@
 ﻿using BitMiracle.LibTiff.Classic;
 using UnityEngine;
 
-public class PlanarTerrainModel : TerrainModelBase {
+public class PlanarTerrainModel : TerrainModel {
 
     [SerializeField]
     private float _size;

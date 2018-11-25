@@ -39,7 +39,7 @@ public class TerrainModelManager : MonoBehaviour {
     private GlobalTerrainModel _defaultPlanetModel;
 
     // TODO Find out how the initial capacity for lists works in C#.
-    private List<TerrainModelBase> _terrainModels = new List<TerrainModelBase>();
+    private List<TerrainModel> _terrainModels = new List<TerrainModel>();
 
     private GameObject _terrainModelsContainer;
 
@@ -81,7 +81,7 @@ public class TerrainModelManager : MonoBehaviour {
     private int _counter = 0;
 
     [Obsolete("Planar terrains should no longer be created. Use CreatePartial() to create partial terrain instead.")]
-    public TerrainModelBase Create(string demPath, string albedoPath = null) {
+    public TerrainModel Create(string demPath, string albedoPath = null) {
         GameObject terrainModelContainer = new GameObject();
         terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform);
         terrainModelContainer.name = $"Model {++_counter}";
@@ -106,7 +106,7 @@ public class TerrainModelManager : MonoBehaviour {
         return AddTerrainModel(terrainModel);
     }
 
-    public TerrainModelBase CreatePartial(Vector4 boundingBox, string demPath, string albedoPath = null) {
+    public TerrainModel CreatePartial(Vector4 boundingBox, string demPath, string albedoPath = null) {
         GameObject terrainModelContainer = new GameObject();
         terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform);
         terrainModelContainer.name = $"Model {++_counter}";
@@ -159,7 +159,7 @@ public class TerrainModelManager : MonoBehaviour {
     ///     controller was changed. Otherwise, returns false.
     /// </returns>
     // TODO Write a separate method to clone the rotation.
-    public bool ShowTerrainModel(TerrainModelBase terrainModel, bool cloneRotation = false) {
+    public bool ShowTerrainModel(TerrainModel terrainModel, bool cloneRotation = false) {
         if (terrainModel == null || terrainModel.Visible) {
             return false; // Retun false if the terrain model is already visible.
         }
@@ -191,7 +191,7 @@ public class TerrainModelManager : MonoBehaviour {
         return _defaultPlanetModel.transform;
     }
 
-    private TerrainModelBase AddTerrainModel(TerrainModelBase terrainModel) {
+    private TerrainModel AddTerrainModel(TerrainModel terrainModel) {
 
         // If the number of terrain models being managed already exceeds the max limit,
         // then we have to remove one to make space for the new one. We will remove the
@@ -199,7 +199,7 @@ public class TerrainModelManager : MonoBehaviour {
         if (_terrainModels.Count >= MaxModels) {
 
             // TODO Test this
-            TerrainModelBase oldest = _terrainModels.OrderByDescending(w => w.LastVisible).Last();
+            TerrainModel oldest = _terrainModels.OrderByDescending(w => w.LastVisible).Last();
 
             Destroy(oldest.gameObject);
             _terrainModels.Remove(oldest);

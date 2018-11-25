@@ -5,7 +5,7 @@ using Nvidia.TextureTools;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 
-public abstract class TerrainModelBase : MonoBehaviour {
+public abstract class TerrainModel : MonoBehaviour {
 
     [SerializeField]
     protected string _demFilePath;

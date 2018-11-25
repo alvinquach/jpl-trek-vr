@@ -5,7 +5,7 @@
 ///     by bounding box coordinates. Uses TIFF DEM files as a source of
 ///     height data.
 /// </summary>
-public class DigitalElevationModelPartialTerrainMeshGenerator : BasePartialTerrainMeshGenerator {
+public class DigitalElevationModelPartialTerrainMeshGenerator : PartialTerrainMeshGenerator {
 
     public DigitalElevationModelPartialTerrainMeshGenerator(float radius, Vector4 boundingBox) :
         base(radius, boundingBox) {
