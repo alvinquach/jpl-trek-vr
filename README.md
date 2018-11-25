@@ -9,6 +9,7 @@
   * [Running the Unity Project](https://github.com/alvinquach/jpl-trek-vr/blob/master/README.md#running-the-unity-project)
 * [Controls](https://github.com/alvinquach/jpl-trek-vr/blob/master/README.md#controls)
   * [HTC Vive](https://github.com/alvinquach/jpl-trek-vr/blob/master/README.md#htc-vive)
+* [Third-Party Credits](https://github.com/alvinquach/jpl-trek-vr/blob/master/README.md#thrid-party-credits)
 
 
 ## Requirements
