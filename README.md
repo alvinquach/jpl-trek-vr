@@ -73,3 +73,10 @@ Controls specific to the HTC Vive headset.
   When the menu is open, the bookedmarked areas will also appear on the planet with a pin and label.
   
 * Clicking the trigger button when the controller is pointed to the planet will rotate the planet such that the area that is being pointed at is facing you.
+
+## Thrid-Party Credits
+This projects uses assets libraries from third party sources.
+### Assets Store
+Thrid party assets from the Unity Asset Store are located in an external repository ([jpl-trek-vr-ext-assets](https://github.com/alvinquach/jpl-trek-vr-ext-assets)). The list of assets can be found in the README of that repository.
+### Thrid Party DLLs
+Third party .NET DLL files can be found in the `Assets/Plugins` folder of this repository. The list of thrid party DLLs can be found [here](https://github.com/alvinquach/jpl-trek-vr/new/master/Assets/Plugins/README.md).
