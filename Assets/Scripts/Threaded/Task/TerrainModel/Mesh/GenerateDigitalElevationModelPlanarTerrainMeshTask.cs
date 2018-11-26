@@ -1,25 +1,27 @@
 ﻿using System;
 using UnityEngine;
 
-public class DigitalElevationModelPlanarTerrainMeshGenerator : DigitalElevationModelTerrainMeshGenerator {
+public class GenerateDigitalElevationModelPlanarTerrainMeshTask : GenerateDigitalElevationModelTerrainMeshTask {
+
+    private Image<float> _image;
 
     private float _size;
 
-    public DigitalElevationModelPlanarTerrainMeshGenerator(string filepath, float size, float heightScale, int lodLevels, int baseDownsample) :
-        base(filepath, heightScale, lodLevels, baseDownsample) {
+    public GenerateDigitalElevationModelPlanarTerrainMeshTask(TerrainModelMetadata metadata) : base(metadata) {
 
-        _size = size;
     }
 
-    protected override MeshData Generate(Image<float> image, int downsample = 1) {
+    protected override MeshData GenerateForLod(Image<float> image, int downsample = 1) {
 
         // Downsampling rate must be a power of 2.
         if (!MathUtils.IsPowerOfTwo(downsample)) {
             throw new Exception($"Downsample rate of {downsample} is not a power of 2.");
         }
 
-        // Vertex counts in the horizontal and vertical directions are the
-        // same as the downsampled texture width and height, respectively.
+        /*
+         * Vertex counts in the horizontal and vertical directions are the
+         * same as the downsampled texture width and height, respectively.
+         */
         int hVertCount = image.Width / downsample;
         int vVertCount = image.Height / downsample;
 
@@ -57,7 +59,7 @@ public class DigitalElevationModelPlanarTerrainMeshGenerator : DigitalElevationM
                 //float value = image.GetPixel(x, y);
 
                 // Scale the intensity value by the height scale.
-                float scaled = value * _heightScale;
+                float scaled = value * _metadata.heightScale;
 
                 verts[vertexIndex] = new Vector3(vx * dimScale - hOffset, scaled, vy * dimScale - vOffset);
                 uvs[vertexIndex] = GenerateStandardUV(vx, vy, hVertCount, vVertCount);

@@ -1,17 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
-public class DigitalElevationModelSphericalTerrainMeshGenerator : DigitalElevationModelTerrainMeshGenerator {
+public class GenerateDigitalElevationModelSphericalTerrainMeshTask : GenerateDigitalElevationModelTerrainMeshTask {
 
-    private float _radius;
+    public GenerateDigitalElevationModelSphericalTerrainMeshTask(TerrainModelMetadata metadata) : base(metadata) {
 
-    public DigitalElevationModelSphericalTerrainMeshGenerator(string filepath, float radius, float heightScale, int lodLevels, int baseDownsample) : 
-        base(filepath, heightScale, lodLevels, baseDownsample) {
-
-        _radius = radius;
     }
 
-    protected override MeshData Generate(Image<float> image, int downsample = 1) {
+    protected override MeshData GenerateForLod(Image<float> image, int downsample = 1) {
 
         // Downsampling rate must be a power of 2.
         if (!MathUtils.IsPowerOfTwo(downsample)) {
@@ -66,10 +62,10 @@ public class DigitalElevationModelSphericalTerrainMeshGenerator : DigitalElevati
                     image.GetCenteredAverage(x, y, downsample + 1);
 
                 // Scale the intensity value by the height scale.
-                float scaled = value * _heightScale;
+                float scaled = value * _metadata.heightScale;
 
                 // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
-                verts[vertexIndex] = Quaternion.Euler(0, -90 - vx * lonStepSize, 0) * ((_radius + _heightScale * value) * baseLatVertex);
+                verts[vertexIndex] = Quaternion.Euler(0, -90 - vx * lonStepSize, 0) * ((_metadata.radius + _metadata.heightScale * value) * baseLatVertex);
                 uvs[vertexIndex] = GenerateStandardUV(vx, vy, lonVertCount, latVertCount);
                 vertexIndex++;
             }

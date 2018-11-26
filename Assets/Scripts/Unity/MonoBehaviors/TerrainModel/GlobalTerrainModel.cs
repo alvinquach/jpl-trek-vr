@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using BitMiracle.LibTiff.Classic;
 
 public class GlobalTerrainModel : TerrainModel {
 
@@ -11,29 +10,27 @@ public class GlobalTerrainModel : TerrainModel {
         set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
     }
 
-    private DigitalElevationModelSphericalTerrainMeshGenerator _meshGenerator;
-
-    protected override TerrainMeshGenerator MeshGenerator {
-        get {
-            if (!_meshGenerator && _initTaskStatus > TaskStatus.NotStarted) {
-                _meshGenerator = new DigitalElevationModelSphericalTerrainMeshGenerator(
-                    _demFilePath,
-                    _radius,
-                    _heightScale,
-                    _lodLevels,
-                    _baseDownsampleLevel
-                );
-            }
-            return _meshGenerator;
-        }
-    }
-
-    protected override void ProcessMeshData(TerrainMeshGenerator meshGenerator = null) {
-        base.ProcessMeshData(meshGenerator);
+    protected override void ProcessMeshData(MeshData[] meshData) {
+        base.ProcessMeshData(meshData);
 
         // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
         SphereCollider collider = gameObject.AddComponent<SphereCollider>();
         collider.radius = _radius;
     }
 
+    protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
+        TerrainModelMetadata metadata = GenerateMetadata();
+        return new GenerateDigitalElevationModelSphericalTerrainMeshTask(metadata);
+    }
+
+    protected override TerrainModelMetadata GenerateMetadata() {
+        return new TerrainModelMetadata() {
+            demFilePath = _demFilePath,
+            albedoFilePath = _albedoFilePath,
+            radius = _radius,
+            heightScale = _heightScale,
+            lodLevels = _lodLevels,
+            baseDownsample = _baseDownsampleLevel
+        };
+    }
 }

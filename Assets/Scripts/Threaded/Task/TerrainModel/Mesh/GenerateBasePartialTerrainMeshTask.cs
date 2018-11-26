@@ -5,21 +5,18 @@
 ///     by bounding box coordinates. Does not use any height data;
 ///     as such, the resulting mesh will be a smooth surface.
 /// </summary>
-public class PartialTerrainMeshGenerator : TerrainMeshGenerator {
+public class GenerateBasePartialTerrainMeshTask : GenerateTerrainMeshTask {
 
     // TEMPORARY
     private static readonly int LatLongVertCount = 50;
 
-    protected float _radius;
-
     protected Vector4 _boundingBox;
 
-    public PartialTerrainMeshGenerator(float radius, Vector4 boundingBox) {
-        _radius = radius;
-        _boundingBox = BoundingBoxUtils.SortBoundingBox(boundingBox);
+    public GenerateBasePartialTerrainMeshTask(TerrainModelMetadata metadata, Vector4 boundingBox) : base(metadata) {
+        _boundingBox = boundingBox;
     }
 
-    public override void Generate() {
+    protected override void Generate() {
 
         float latStart = _boundingBox[1] * Mathf.Deg2Rad;
         float latStop = _boundingBox[3] * Mathf.Deg2Rad;
@@ -45,14 +42,16 @@ public class PartialTerrainMeshGenerator : TerrainMeshGenerator {
 
             int xIndex = 0;
 
-            // Create a new vertex using the latitude angle. The coordinates of this
-            // vertex will serve as a base for all the other vertices in this latitude.
+            /*
+             * Create a new vertex using the latitude angle. The coordinates of this
+             * vertex will serve as a base for all the other vertices in this latitude.
+             */
             Vector3 baseLatVertex = new Vector3(Mathf.Cos(y), Mathf.Sin(y), 0);
 
             for (float x = lonStart; xIndex < LatLongVertCount; x += lonIncrement) {
 
                 // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
-                verts[vertexIndex] = _radius * (Quaternion.Euler(0, -90 - x, 0) * baseLatVertex - offset);
+                verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - x, 0) * baseLatVertex - offset);
                 uvs[vertexIndex] = GenerateStandardUV(xIndex, yIndex, LatLongVertCount, LatLongVertCount);
                 xIndex++;
                 vertexIndex++;
@@ -60,9 +59,9 @@ public class PartialTerrainMeshGenerator : TerrainMeshGenerator {
             yIndex++;
         }
 
-        InProgress = false;
-        Complete = true;
-        Progress = 1f;
+        _progress = 1f;
+
+        // Only one LOD is generated.
         MeshData = new MeshData[] {
             new MeshData() {
                 Vertices = verts,
@@ -74,3 +73,6 @@ public class PartialTerrainMeshGenerator : TerrainMeshGenerator {
     }
 
 }
+ 
+ 
+ 

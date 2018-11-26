@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class PartialTerrainModel : TerrainModel {
 
@@ -31,27 +31,7 @@ public class PartialTerrainModel : TerrainModel {
     ///     temporarily displayed while the DEM and textures are retrieved, and a new
     ///     mesh with height data is generated.
     /// </summary>
-    private PartialTerrainMeshGenerator _baseMeshGenerator;
-
-    /// <summary>
-    ///     For generating generates the mesh with height data.
-    /// </summary>
-    private DigitalElevationModelPartialTerrainMeshGenerator _meshGenerator;
-
-    protected override TerrainMeshGenerator MeshGenerator {
-        get {
-            if (_meshGenerator) {
-                return _meshGenerator;
-            }
-            else if (!_baseMeshGenerator && _initTaskStatus > TaskStatus.NotStarted) {
-                _baseMeshGenerator = new PartialTerrainMeshGenerator(
-                    _radius,
-                    _boundingBox
-                );
-            }
-            return _baseMeshGenerator;
-        }
-    }
+    private GenerateBasePartialTerrainMeshTask _baseMeshGenerator;
 
     protected override void Start() {
         base.Start();
@@ -59,35 +39,51 @@ public class PartialTerrainModel : TerrainModel {
     }
 
     protected override void Update() {
-
-        if (_initTaskStatus == TaskStatus.Started && _baseMeshGenerator.Complete) {
-            ProcessMeshData(_baseMeshGenerator);
-
-            transform.rotation = TerrainModelManager.Instance.GetDefaultPlanetModelTransform().rotation;
-            transform.localPosition = transform.rotation * (0.25f * 3.39f * BoundingBoxUtils.MedianDirection(_boundingBox));
-
-            _initTaskStatus = TaskStatus.Completed;
-
-            // Start the view transition.
-            _startPosition = transform.position;
-            _startRotation = transform.rotation;
-            _targetRotation = Quaternion.FromToRotation(BoundingBoxUtils.MedianDirection(_boundingBox), Vector3.up);
-            _targetScale = 0.5f / BoundingBoxUtils.LargestDimension(_boundingBox);
-            _viewTransitionTaskStatus = TaskStatus.Started;
-        }
-
-        if (_viewTransitionTaskStatus == TaskStatus.Started) {
-            // TODO Un-hardcode these values
-            _viewTransitionProgress += Time.deltaTime / 1.337f;
-            transform.rotation = Quaternion.Lerp(_startRotation, _targetRotation, _viewTransitionProgress);
-            transform.position = Vector3.Lerp(_startPosition, 0.69f * Vector3.up, _viewTransitionProgress);
-            transform.localScale = Vector3.Lerp(0.25f * Vector3.one, _targetScale * Vector3.one, _viewTransitionProgress);
-            if (_viewTransitionProgress >= 1.0f) {
-                _viewTransitionTaskStatus = TaskStatus.Completed;
-            } 
-        }
-
+        base.Update();
+         if (_viewTransitionTaskStatus == TaskStatus.Started) {
+            TransitionView();
+         }
     }
 
+    protected override void ProcessMeshData(MeshData[] meshData) {
+        base.ProcessMeshData(meshData);
+        transform.rotation = TerrainModelManager.Instance.GetDefaultPlanetModelTransform().rotation;
+        transform.localPosition = transform.rotation * (0.25f * 3.39f * BoundingBoxUtils.MedianDirection(_boundingBox));
+
+        // Start the view transition.
+        _startPosition = transform.position;
+        _startRotation = transform.rotation;
+        _targetRotation = Quaternion.FromToRotation(BoundingBoxUtils.MedianDirection(_boundingBox), Vector3.up);
+        _targetScale = 0.5f / BoundingBoxUtils.LargestDimension(_boundingBox);
+        _viewTransitionTaskStatus = TaskStatus.Started;
+    }
+
+    private void TransitionView() {
+        // TODO Un-hardcode these values
+        _viewTransitionProgress += Time.deltaTime / 1.337f;
+        transform.rotation = Quaternion.Lerp(_startRotation, _targetRotation, _viewTransitionProgress);
+        transform.position = Vector3.Lerp(_startPosition, 0.69f * Vector3.up, _viewTransitionProgress);
+        transform.localScale = Vector3.Lerp(0.25f * Vector3.one, _targetScale * Vector3.one, _viewTransitionProgress);
+        if (_viewTransitionProgress >= 1.0f) {
+            _viewTransitionTaskStatus = TaskStatus.Completed;
+        }
+    }
+
+    protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
+        TerrainModelMetadata metadata = GenerateMetadata();
+        return new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox);
+        //return new DigitalElevationModelPartialTerrainMeshGenerator(metadata, _boundingBox);
+    }
+
+    protected override TerrainModelMetadata GenerateMetadata() {
+        return new TerrainModelMetadata() {
+            demFilePath = _demFilePath,
+            albedoFilePath = _albedoFilePath,
+            radius = _radius,
+            heightScale = _heightScale,
+            lodLevels = _lodLevels,
+            baseDownsample = _baseDownsampleLevel
+        };
+    }
 
 }

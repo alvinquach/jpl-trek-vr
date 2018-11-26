@@ -1,27 +1,32 @@
-using System.Threading;
+using App.Threaded.Task;
 using UnityEngine;
 
-public abstract class TerrainMeshGenerator {
+public abstract class GenerateTerrainMeshTask : ThreadedTask<TerrainModelMetadata, float, MeshData[]> {
+
+    protected TerrainModelMetadata _metadata;
 
     public MeshData[] MeshData { get; protected set; }
 
-    public bool InProgress { get; protected set; } = false;
+    protected float _progress = 0.0f;
 
-    public bool Complete { get; protected set; } = false;
-
-    public float Progress { get; protected set; } = 0f;
-
-    public abstract void Generate();
-
-    public void GenerateAsync() {
-
-        Thread thread = new Thread(
-            new ThreadStart(Generate)
-        );
-
-        thread.Start();
+    public GenerateTerrainMeshTask(TerrainModelMetadata metadata) {
+        _metadata = metadata;
+        // TODO Check if baseDownsample is power of 2.
     }
 
+    public override float GetProgress() {
+        return _progress;
+    }
+
+    protected sealed override MeshData[] Task() {
+        Generate();
+        return MeshData;
+    }
+
+    /// <summary>Generate the mesh data and store it in the member variable.</summary>
+    protected abstract void Generate();
+
+    /// <summary>Generates the list of triangles.</summary>
     protected int[] GenerateTriangles(int hVertCount, int vVertCount) {
 
         // The number of quads (triangle pairs) in each dimension is 
@@ -54,20 +59,10 @@ public abstract class TerrainMeshGenerator {
         return result;
     }
 
+    /// <summary>Generates the list of UV coordinates.</summary>
     protected Vector2 GenerateStandardUV(int x, int y, int width, int height) {
         return new Vector2(x / (width - 1f), -y / (height - 1f));
     }
 
-    public static bool operator true(TerrainMeshGenerator o) {
-        return o != null;
-    }
-
-    public static bool operator false(TerrainMeshGenerator o) {
-        return o == null;
-    }
-
-    public static bool operator !(TerrainMeshGenerator o) {
-        return o ? false : true;
-    }
 
 }

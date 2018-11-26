@@ -1,12 +1,9 @@
-﻿using UnityEngine;
-using System;
-using System.IO;
-using Nvidia.TextureTools;
-using System.Runtime.InteropServices;
-using Unity.Collections;
 using App.Texture.Models;
+using App.Unity.MonoBehaviors;
+using System;
+using UnityEngine;
 
-public abstract class TerrainModel : MonoBehaviour {
+public abstract class TerrainModel : MonoBehaviourWithTaskQueue<MeshData[]> {
 
     [SerializeField]
     protected string _demFilePath;
@@ -55,13 +52,6 @@ public abstract class TerrainModel : MonoBehaviour {
     protected TaskStatus _initTaskStatus = TaskStatus.NotStarted;
 
     /// <summary>
-    ///     This should be implemented in a way such that a TerrainMeshGenerator
-    ///     object is always available (not null) while _initTaskStatus is Started
-    ///     or completed, and always null if _initTaskStatus is NotStarted.
-    /// </summary>
-    protected abstract TerrainMeshGenerator MeshGenerator { get; }
-
-    /// <summary>
     ///     The last time this terrain was set to visible via the Visible property.
     /// </summary>
     public long LastVisible { get; private set; } = 0L;
@@ -81,33 +71,37 @@ public abstract class TerrainModel : MonoBehaviour {
         }
     }
 
+    #region Unity lifecycle methods
+
     protected virtual void Start() {
-        GenerateMeshData();
+        InitModel();
     }
 
-    protected virtual void Update() {
-        if (_initTaskStatus == TaskStatus.Started) {
-            if (MeshGenerator.Complete) {
-                ProcessMeshData();
-                _initTaskStatus = TaskStatus.Completed;
-            }
-        }
+    // If this method is overriden, then this method should be 
+    // called from the overriding method.
+    protected override void Update() {
+        base.Update();
     }
+
+    #endregion
 
     // Can only be called once.
-    public virtual void GenerateMeshData() {
+    public virtual void InitModel() {
         if (_initTaskStatus > TaskStatus.NotStarted) {
             return;
         }
         _initTaskStatus = TaskStatus.Started;
-        MeshGenerator.GenerateAsync();
+        GenerateTerrainMeshTask generateMeshTask = InstantiateGenerateMeshTask();
+        generateMeshTask.Start((meshData) => {
+            QueueTask(ProcessMeshData, meshData);
+            _initTaskStatus = TaskStatus.Completed;
+        });
     }
 
-    protected virtual void ProcessMeshData(TerrainMeshGenerator meshGenerator = null) {
+    /// <summary>Instantiates the task for generating the terrain model mesh data.</summary>
+    protected abstract GenerateTerrainMeshTask InstantiateGenerateMeshTask();
 
-        if (meshGenerator == null) {
-            meshGenerator = MeshGenerator;
-        }
+    protected virtual void ProcessMeshData(MeshData[] meshData) {
 
         // If material was not set, then generate a meterial for the mesh,
         // or use the default material if it failed to generate.
@@ -163,19 +157,19 @@ public abstract class TerrainModel : MonoBehaviour {
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 
             // Assign mesh data
-            MeshData meshData = meshGenerator.MeshData[i];
+            MeshData lodMeshData = meshData[i];
 
             float start = Time.realtimeSinceStartup;
-            mesh.vertices = meshData.Vertices;
+            mesh.vertices = lodMeshData.Vertices;
             Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign vertices.");
 
             start = Time.realtimeSinceStartup;
-            mesh.uv = meshData.TexCoords;
+            mesh.uv = lodMeshData.TexCoords;
             Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign UVs.");
 
 
             start = Time.realtimeSinceStartup;
-            mesh.triangles = meshData.Triangles;
+            mesh.triangles = lodMeshData.Triangles;
             Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign triangles.");
 
             // This is a time consuming operation, and may cause the app to pause
@@ -191,9 +185,8 @@ public abstract class TerrainModel : MonoBehaviour {
         // Assign LOD meshes to LOD group.
         lodGroup.SetLODs(lods);
 
-        // Calculate bounds if there are one or more LOD level.
-        // If there are no LOD levels, then we can just disable
-        // LOD, so there is no need to calculate bounds.
+        // Calculate bounds if there are one or more LOD level. If there are no LOD levels, 
+        // then we can just disable LOD, so there is no need to calculate bounds.
         if (_lodLevels > 0) {
             lodGroup.RecalculateBounds();
         }
@@ -250,5 +243,7 @@ public abstract class TerrainModel : MonoBehaviour {
         material.SetTexture("_MainTex", texture); // Set albedo texture.
         return material;
     }
+
+    protected abstract TerrainModelMetadata GenerateMetadata();
 
 }

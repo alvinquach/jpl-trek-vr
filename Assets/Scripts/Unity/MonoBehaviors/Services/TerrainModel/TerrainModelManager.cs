@@ -95,7 +95,7 @@ public class TerrainModelManager : MonoBehaviour {
             terrainModel.BaseDownSampleLevel = 4;
             terrainModel.DemFilePath = demPath;
             terrainModel.AlbedoFilePath = albedoPath;
-            terrainModel.GenerateMeshData();
+            terrainModel.InitModel();
         }
         catch (Exception e) {
             Debug.LogError(e.Message);
@@ -119,7 +119,7 @@ public class TerrainModelManager : MonoBehaviour {
             // Bounding box is in the format (lonStart, latStart, lonEnd, latEnd)
             terrainModel.BoundingBox = boundingBox;
             terrainModel.LodLevels = 0;
-            terrainModel.GenerateMeshData();
+            terrainModel.InitModel();
 
             terrainModelContainer.transform.localPosition = Vector3.up;
             terrainModelContainer.transform.localScale = 0.25f * Vector3.one;
