@@ -39,7 +39,7 @@ public abstract class GenerateDigitalElevationModelTerrainMeshTask : GenerateTer
             }
 
             _progress = 1.0f;
-            MeshData = meshData;
+            _meshData = meshData;
         }
 
     }

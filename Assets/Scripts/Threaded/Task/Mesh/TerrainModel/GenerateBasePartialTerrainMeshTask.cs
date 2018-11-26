@@ -62,7 +62,7 @@ public class GenerateBasePartialTerrainMeshTask : GenerateTerrainMeshTask {
         _progress = 1f;
 
         // Only one LOD is generated.
-        MeshData = new MeshData[] {
+        _meshData = new MeshData[] {
             new MeshData() {
                 Vertices = verts,
                 TexCoords = uvs,
