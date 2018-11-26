@@ -198,10 +198,11 @@ public abstract class TerrainModel : MonoBehaviourWithTaskQueue<MeshData[]> {
 
     protected virtual Material GenerateMaterial() {
 
-        Texture2D texture;
+        Material material = new Material(Shader.Find("Standard"));
+        material.SetColor("_Color", Color.white); // Set color to white so it doesn't tint the albedo.
 
         // TODO Also check if file exists.
-        if (!string.IsNullOrEmpty(_albedoFilePath)) {
+        if (string.IsNullOrEmpty(_albedoFilePath)) {
 
             float start = Time.realtimeSinceStartup;
 
@@ -217,30 +218,14 @@ public abstract class TerrainModel : MonoBehaviourWithTaskQueue<MeshData[]> {
             Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to load texture.");
 
             start = Time.realtimeSinceStartup;
-            texture = new Texture2D(srcImage.Width, srcImage.Height, textureFormat.GetUnityFormat(), true);
+            Texture2D texture = new Texture2D(srcImage.Width, srcImage.Height, textureFormat.GetUnityFormat(), true);
             texture.GetRawTextureData<byte>().CopyFrom(destBytes);
             texture.Apply();
             Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
+
+            material.SetTexture("_MainTex", texture); // Set albedo texture.
         }
 
-        // TODO This is temporary
-        else {
-            TiffTexture2DConverter textureConverter = new TiffTexture2DConverter(null, 1024, 1024);
-            textureConverter.Convert();
-
-            texture = new Texture2D(1024, 1024);
-            texture.SetPixels32(textureConverter.Pixels);
-            texture.Apply();
-            texture.Compress(true);
-        }
-
-        if (texture == null) {
-            return null; // TODO Throw exception
-        }
-
-        Material material = new Material(Shader.Find("Standard"));
-        material.SetColor("_Color", Color.white); // Set color to white so it doesn't tint the albedo.
-        material.SetTexture("_MainTex", texture); // Set albedo texture.
         return material;
     }
 
