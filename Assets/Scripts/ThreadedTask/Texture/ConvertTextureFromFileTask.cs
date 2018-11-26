@@ -1,5 +1,5 @@
 ﻿using App.Texture.Models;
-using App.Threaded.Task;
+using App.ThreadedTask;
 
 public class ConvertTextureFromFileTask : ThreadedTask<float, byte[]> {
 

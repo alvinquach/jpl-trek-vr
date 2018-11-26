@@ -1,4 +1,4 @@
-using App.Threaded.Task;
+using App.ThreadedTask;
 using UnityEngine;
 
 public abstract class GenerateTerrainMeshTask : ThreadedTask<float, MeshData[]> {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace App.Threaded.Task {
+namespace App.ThreadedTask {
 
     public abstract class ThreadedTask<Progress, Result> {
 
