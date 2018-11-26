@@ -3,15 +3,11 @@ using System.Threading;
 
 namespace App.Threaded.Task {
 
-    public abstract class ThreadedTask<Params, Progress, Result> {
+    public abstract class ThreadedTask<Progress, Result> {
 
         protected Action<Progress> _progressCallback;
 
         public TaskStatus Status { get; private set; } = TaskStatus.NotStarted;
-
-        public ThreadedTask(params Params[] args) {
-
-        }
 
         public void Start(Action<Result> callback = null) {
             if (Status >= TaskStatus.Started) {
@@ -41,15 +37,15 @@ namespace App.Threaded.Task {
 
         protected abstract Result Task();
 
-        public static bool operator true(ThreadedTask<Params, Progress, Result> o) {
+        public static bool operator true(ThreadedTask<Progress, Result> o) {
             return o != null;
         }
 
-        public static bool operator false(ThreadedTask<Params, Progress, Result> o) {
+        public static bool operator false(ThreadedTask<Progress, Result> o) {
             return o == null;
         }
 
-        public static bool operator !(ThreadedTask<Params, Progress, Result> o) {
+        public static bool operator !(ThreadedTask<Progress, Result> o) {
             return o ? false : true;
         }
 

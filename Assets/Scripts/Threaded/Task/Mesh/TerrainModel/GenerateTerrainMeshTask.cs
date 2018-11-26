@@ -1,7 +1,7 @@
 using App.Threaded.Task;
 using UnityEngine;
 
-public abstract class GenerateTerrainMeshTask : ThreadedTask<TerrainModelMetadata, float, MeshData[]> {
+public abstract class GenerateTerrainMeshTask : ThreadedTask<float, MeshData[]> {
 
     protected TerrainModelMetadata _metadata;
 
