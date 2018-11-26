@@ -3,7 +3,7 @@ using App.Unity.MonoBehaviors;
 using System;
 using UnityEngine;
 
-public abstract class TerrainModel : MonoBehaviourWithTaskQueue<MeshData[]> {
+public abstract class TerrainModel : MonoBehaviourWithTaskQueue {
 
     [SerializeField]
     protected string _demFilePath;
@@ -92,8 +92,8 @@ public abstract class TerrainModel : MonoBehaviourWithTaskQueue<MeshData[]> {
         }
         _initTaskStatus = TaskStatus.Started;
         GenerateTerrainMeshTask generateMeshTask = InstantiateGenerateMeshTask();
-        generateMeshTask.Start((meshData) => {
-            QueueTask(ProcessMeshData, meshData);
+        generateMeshTask.Execute((meshData) => {
+            QueueTask(() => ProcessMeshData(meshData));
             _initTaskStatus = TaskStatus.Completed;
         });
     }
@@ -202,28 +202,35 @@ public abstract class TerrainModel : MonoBehaviourWithTaskQueue<MeshData[]> {
         material.SetColor("_Color", Color.white); // Set color to white so it doesn't tint the albedo.
 
         // TODO Also check if file exists.
-        if (string.IsNullOrEmpty(_albedoFilePath)) {
+        if (!string.IsNullOrEmpty(_albedoFilePath)) {
 
             float start = Time.realtimeSinceStartup;
 
-            RGBAImage srcImage;
-
-            using (TiffWrapper tiff = new TiffWrapper(_albedoFilePath)) {
-                srcImage = tiff.ToRGBAImage();
-            }
-
             TextureCompressionFormat textureFormat = TextureCompressionFormat.DXT1;
 
-            byte[] destBytes = TextureToolUtils.ImageToTexture(srcImage, textureFormat);
-            Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to load texture.");
+            // Task for loading texture data on a separate thread.
+            ConvertTextureFromFileTask textureTask = new ConvertTextureFromFileTask(_albedoFilePath, textureFormat);
 
-            start = Time.realtimeSinceStartup;
-            Texture2D texture = new Texture2D(srcImage.Width, srcImage.Height, textureFormat.GetUnityFormat(), true);
-            texture.GetRawTextureData<byte>().CopyFrom(destBytes);
-            texture.Apply();
-            Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
+            // Execute the task.
+            textureTask.Execute((data) => {
 
-            material.SetTexture("_MainTex", texture); // Set albedo texture.
+                int width = textureTask.TextureWidth, height = textureTask.TextureHeight;
+
+                // Queue a task to apply texture on the main thread during the next update.
+                QueueTask(() => {
+                    Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to generate texture.");
+                    start = Time.realtimeSinceStartup;
+
+                    Texture2D texture = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
+                    texture.GetRawTextureData<byte>().CopyFrom(data);
+                    texture.Apply();
+                    material.SetTexture("_MainTex", texture); // Set albedo texture.
+
+                    Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
+                });
+
+            });
+            
         }
 
         return material;

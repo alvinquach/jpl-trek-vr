@@ -9,7 +9,7 @@ namespace App.Threaded.Task {
 
         public TaskStatus Status { get; private set; } = TaskStatus.NotStarted;
 
-        public void Start(Action<Result> callback = null) {
+        public void Execute(Action<Result> callback = null) {
             if (Status >= TaskStatus.Started) {
                 // TODO Throw exception.
                 return;
