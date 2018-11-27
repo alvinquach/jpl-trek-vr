@@ -3,10 +3,6 @@ using UnityEngine;
 
 public class GenerateDigitalElevationModelPlanarTerrainMeshTask : GenerateDigitalElevationModelTerrainMeshTask {
 
-    private Image<float> _image;
-
-    private float _size;
-
     public GenerateDigitalElevationModelPlanarTerrainMeshTask(TerrainModelMetadata metadata) : base(metadata) {
 
     }
@@ -29,7 +25,7 @@ public class GenerateDigitalElevationModelPlanarTerrainMeshTask : GenerateDigita
         Vector2[] uvs = new Vector2[hVertCount * vVertCount];
 
         // For now, the scaling factor is based on the width of the DEM file.
-        float dimScale = _size / (hVertCount - 1);
+        float dimScale = _metadata.size / (hVertCount - 1);
 
         // Vertex counter
         int vertexIndex = 0;
@@ -37,7 +33,7 @@ public class GenerateDigitalElevationModelPlanarTerrainMeshTask : GenerateDigita
         // Lowest height value
         float min = float.MaxValue;
 
-        float hOffset = _size / 2;
+        float hOffset = _metadata.size / 2;
         float vOffset = dimScale * (vVertCount - 1) / 2;
 
         // Iterate through the rows of vertices.
