@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -44,6 +45,21 @@ namespace App.Http.Utils {
 
             });
 
+        }
+
+        public WebClient DownloadFile(string uri, string fileName, Action callback = null, Action<DownloadProgressChangedEventArgs> progressCallback = null) {
+
+            WebClient client = new WebClient();
+
+            if (callback != null) {
+                client.DownloadFileCompleted += new AsyncCompletedEventHandler((sender, e) => callback());
+            }
+            if (progressCallback != null) {
+                client.DownloadProgressChanged += new DownloadProgressChangedEventHandler((sender, e) => progressCallback(e));
+            }
+
+            client.DownloadFileAsync(new Uri(uri), fileName);
+            return client;
         }
 
         private void SendRequest(HttpWebRequest request, Action<HttpWebResponse> callback, Action<HttpWebResponse> errorCallback) {
