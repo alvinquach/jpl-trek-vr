@@ -1,9 +1,10 @@
-﻿using System;
+﻿using App.Geo;
+using System;
 
 public interface IDigitalElevationModelWebService {
 
     void ClearCache();
 
-    void GetDEM(string resourceUrl, string destPath, Action callback);
+    void GetDEM(BoundingBox bbox, int size, Action callback);
 
 }

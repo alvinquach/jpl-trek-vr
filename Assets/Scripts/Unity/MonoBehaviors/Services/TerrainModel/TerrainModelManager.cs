@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using App.Geo;
 
 [DisallowMultipleComponent]
 public class TerrainModelManager : MonoBehaviour {
@@ -106,7 +107,7 @@ public class TerrainModelManager : MonoBehaviour {
         return AddTerrainModel(terrainModel);
     }
 
-    public TerrainModel CreatePartial(Vector4 boundingBox, string demPath, string albedoPath = null) {
+    public TerrainModel CreatePartial(BoundingBox boundingBox, string demPath, string albedoPath = null) {
         GameObject terrainModelContainer = new GameObject();
         terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform);
         terrainModelContainer.name = $"Model {++_counter}";

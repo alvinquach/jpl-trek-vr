@@ -1,3 +1,4 @@
+using App.Geo;
 using UnityEngine;
 
 public class PartialTerrainModel : TerrainModel {
@@ -10,10 +11,9 @@ public class PartialTerrainModel : TerrainModel {
         set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
     }
 
-    [SerializeField]
-    private Vector4 _boundingBox;
+    private BoundingBox _boundingBox;
 
-    public Vector4 BoundingBox {
+    public BoundingBox BoundingBox {
         get { return _boundingBox; }
         set { if (_initTaskStatus == TaskStatus.NotStarted) _boundingBox = value; }
     }

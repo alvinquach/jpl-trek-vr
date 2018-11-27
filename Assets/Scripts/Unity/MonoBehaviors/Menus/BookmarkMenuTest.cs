@@ -1,4 +1,5 @@
-﻿using App.Unity.MonoBehaviors;
+﻿using App.Geo;
+using App.Unity.MonoBehaviors;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,7 +38,8 @@ public class BookmarkMenuTest : MonoBehaviourWithTaskQueue {
     private void ProcessBookmarks() {
         for (int i = 0; i < _bookmarks.Count; i++) {
             Bookmark bookmark = _bookmarks[i];
-            Vector2 centerCoords = BoundingBoxUtils.ParseBoundingBox(bookmark.bbox);
+            BoundingBox bbox = BoundingBoxUtils.ParseBoundingBox(bookmark.bbox);
+            Vector2 centerCoords = BoundingBoxUtils.MedianLatLon(bbox);
 
             if (buttonTemplate != null) {
                 GameObject obj = Instantiate(buttonTemplate, transform);

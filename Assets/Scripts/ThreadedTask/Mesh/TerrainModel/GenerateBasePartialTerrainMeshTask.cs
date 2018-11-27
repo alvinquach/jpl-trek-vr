@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using App.Geo;
+using UnityEngine;
 
 /// <summary>
 ///     Generates the mesh for a partial section of the planet defined
@@ -10,9 +11,9 @@ public class GenerateBasePartialTerrainMeshTask : GenerateTerrainMeshTask {
     // TEMPORARY
     private static readonly int LatLongVertCount = 50;
 
-    protected Vector4 _boundingBox;
+    protected BoundingBox _boundingBox;
 
-    public GenerateBasePartialTerrainMeshTask(TerrainModelMetadata metadata, Vector4 boundingBox) : base(metadata) {
+    public GenerateBasePartialTerrainMeshTask(TerrainModelMetadata metadata, BoundingBox boundingBox) : base(metadata) {
         _boundingBox = boundingBox;
     }
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using App.Geo;
+using System.IO;
 using UnityEngine;
 
 /// <summary>
@@ -12,7 +13,7 @@ public class XRMenuTestButton : XRMenuElement {
         TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
         if (terrainModelManager.DefaultPlanetModelIsVisible()) {
             string destFileName = $"test1.data";
-            _dataElevationModelWebService.GetDEM(null, destFileName, () => {
+            _dataElevationModelWebService.GetDEM(new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f), 1024, () => {
                 string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
                 TerrainModel terrainModel = terrainModelManager.Create(destFilePath);
                 terrainModelManager.ShowTerrainModel(terrainModel);
