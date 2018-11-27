@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 
-namespace TrekVRApplication.Http {
+namespace TrekVRApplication {
 
     public static class HttpRequestUtils {
 

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using UnityEngine;
 
-namespace App.Unity.MonoBehaviors {
+namespace TrekVRApplication {
 
     public abstract class MonoBehaviourWithTaskQueue : MonoBehaviour {
 

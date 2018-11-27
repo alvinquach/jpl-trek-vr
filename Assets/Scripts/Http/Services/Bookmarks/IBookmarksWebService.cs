@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public interface IBookmarksWebService {
+namespace TrekVRApplication {
 
-    void ClearCache();
+    public interface IBookmarksWebService {
 
-    void GetBookmarks(Action<IList<Bookmark>> callback);
+        void ClearCache();
+
+        void GetBookmarks(Action<IList<Bookmark>> callback);
+
+    }
 
 }

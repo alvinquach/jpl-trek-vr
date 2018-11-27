@@ -1,17 +1,21 @@
-﻿public struct TerrainModelMetadata {
+﻿namespace TrekVRApplication {
 
-    public string demFilePath;
+    public struct TerrainModelMetadata {
 
-    public string albedoFilePath;
+        public string demFilePath;
 
-    public float size;
+        public string albedoFilePath;
 
-    public float radius;
+        public float size;
 
-    public float heightScale;
+        public float radius;
 
-    public int lodLevels;
+        public float heightScale;
 
-    public int baseDownsample;
+        public int lodLevels;
+
+        public int baseDownsample;
+
+    }
 
 }

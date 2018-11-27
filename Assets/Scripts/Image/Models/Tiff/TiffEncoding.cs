@@ -1,6 +1,10 @@
-﻿public enum TiffEncoding {
+﻿namespace TrekVRApplication {
 
-    Scanline,
-    Tiled
+    public enum TiffEncoding {
+
+        Scanline,
+        Tiled
+
+    }
 
 }

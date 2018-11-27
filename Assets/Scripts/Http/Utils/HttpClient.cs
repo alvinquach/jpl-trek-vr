@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-namespace App.Http.Utils {
+namespace TrekVRApplication {
 
     public class HttpClient {
 

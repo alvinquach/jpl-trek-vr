@@ -1,37 +1,40 @@
-﻿using BitMiracle.LibTiff.Classic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class PlanarTerrainModel : TerrainModel {
+namespace TrekVRApplication {
 
-    [SerializeField]
-    private float _size;
+    public class PlanarTerrainModel : TerrainModel {
 
-    public float Size {
-        get { return _size; }
-        set { if (_initTaskStatus == TaskStatus.NotStarted) _size = value; }
-    }
+        [SerializeField]
+        private float _size;
 
-    protected override void ProcessMeshData(MeshData[] meshData) {
-        base.ProcessMeshData(meshData);
+        public float Size {
+            get { return _size; }
+            set { if (_initTaskStatus == TaskStatus.NotStarted) _size = value; }
+        }
 
-        // TEMPORARY
-        transform.localPosition = new Vector3(0, 0.31f, 0);
-    }
+        protected override void ProcessMeshData(MeshData[] meshData) {
+            base.ProcessMeshData(meshData);
 
-    protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
-        TerrainModelMetadata metadata = GenerateMetadata();
-        return new GenerateDigitalElevationModelPlanarTerrainMeshTask(metadata);
-    }
+            // TEMPORARY
+            transform.localPosition = new Vector3(0, 0.31f, 0);
+        }
 
-    protected override TerrainModelMetadata GenerateMetadata() {
-        return new TerrainModelMetadata() {
-            demFilePath = _demFilePath,
-            albedoFilePath = _albedoFilePath,
-            size = _size,
-            heightScale = _heightScale,
-            lodLevels = _lodLevels,
-            baseDownsample = _baseDownsampleLevel
-        };
+        protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
+            TerrainModelMetadata metadata = GenerateMetadata();
+            return new GenerateDigitalElevationModelPlanarTerrainMeshTask(metadata);
+        }
+
+        protected override TerrainModelMetadata GenerateMetadata() {
+            return new TerrainModelMetadata() {
+                demFilePath = _demFilePath,
+                albedoFilePath = _albedoFilePath,
+                size = _size,
+                heightScale = _heightScale,
+                lodLevels = _lodLevels,
+                baseDownsample = _baseDownsampleLevel
+            };
+        }
+
     }
 
 }

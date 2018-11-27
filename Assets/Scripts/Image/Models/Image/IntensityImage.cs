@@ -1,42 +1,46 @@
-﻿public class IntensityImage : Image<float> {
+﻿namespace TrekVRApplication {
 
-    public IntensityImage(int width, int height) : base(width, height) { }
+    public class IntensityImage : Image<float> {
 
-    public override float GetAverage(int x, int y, int width, int height, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
+        public IntensityImage(int width, int height) : base(width, height) { }
 
-        float sum = 0;
-        int count = 0;
+        public override float GetAverage(int x, int y, int width, int height, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
 
-        for (int j = y; j < y + height; j++) {
+            float sum = 0;
+            int count = 0;
 
-            // If the boundary mode is 'None', then ignore the entire row if it is out of bounds.
-            if (boundaryMode == ImageBoundaryMode.None && IsOutOfBounds(0, j)) {
-                continue;
-            }
+            for (int j = y; j < y + height; j++) {
 
-            for (int i = x; i < x + width; i++) {
-
-                // If the boundary mode is 'None', then ignore the pixel if it is out of bounds.
-                if (boundaryMode == ImageBoundaryMode.None && IsOutOfBounds(i, j)) {
+                // If the boundary mode is 'None', then ignore the entire row if it is out of bounds.
+                if (boundaryMode == ImageBoundaryMode.None && IsOutOfBounds(0, j)) {
                     continue;
                 }
 
-                // Call GetPixel() instead of accessing the pixel array directly to handle boundaries.
-                sum += GetPixel(i, j, boundaryMode);
-                count++;
+                for (int i = x; i < x + width; i++) {
+
+                    // If the boundary mode is 'None', then ignore the pixel if it is out of bounds.
+                    if (boundaryMode == ImageBoundaryMode.None && IsOutOfBounds(i, j)) {
+                        continue;
+                    }
+
+                    // Call GetPixel() instead of accessing the pixel array directly to handle boundaries.
+                    sum += GetPixel(i, j, boundaryMode);
+                    count++;
+                }
             }
+
+            return sum / count;
         }
 
-        return sum / count;
-    }
+        public override byte[] ToByteArray() {
+            // TODO Implement this
+            throw new System.NotImplementedException();
+        }
 
-    public override byte[] ToByteArray() {
-        // TODO Implement this
-        throw new System.NotImplementedException();
-    }
+        protected override float DefaultValue() {
+            return 0.0f;
+        }
 
-    protected override float DefaultValue() {
-        return 0.0f;
     }
 
 }

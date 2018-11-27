@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace App.Geo {
+namespace TrekVRApplication {
 
     public struct BoundingBox {
 

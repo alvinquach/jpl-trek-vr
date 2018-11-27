@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace App.Texture.Models {
+namespace TrekVRApplication {
 
     public enum TextureCompressionFormat {
         DXT1,
@@ -11,7 +11,7 @@ namespace App.Texture.Models {
     }
 
 
-    public static class EnumExtensions {
+    public static class TextureCompressionFormatEnumExtensions {
 
         private static TextureCompressionFormat DefaultFormat = TextureCompressionFormat.DXT5;
 

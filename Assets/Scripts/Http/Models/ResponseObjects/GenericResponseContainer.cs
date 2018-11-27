@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
 
-public class GenericResponseContainer {
+namespace TrekVRApplication {
 
-    public Dictionary<string, object> responseHeader;
+    public class GenericResponseContainer {
 
-    public object response;
+        public Dictionary<string, object> responseHeader;
 
-    public object facet_counts;
+        public object response;
+
+        public object facet_counts;
+
+    }
 
 }

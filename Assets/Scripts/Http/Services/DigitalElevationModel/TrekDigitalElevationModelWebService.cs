@@ -1,22 +1,23 @@
-﻿using App.Geo;
-using App.Http.Utils;
-using System;
-using UnityEngine;
+﻿using System;
 
-public class TrekDigitalElevationModelWebService : IDigitalElevationModelWebService {
+namespace TrekVRApplication {
 
-    private const string BaseUrl = "http://ec2-54-177-76-230.us-west-1.compute.amazonaws.com/arcgis/rest/services/mola128_mola64_merge_90Nto90S_SimpleC_clon0/ImageServer";
+    public class TrekDigitalElevationModelWebService : IDigitalElevationModelWebService {
 
-    public static TrekDigitalElevationModelWebService Instance { get; } = new TrekDigitalElevationModelWebService();
+        private const string BaseUrl = "http://ec2-54-177-76-230.us-west-1.compute.amazonaws.com/arcgis/rest/services/mola128_mola64_merge_90Nto90S_SimpleC_clon0/ImageServer";
 
-    private HttpClient _httpClient = HttpClient.Instance;
+        public static TrekDigitalElevationModelWebService Instance { get; } = new TrekDigitalElevationModelWebService();
 
-    public void ClearCache() {
-        // TODO Implement this
-    }
+        private HttpClient _httpClient = HttpClient.Instance;
 
-    public void GetDEM(BoundingBox bbox, int size, Action callback) {
-        //_httpClient.DownloadFile(resourceUrl, destPath, callback);
+        public void ClearCache() {
+            // TODO Implement this
+        }
+
+        public void GetDEM(BoundingBox bbox, int size, Action callback) {
+            //_httpClient.DownloadFile(resourceUrl, destPath, callback);
+        }
+
     }
 
 }

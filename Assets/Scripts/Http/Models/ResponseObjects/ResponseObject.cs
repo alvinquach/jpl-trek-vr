@@ -1,5 +1,7 @@
-﻿public abstract class ResponseObject {
+﻿namespace TrekVRApplication {
 
+    public abstract class ResponseObject {
 
+    }
 
 }

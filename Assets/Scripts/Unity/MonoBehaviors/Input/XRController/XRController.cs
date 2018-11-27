@@ -1,44 +1,48 @@
 ﻿using UnityEngine;
 
-public abstract class XRController : MonoBehaviour {
+namespace TrekVRApplication {
 
-    [SerializeField]
-    public GameObject cursor;
+    public abstract class XRController : MonoBehaviour {
 
-    [SerializeField]
-    protected GameObject _cameraRig;
+        [SerializeField]
+        public GameObject cursor;
 
-    public GameObject CameraRig { get { return _cameraRig; } }
+        [SerializeField]
+        protected GameObject _cameraRig;
 
-    public SteamVR_TrackedController controller { get; private set; }
+        public GameObject CameraRig { get { return _cameraRig; } }
 
-    private void OnEnable() {
-        controller = GetComponent<SteamVR_TrackedController>();
-        controller.TriggerClicked += TriggerClickedHandler;
-        controller.TriggerUnclicked += TriggerUnclickedHandler;
-        controller.PadClicked += PadClickedHandler;
-        controller.PadUnclicked += PadUnclickedHandler;
-        controller.MenuButtonClicked += MenuButtonClickedHandler;
-        controller.Gripped += GrippedHandler;
-        controller.Ungripped += UngrippedHandler;
+        public SteamVR_TrackedController controller { get; private set; }
+
+        private void OnEnable() {
+            controller = GetComponent<SteamVR_TrackedController>();
+            controller.TriggerClicked += TriggerClickedHandler;
+            controller.TriggerUnclicked += TriggerUnclickedHandler;
+            controller.PadClicked += PadClickedHandler;
+            controller.PadUnclicked += PadUnclickedHandler;
+            controller.MenuButtonClicked += MenuButtonClickedHandler;
+            controller.Gripped += GrippedHandler;
+            controller.Ungripped += UngrippedHandler;
+        }
+
+        private void OnDisable() {
+            controller.TriggerClicked -= TriggerClickedHandler;
+            controller.TriggerUnclicked -= TriggerUnclickedHandler;
+            controller.PadClicked -= PadClickedHandler;
+            controller.PadUnclicked -= PadUnclickedHandler;
+            controller.MenuButtonClicked -= MenuButtonClickedHandler;
+            controller.Gripped -= GrippedHandler;
+            controller.Ungripped -= UngrippedHandler;
+        }
+
+        protected virtual void TriggerClickedHandler(object sender, ClickedEventArgs e) { }
+        protected virtual void TriggerUnclickedHandler(object sender, ClickedEventArgs e) { }
+        protected virtual void PadClickedHandler(object sender, ClickedEventArgs e) { }
+        protected virtual void PadUnclickedHandler(object sender, ClickedEventArgs e) { }
+        protected virtual void MenuButtonClickedHandler(object sender, ClickedEventArgs e) { }
+        protected virtual void GrippedHandler(object sender, ClickedEventArgs e) { }
+        protected virtual void UngrippedHandler(object sender, ClickedEventArgs e) { }
+
     }
-
-    private void OnDisable() {
-        controller.TriggerClicked -= TriggerClickedHandler;
-        controller.TriggerUnclicked -= TriggerUnclickedHandler;
-        controller.PadClicked -= PadClickedHandler;
-        controller.PadUnclicked -= PadUnclickedHandler;
-        controller.MenuButtonClicked -= MenuButtonClickedHandler;
-        controller.Gripped -= GrippedHandler;
-        controller.Ungripped -= UngrippedHandler;
-    }
-
-    protected virtual void TriggerClickedHandler(object sender, ClickedEventArgs e) { }
-    protected virtual void TriggerUnclickedHandler(object sender, ClickedEventArgs e) { }
-    protected virtual void PadClickedHandler(object sender, ClickedEventArgs e) { }
-    protected virtual void PadUnclickedHandler(object sender, ClickedEventArgs e) { }
-    protected virtual void MenuButtonClickedHandler(object sender, ClickedEventArgs e) { }
-    protected virtual void GrippedHandler(object sender, ClickedEventArgs e) { }
-    protected virtual void UngrippedHandler(object sender, ClickedEventArgs e) { }
 
 }

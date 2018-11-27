@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace App.ThreadedTask {
+namespace TrekVRApplication {
 
     public abstract class ThreadedTask<Progress, Result> {
 

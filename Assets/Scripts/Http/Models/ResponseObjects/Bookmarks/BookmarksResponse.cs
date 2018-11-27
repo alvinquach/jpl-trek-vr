@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 
-public class BookmarksResponse : ResponseObject {
+namespace TrekVRApplication {
 
-    public int numFound;
-    public int start;
-    public IList<Bookmark> docs;
+    public class BookmarksResponse : ResponseObject {
+
+        public int numFound;
+        public int start;
+        public IList<Bookmark> docs;
+
+    }
 
 }

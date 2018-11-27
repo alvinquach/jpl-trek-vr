@@ -1,21 +1,24 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.IO;
 
-[DisallowMultipleComponent]
-public class FileServiceManager : MonoBehaviour {
+namespace TrekVRApplication {
 
-    /// <summary>
-    ///     The instance of the FileServiceManager that is present in the scene.
-    ///     There should only be one FileServiceManager in the entire scene.
-    /// </summary>
-    public static FileServiceManager Instance { get; private set; }
+    [DisallowMultipleComponent]
+    public class FileServiceManager : MonoBehaviour {
 
-    void Awake() {
+        /// <summary>
+        ///     The instance of the FileServiceManager that is present in the scene.
+        ///     There should only be one FileServiceManager in the entire scene.
+        /// </summary>
+        public static FileServiceManager Instance { get; private set; }
 
-        if (Instance == null) {
-            Instance = this;
+        void Awake() {
+
+            if (Instance == null) {
+                Instance = this;
+            }
+
         }
 
     }
+
 }

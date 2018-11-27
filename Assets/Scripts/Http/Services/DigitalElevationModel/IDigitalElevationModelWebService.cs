@@ -1,10 +1,13 @@
-﻿using App.Geo;
-using System;
+﻿using System;
 
-public interface IDigitalElevationModelWebService {
+namespace TrekVRApplication {
 
-    void ClearCache();
+    public interface IDigitalElevationModelWebService {
 
-    void GetDEM(BoundingBox bbox, int size, Action callback);
+        void ClearCache();
+
+        void GetDEM(BoundingBox bbox, int size, Action callback);
+
+    }
 
 }

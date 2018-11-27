@@ -1,42 +1,44 @@
-﻿using App.Geo;
-using App.Http.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class TempKeyboardInputController : MonoBehaviour {
+namespace TrekVRApplication {
 
-    private IBookmarksWebService _bookmarksWebService = JplBookmarksWebService.Instance;
-    //private IDigitalElevationModelWebService _dataElevationModelWebService = new MockDigitalElevationModelWebService();
-    private TrekDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
+    public class TempKeyboardInputController : MonoBehaviour {
 
-    private int count = 0;
+        private IBookmarksWebService _bookmarksWebService = TrekBookmarksWebService.Instance;
+        //private IDigitalElevationModelWebService _dataElevationModelWebService = new MockDigitalElevationModelWebService();
+        private TrekDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
 
-    void Update() {
+        private int count = 0;
 
-        if (Input.GetKeyUp(KeyCode.A)) {
-            _bookmarksWebService.GetBookmarks(OnGetBookmarks);
+        void Update() {
+
+            if (Input.GetKeyUp(KeyCode.A)) {
+                _bookmarksWebService.GetBookmarks(OnGetBookmarks);
+            }
+
+            if (Input.GetKeyUp(KeyCode.F)) {
+                TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+                if (terrainModelManager.DefaultPlanetModelIsVisible()) {
+                    string destFileName = $"test4.data";
+                    string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
+                    _dataElevationModelWebService.GetDEM(new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f), 1024, () => {
+                        TerrainModel terrainModel = terrainModelManager.Create(destFilePath);
+                        terrainModelManager.ShowTerrainModel(terrainModel);
+                    });
+                }
+                else {
+                    terrainModelManager.ShowDefaultPlanetModel();
+                }
+            }
+
         }
 
-        if (Input.GetKeyUp(KeyCode.F)) {
-            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            if (terrainModelManager.DefaultPlanetModelIsVisible()) {
-                string destFileName = $"test4.data";
-                string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
-                _dataElevationModelWebService.GetDEM(new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f), 1024, () => {
-                    TerrainModel terrainModel = terrainModelManager.Create(destFilePath);
-                    terrainModelManager.ShowTerrainModel(terrainModel);
-                });
-            }
-            else {
-                terrainModelManager.ShowDefaultPlanetModel();
-            }
+        private void OnGetBookmarks(IList<Bookmark> bookmarks) {
+            Debug.Log("Hello " + ++count + "; count=" + bookmarks.Count);
         }
 
     }
-
-    private void OnGetBookmarks(IList<Bookmark> bookmarks) {
-        Debug.Log("Hello " + ++count + "; count=" + bookmarks.Count);
-    }
-
+    
 }

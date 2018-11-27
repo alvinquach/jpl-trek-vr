@@ -1,5 +1,9 @@
-﻿public enum ImageBoundaryMode {
-    None,
-    Repeat,
-    Wrap
+﻿namespace TrekVRApplication {
+
+    public enum ImageBoundaryMode {
+        None,
+        Repeat,
+        Wrap
+    }
+
 }

@@ -1,30 +1,34 @@
 ﻿using UnityEngine;
 
-public class SecondaryXRController : XRController {
+namespace TrekVRApplication {
 
-    [SerializeField]
-    private FlashlightController _flashlight;
+    public class SecondaryXRController : XRController {
 
-    [SerializeField]
-    private RoomLightingController _roomLights;
+        [SerializeField]
+        private FlashlightController _flashlight;
 
-    protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
-        _flashlight?.Toggle();
-    }
+        [SerializeField]
+        private RoomLightingController _roomLights;
 
-    protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
-        Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
-
-        if (e.padY > 0) {
-            _roomLights?.Brighten();
+        protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
+            _flashlight?.Toggle();
         }
-        else {
-            _roomLights?.Dim();
-        }
-    }
 
-    protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
-        _flashlight?.CycleNextColor();
+        protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
+            Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
+
+            if (e.padY > 0) {
+                _roomLights?.Brighten();
+            }
+            else {
+                _roomLights?.Dim();
+            }
+        }
+
+        protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
+            _flashlight?.CycleNextColor();
+        }
+
     }
 
 }

@@ -1,30 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[DisallowMultipleComponent]
-public class TemplateService : MonoBehaviour {
+namespace TrekVRApplication {
 
-    public static TemplateService Instance { get; private set; }
+    [DisallowMultipleComponent]
+    public class TemplateService : MonoBehaviour {
 
-    private Dictionary<string, GameObject> _templates = new Dictionary<string, GameObject>();
+        public static TemplateService Instance { get; private set; }
 
-    void Awake() {
+        private Dictionary<string, GameObject> _templates = new Dictionary<string, GameObject>();
 
-        if (!Instance) {
-            Instance = this;
+        void Awake() {
+
+            if (!Instance) {
+                Instance = this;
+            }
+            else if (Instance != this) {
+                Destroy(gameObject);
+                return;
+            }
+
         }
-        else if (Instance != this) {
-            Destroy(gameObject);
-            return;
+
+        public GameObject GetTemplate(string name) {
+            if (!_templates.ContainsKey(name)) {
+                _templates[name] = transform.Find(name).gameObject;
+            }
+            return _templates[name];
         }
 
-    }
-
-    public GameObject GetTemplate(string name) {
-        if (!_templates.ContainsKey(name)) {
-            _templates[name] = transform.Find(name).gameObject;
-        }
-        return _templates[name];
     }
 
 }

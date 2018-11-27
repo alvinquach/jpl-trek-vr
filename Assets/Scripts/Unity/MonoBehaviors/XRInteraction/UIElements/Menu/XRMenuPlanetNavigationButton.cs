@@ -1,22 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class XRMenuPlanetNavigationButton : XRMenuElement {
+namespace TrekVRApplication {
 
-    [SerializeField]
-    private XRInteractablePlanet _planet;
+    public class XRMenuPlanetNavigationButton : XRMenuElement {
 
-    public float latitude;
+        [SerializeField]
+        private XRInteractablePlanet _planet;
 
-    public float longitude;
+        public float latitude;
 
-    //public override void OnTriggerDoubleClick(PrimaryXRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
-    public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+        public float longitude;
 
-        if (_planet != null) {
-            Camera eye = sender.CameraRig.GetComponentInChildren<Camera>();
-            _planet.NavigateTo(new Vector2(latitude, longitude), eye.transform.position);
+        //public override void OnTriggerDoubleClick(PrimaryXRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+        public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+
+            if (_planet != null) {
+                Camera eye = sender.CameraRig.GetComponentInChildren<Camera>();
+                _planet.NavigateTo(new Vector2(latitude, longitude), eye.transform.position);
+            }
+
         }
 
     }

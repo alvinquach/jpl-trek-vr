@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace App.Geo {
+namespace TrekVRApplication {
 
     public static class BoundingBoxUtils {
 

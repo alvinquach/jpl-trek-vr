@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿namespace TrekVRApplication {
 
-public class XRMenuElement : XRInteractableObject {
+    public class XRMenuElement : XRInteractableObject {
 
-    // TODO Implement this
+        // TODO Implement this
+
+    }
 
 }
