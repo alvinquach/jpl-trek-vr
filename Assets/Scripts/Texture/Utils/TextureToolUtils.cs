@@ -105,7 +105,6 @@ public static class TextureToolUtils {
                     }
 
                     // Copy the generated mip data into the destination array.
-                    byte[] mipData = new byte[size];
                     Marshal.Copy(data, destBytes.Bytes, destIndex, size);
 
                     destIndex += size;
