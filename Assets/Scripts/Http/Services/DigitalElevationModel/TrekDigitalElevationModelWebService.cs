@@ -15,10 +15,6 @@ namespace TrekVRApplication {
 
         private HttpClient _httpClient = HttpClient.Instance;
 
-        public void ClearCache() {
-            // TODO Implement this
-        }
-
         public void GetDEM(BoundingBox bbox, int size, Action<string> callback) {
 
             TerrainModelFileMetadata metadata = new TerrainModelFileMetadata(0, bbox, size, "tiff");

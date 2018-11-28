@@ -9,10 +9,6 @@ namespace TrekVRApplication {
     /// </summary>
     public class MockDigitalElevationModelWebService : IDigitalElevationModelWebService {
 
-        public void ClearCache() {
-            // TODO Implement this
-        }
-
         public void GetDEM(BoundingBox bbox, int size, Action<string> callback) {
             callback?.Invoke(Path.Combine(FilePath.PersistentRoot, FilePath.Test, "test1.data"));
         }
