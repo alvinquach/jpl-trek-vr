@@ -54,7 +54,7 @@ namespace TrekVRApplication {
 
                     // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
                     verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - x, 0) * baseLatVertex - offset);
-                    uvs[vertexIndex] = GenerateStandardUV(xIndex, yIndex, LatLongVertCount, LatLongVertCount);
+                    uvs[vertexIndex] = GenerateStandardUV(xIndex, LatLongVertCount - yIndex, LatLongVertCount, LatLongVertCount);
                     xIndex++;
                     vertexIndex++;
                 }
@@ -65,12 +65,12 @@ namespace TrekVRApplication {
 
             // Only one LOD is generated.
             _meshData = new MeshData[] {
-            new MeshData() {
-                Vertices = verts,
-                TexCoords = uvs,
-                Triangles = GenerateTriangles(LatLongVertCount, LatLongVertCount)
-            }
-        };
+                new MeshData() {
+                    Vertices = verts,
+                    TexCoords = uvs,
+                    Triangles = GenerateTriangles(LatLongVertCount, LatLongVertCount)
+                }
+            };
 
         }
 
