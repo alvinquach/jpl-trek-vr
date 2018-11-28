@@ -26,6 +26,7 @@ namespace TrekVRApplication {
             string filepath = Path.Combine(directory, filename);
             if (availableFiles.Contains(filename)) {
                 callback(filepath);
+                return;
             }
 
             IDictionary<string, string> paramsMap = new Dictionary<string, string>() {
