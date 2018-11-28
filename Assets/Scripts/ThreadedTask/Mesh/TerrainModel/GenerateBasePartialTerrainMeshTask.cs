@@ -40,20 +40,17 @@ namespace TrekVRApplication {
             Vector3 offset = BoundingBoxUtils.MedianDirection(_boundingBox);
 
             int yIndex = 0, vertexIndex = 0;
-            for (float y = latStart; yIndex < LatLongVertCount; y += latIncrement) {
+            for (float vy = latStart; yIndex < LatLongVertCount; vy += latIncrement) {
+
+                // Create a new vertex using the latitude angle. The coordinates of this
+                // vertex will serve as a base for all the other vertices in this latitude.
+                Vector3 baseLatVertex = new Vector3(Mathf.Cos(vy), Mathf.Sin(vy), 0);
 
                 int xIndex = 0;
-
-                /*
-                 * Create a new vertex using the latitude angle. The coordinates of this
-                 * vertex will serve as a base for all the other vertices in this latitude.
-                 */
-                Vector3 baseLatVertex = new Vector3(Mathf.Cos(y), Mathf.Sin(y), 0);
-
-                for (float x = lonStart; xIndex < LatLongVertCount; x += lonIncrement) {
+                for (float vx = lonStart; xIndex < LatLongVertCount; vx += lonIncrement) {
 
                     // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
-                    verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - x, 0) * baseLatVertex - offset);
+                    verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - vx, 0) * baseLatVertex - offset);
                     uvs[vertexIndex] = GenerateStandardUV(xIndex, LatLongVertCount - yIndex, LatLongVertCount, LatLongVertCount);
                     xIndex++;
                     vertexIndex++;

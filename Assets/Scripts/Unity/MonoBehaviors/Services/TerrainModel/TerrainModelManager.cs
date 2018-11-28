@@ -117,7 +117,7 @@ namespace TrekVRApplication {
             PartialTerrainModel terrainModel = terrainModelContainer.AddComponent<PartialTerrainModel>();
             try {
                 terrainModel.Radius = 3.39f;
-                terrainModel.HeightScale = 0f;
+                terrainModel.HeightScale = 1e-6f;
                 // Bounding box is in the format (lonStart, latStart, lonEnd, latEnd)
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;

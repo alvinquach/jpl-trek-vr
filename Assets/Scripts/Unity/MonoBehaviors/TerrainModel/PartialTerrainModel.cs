@@ -4,6 +4,10 @@ namespace TrekVRApplication {
 
     public class PartialTerrainModel : TerrainModel {
 
+        private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
+
+        private IMosaicWebService _mosaicWebService = TrekMosaicWebService.Instance;
+
         [SerializeField]
         private float _radius;
 
@@ -46,6 +50,55 @@ namespace TrekVRApplication {
             }
         }
 
+        public override void InitModel() {
+            if (_initTaskStatus > TaskStatus.NotStarted) {
+                return;
+            }
+
+            _initTaskStatus = TaskStatus.Started;
+
+            TerrainModelMetadata metadata = GenerateMetadata();
+            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox);
+            generateBaseMeshTask.Execute((meshData) => {
+                QueueTask(() => ProcessMeshData(meshData));
+                _initTaskStatus = TaskStatus.Completed;
+            });
+
+            _dataElevationModelWebService.GetDEM(_boundingBox, 1024, (demFilePath) => {
+                _demFilePath = demFilePath; // Should this be allowed?
+                GenerateTerrainMeshTask generateMeshTask = InstantiateGenerateMeshTask();
+                generateMeshTask.Execute((meshData) => {
+                    QueueTask(() => {
+                        // TODO Rework the logic in the base class to do this instead.
+                        GameObject lodGroupContainer = transform.Find(GameObjectName.LODGroupContainer).gameObject;
+                        if (lodGroupContainer) {
+                            Destroy(lodGroupContainer);
+                        }
+                        base.ProcessMeshData(meshData);
+                    });
+                });
+            });
+
+            _mosaicWebService.GetMosaic(_boundingBox, 1024, (textureFilePath) => {
+                _albedoFilePath = textureFilePath; // Should this be allowed?
+
+                // TODO Restructure base class to remove this duplicate logic.
+                TextureCompressionFormat textureFormat = TextureCompressionFormat.DXT1;
+                ConvertTextureFromFileTask textureTask = new ConvertTextureFromFileTask(textureFilePath, textureFormat);
+                textureTask.Execute((data) => {
+                    int width = textureTask.TextureWidth, height = textureTask.TextureHeight;
+                    QueueTask(() => {
+                        Texture2D texture = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
+                        texture.GetRawTextureData<byte>().CopyFrom(data);
+                        texture.Apply();
+                        Material.SetTexture("_MainTex", texture); // Assume Material is not null or default.
+                    });
+
+                });
+            });
+
+        }
+
         protected override void ProcessMeshData(MeshData[] meshData) {
             base.ProcessMeshData(meshData);
             transform.rotation = TerrainModelManager.Instance.GetDefaultPlanetModelTransform().rotation;
@@ -72,8 +125,8 @@ namespace TrekVRApplication {
 
         protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
             TerrainModelMetadata metadata = GenerateMetadata();
-            return new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox);
-            //return new DigitalElevationModelPartialTerrainMeshGenerator(metadata, _boundingBox);
+            //return new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox);
+            return new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox);
         }
 
         protected override TerrainModelMetadata GenerateMetadata() {
