@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace TrekVRApplication {
 
@@ -12,11 +13,8 @@ namespace TrekVRApplication {
             // TODO Implement this
         }
 
-        public void GetDEM(BoundingBox bbox, int size, Action callback) {
-            //UnityWebRequest request = WebRequestUtils.Post("localhost:8080/rest/files/download", "D:/Alvin/Downloads/Trek DEMs/mola128_mola64_merge_90Nto90S_SimpleC_clon0_small.tif");
-            //string dest = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destPath);
-            //FileRequest(request, dest, callback);
-            callback?.Invoke();
+        public void GetDEM(BoundingBox bbox, int size, Action<string> callback) {
+            callback?.Invoke(Path.Combine(FilePath.PersistentRoot, FilePath.Test, "test1.data"));
         }
 
     }

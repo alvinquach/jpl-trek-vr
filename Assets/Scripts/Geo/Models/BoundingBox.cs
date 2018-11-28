@@ -69,13 +69,14 @@ namespace TrekVRApplication {
             _lonStart = WrapLongitude(lonStart);
             _latStart = WrapLatitude(latStart);
             _lonEnd = WrapLongitude(lonEnd);
-            _latEnd = WrapLatitude(lonEnd);
+            _latEnd = WrapLatitude(latEnd);
             SortBoundingBox();
         }
 
         public BoundingBox(Vector4 v) : this(v[0], v[1], v[2], v[3]) {
 
         }
+
 
         private void SortBoundingBox() {
             if (this[2] < this[0]) {
@@ -88,6 +89,22 @@ namespace TrekVRApplication {
                 this[1] = this[3];
                 this[3] = lat;
             }
+        }
+
+        public override string ToString() {
+            return ToString(", ");
+        }
+
+        public string ToString(string delimiter, int decimalPlaces = 4) {
+
+            // This will add thousands separators, but it shouldn't matter for
+            // bounding box since the highest possible value should be 180.
+            string format = $"n{decimalPlaces}"; 
+
+            return this[0].ToString(format) + delimiter +
+                   this[1].ToString(format) + delimiter +
+                   this[2].ToString(format) + delimiter +
+                   this[3].ToString(format);
         }
 
         private static float WrapLongitude(float lon) {

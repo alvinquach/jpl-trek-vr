@@ -8,7 +8,7 @@ namespace TrekVRApplication {
 
         private IBookmarksWebService _bookmarksWebService = TrekBookmarksWebService.Instance;
         //private IDigitalElevationModelWebService _dataElevationModelWebService = new MockDigitalElevationModelWebService();
-        private TrekDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
+        private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
 
         private int count = 0;
 
@@ -21,10 +21,8 @@ namespace TrekVRApplication {
             if (Input.GetKeyUp(KeyCode.F)) {
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
                 if (terrainModelManager.DefaultPlanetModelIsVisible()) {
-                    string destFileName = $"test4.data";
-                    string destFilePath = Path.Combine(FilePath.PersistentRoot, FilePath.Test, destFileName);
-                    _dataElevationModelWebService.GetDEM(new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f), 1024, () => {
-                        TerrainModel terrainModel = terrainModelManager.Create(destFilePath);
+                    _dataElevationModelWebService.GetDEM(new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f), 1024, (filepath) => {
+                        TerrainModel terrainModel = terrainModelManager.Create(filepath);
                         terrainModelManager.ShowTerrainModel(terrainModel);
                     });
                 }

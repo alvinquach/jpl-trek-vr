@@ -47,18 +47,18 @@ namespace TrekVRApplication {
 
         }
 
-        public WebClient DownloadFile(string uri, string fileName, Action callback = null, Action<DownloadProgressChangedEventArgs> progressCallback = null) {
+        public WebClient DownloadFile(string uri, string filepath, Action<string> callback = null, Action<DownloadProgressChangedEventArgs> progressCallback = null) {
 
             WebClient client = new WebClient();
 
             if (callback != null) {
-                client.DownloadFileCompleted += new AsyncCompletedEventHandler((sender, e) => callback());
+                client.DownloadFileCompleted += new AsyncCompletedEventHandler((sender, e) => callback(filepath));
             }
             if (progressCallback != null) {
                 client.DownloadProgressChanged += new DownloadProgressChangedEventHandler((sender, e) => progressCallback(e));
             }
 
-            client.DownloadFileAsync(new Uri(uri), fileName);
+            client.DownloadFileAsync(new Uri(uri), filepath);
             return client;
         }
 

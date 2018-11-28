@@ -6,7 +6,7 @@ namespace TrekVRApplication {
 
         void ClearCache();
 
-        void GetDEM(BoundingBox bbox, int size, Action callback);
+        void GetDEM(BoundingBox bbox, int size, Action<string> callback);
 
     }
 
