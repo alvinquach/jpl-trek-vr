@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Text;
 
 namespace TrekVRApplication {
 
     public static class HttpRequestUtils {
 
-        public static string AppendParams(string baseUrl, IDictionary<string, string> paramsMap, bool urlEncode = true) {
-            string paramsString = GenerateParamsString(paramsMap, urlEncode);
+        public static string AppendParams(string baseUrl, IDictionary<string, string> paramsMap, bool urlEncodeParams = true) {
+            string paramsString = GenerateParamsString(paramsMap, urlEncodeParams);
             return AppendParams(baseUrl, paramsString);
         }
 
@@ -15,10 +16,20 @@ namespace TrekVRApplication {
         }
 
         public static string GenerateParamsString(IDictionary<string, string> paramsMap, bool urlEncode = true) {
-            // TODO Implement this
-            return null;
+            if (paramsMap.Count == 0) {
+                return "";
+            }
+            StringBuilder sb = new StringBuilder();
+            int index = 0;
+            foreach (KeyValuePair<string, string> kv in paramsMap) {
+                if (index > 0) {
+                    sb.Append("&");
+                }
+                sb.Append(urlEncode ? $"{EncodeUrl(kv.Key)}={EncodeUrl(kv.Value)}" : $"{kv.Key}={kv.Value}");
+                index++;
+            }
+            return sb.ToString();
         }
-
 
         public static string DecodeUrl(string url) {
             return WebUtility.UrlDecode(url);
