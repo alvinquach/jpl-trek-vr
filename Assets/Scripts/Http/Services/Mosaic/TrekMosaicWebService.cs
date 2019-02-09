@@ -9,7 +9,7 @@ namespace TrekVRApplication {
 
         private const string Format = "tiff";
 
-        private const string BaseUrl = "http://ec2-54-177-76-230.us-west-1.compute.amazonaws.com/arcgis/rest/services/Mars_Viking_MDIM21_ClrMosaic_global_232m/ImageServer";
+        private const string BaseUrl = "https://trek.nasa.gov/mars/arcgis/rest/services/Mars_Viking_MDIM21_ClrMosaic_global_232m/ImageServer";
 
         public static TrekMosaicWebService Instance { get; } = new TrekMosaicWebService();
 

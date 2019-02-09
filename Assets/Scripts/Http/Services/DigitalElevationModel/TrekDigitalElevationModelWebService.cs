@@ -9,7 +9,7 @@ namespace TrekVRApplication {
 
         private const string Format = "tiff";
 
-        private const string BaseUrl = "http://ec2-54-177-76-230.us-west-1.compute.amazonaws.com/arcgis/rest/services/mola128_mola64_merge_90Nto90S_SimpleC_clon0/ImageServer";
+        private const string BaseUrl = "https://trek.nasa.gov/mars/arcgis/rest/services/mola128_mola64_merge_90Nto90S_SimpleC_clon0/ImageServer";
 
         public static TrekDigitalElevationModelWebService Instance { get; } = new TrekDigitalElevationModelWebService();
 
