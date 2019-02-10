@@ -41,7 +41,6 @@ namespace TrekVRApplication {
 
         public static Vector3 MedianDirection(BoundingBox boundingBox) {
             Vector2 medianLatLong = MedianLatLon(boundingBox);
-            Debug.Log(medianLatLong);
             return CoordinateUtils.LatLonToDirection(medianLatLong);
         }
 
