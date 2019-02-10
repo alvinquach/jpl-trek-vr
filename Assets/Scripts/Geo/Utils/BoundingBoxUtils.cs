@@ -5,14 +5,21 @@ namespace TrekVRApplication {
 
     public static class BoundingBoxUtils {
 
+        /// <summary>
+        ///     Parses a comma delimted string contaning with start longitude,
+        ///     start latitude, end longitude, and end latitude values.
+        /// </summary>
+        /// <param name="boundingBox"></param>
+        /// <returns></returns>
         public static BoundingBox ParseBoundingBox(string boundingBox) {
-            BoundingBox result = BoundingBox.Zero;
             string[] split = boundingBox.Split(',');
             // TODO Add sanity checks.
-            for (int i = 0; i < 4; i++) {
-                result[i] = float.Parse(split[i]);
-            }
-            return result;
+            return new BoundingBox(
+                float.Parse(split[0]),
+                float.Parse(split[1]),
+                float.Parse(split[2]),
+                float.Parse(split[3])
+            );
         }
 
         /// <summary>

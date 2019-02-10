@@ -6,6 +6,8 @@ namespace TrekVRApplication {
 
     public struct BoundingBox {
 
+        public static BoundingBox Zero { get { return new BoundingBox(0f, 0f, 0f, 0f); } }
+
         private float _lonStart;
         public float LonStart {
             get { return _lonStart; }
@@ -77,7 +79,6 @@ namespace TrekVRApplication {
 
         }
 
-
         private void SortBoundingBox() {
             if (this[2] < this[0]) {
                 float lon = this[0];
@@ -89,6 +90,27 @@ namespace TrekVRApplication {
                 this[1] = this[3];
                 this[3] = lat;
             }
+        }
+
+        public override bool Equals(object obj) {
+            if (!(obj is BoundingBox)) {
+                return false;
+            }
+
+            var box = (BoundingBox)obj;
+            return _lonStart == box._lonStart &&
+                   _latStart == box._latStart &&
+                   _lonEnd == box._lonEnd &&
+                   _latEnd == box._latEnd;
+        }
+
+        public override int GetHashCode() {
+            var hashCode = -335603062;
+            hashCode = hashCode * -1521134295 + _lonStart.GetHashCode();
+            hashCode = hashCode * -1521134295 + _latStart.GetHashCode();
+            hashCode = hashCode * -1521134295 + _lonEnd.GetHashCode();
+            hashCode = hashCode * -1521134295 + _latEnd.GetHashCode();
+            return hashCode;
         }
 
         public override string ToString() {
@@ -115,7 +137,13 @@ namespace TrekVRApplication {
             return Mathf.Clamp(MathUtils.WrapAngle180(lat), -90f, 90f);
         }
 
-        public static BoundingBox Zero { get { return new BoundingBox(0f, 0f, 0f, 0f); } }
+        public static bool operator ==(BoundingBox bbox1, BoundingBox bbox2) {
+            return bbox1.Equals(bbox2);
+        }
+
+        public static bool operator !=(BoundingBox bbox1, BoundingBox bbox2) {
+            return !bbox1.Equals(bbox2);
+        }
 
         // Converts a Vector4 to a BoundingBox.
         public static implicit operator BoundingBox(Vector4 v) {
