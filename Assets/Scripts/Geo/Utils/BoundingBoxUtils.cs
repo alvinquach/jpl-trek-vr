@@ -44,6 +44,10 @@ namespace TrekVRApplication {
             return CoordinateUtils.LatLonToDirection(medianLatLong);
         }
 
+        public static BoundingBox ExpandToSquare(BoundingBox boundingBox, RelativePosition relativeTo = RelativePosition.Center) {
+            return boundingBox;
+        }
+
         /// <summary>
         ///     Calculates the largest dimension (width or height) of the terrain slice
         ///     enclosed by the bounding box if the terrain slice is rotated such that

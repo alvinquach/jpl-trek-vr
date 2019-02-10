@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using TrekVRApplication;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace Tests {
         private readonly BoundingBox _boundingBoxB = new BoundingBox(-12.3f, -45.6f, 78.9f, 0.0f);
         private readonly BoundingBox _boundingBoxC = new BoundingBox(-45.0f, 0.0f, 45.0f, 90f);
         private readonly BoundingBox _boundingBoxD = new BoundingBox(-135.0f, -90.0f, 45.0f, 0.0f);
+        private readonly BoundingBox _boundingBoxE = new BoundingBox(-20.0f, -0.0f, 10.0f, 90.0f);
 
         [Test]
         public void ParseBoundingBox_BoundingBoxA_ParsesCorrectly() {
@@ -78,11 +80,122 @@ namespace Tests {
         public void MedianDirection_BoundingBoxD_CorrectResult() {
             Vector3 expected = new Vector3(0.5f, -Mathf.Sqrt(0.5f), 0.5f);
             Vector3 actual = BoundingBoxUtils.MedianDirection(_boundingBoxD);
-            VectorUtils.Print(expected);
-            VectorUtils.Print(actual);
             for (int i = 0; i < 3; i++) {
                 CompareFloats(expected[i], actual[i]);
             }
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxACenter_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, -3.5f, 42.0f, 31.6f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.Center);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxALeft_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, -3.5f, 42.0f, 31.6f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.Left);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxARight_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, -3.5f, 42.0f, 31.6f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.Right);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxATop_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, -10.1f, 42.0f, 25.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.Top);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxATopLeft_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, -10.1f, 42.0f, 25.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.TopLeft);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxATopRight_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, -10.1f, 42.0f, 25.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.TopRight);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxABottom_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, 3.1f, 42.0f, 38.2f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.Bottom);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxABottomLeft_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, 3.1f, 42.0f, 38.2f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.BottomLeft);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxABottomRight_CorrectResults() {
+            BoundingBox expected = new BoundingBox(6.9f, 3.1f, 42.0f, 38.2f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxA, RelativePosition.BottomRight);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxBCenter_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-12.3f, -68.4f, 78.9f, 22.8f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxB, RelativePosition.Center);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxBTop_ThrowsException() {
+            // The start latitude in this case would be -91.2, which is not allowed.
+            Assert.Throws(typeof(Exception), () => BoundingBoxUtils.ExpandToSquare(_boundingBoxB, RelativePosition.Top));
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxBBottom_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-135.0f, -90.0f, 45.0f, 0.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxB, RelativePosition.Bottom);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxC_CorrectResults() {
+            // All Positions should return the original bounding box for this test case.
+            foreach (RelativePosition position in Enum.GetValues(typeof(RelativePosition))) {
+                BoundingBox result = BoundingBoxUtils.ExpandToSquare(_boundingBoxC, position);
+                Assert.AreEqual(result, _boundingBoxC);
+            }
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxECenter_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-50.0f, -0.0f, 40.0f, 90.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxE, RelativePosition.Center);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxELeft_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-20.0f, -0.0f, 70.0f, 90.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxE, RelativePosition.Left);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxERight_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-80.0f, -0.0f, 10.0f, 90.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxE, RelativePosition.Right);
+            Assert.AreEqual(expected, actual);
         }
 
         /// <summary>
