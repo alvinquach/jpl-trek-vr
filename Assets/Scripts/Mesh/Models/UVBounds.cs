@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public struct UVArea {
+    public struct UVBounds {
 
-        public static UVArea Default { get { return new UVArea(0f, 0f, 1f, 1f); } }
+        public static UVBounds Default { get { return new UVBounds(0f, 0f, 1f, 1f); } }
 
         public float U1 { get; set; }
         public float V1 { get; set; }
@@ -20,7 +20,7 @@ namespace TrekVRApplication {
                     case 2: return U2;
                     case 3: return V2;
                     default:
-                        throw new IndexOutOfRangeException("Invalid UVArea index!");
+                        throw new IndexOutOfRangeException("Invalid UVBounds index!");
                 }
             }
             set {
@@ -30,19 +30,19 @@ namespace TrekVRApplication {
                     case 2: U2 = value; break;
                     case 3: V2 = value; break;
                     default:
-                        throw new IndexOutOfRangeException("Invalid UVArea index!");
+                        throw new IndexOutOfRangeException("Invalid UVBounds index!");
                 }
             }
         }
 
-        public UVArea(float u1, float v1, float u2, float v2) {
+        public UVBounds(float u1, float v1, float u2, float v2) {
             U1 = u1;
             V1 = v1;
             U2 = u2;
             V2 = v2;
         }
 
-        public UVArea(Vector4 v) : this(v[0], v[1], v[2], v[3]) {
+        public UVBounds(Vector4 v) : this(v[0], v[1], v[2], v[3]) {
 
         }
 
@@ -63,15 +63,15 @@ namespace TrekVRApplication {
         }
 
         public override bool Equals(object obj) {
-            if (!(obj is UVArea)) {
+            if (!(obj is UVBounds)) {
                 return false;
             }
 
-            var area = (UVArea)obj;
-            return U1 == area.U1 &&
-                   V1 == area.V1 &&
-                   U2 == area.U2 &&
-                   V2 == area.V2;
+            var bounds = (UVBounds)obj;
+            return U1 == bounds.U1 &&
+                   V1 == bounds.V1 &&
+                   U2 == bounds.U2 &&
+                   V2 == bounds.V2;
         }
 
         public override int GetHashCode() {
@@ -83,21 +83,21 @@ namespace TrekVRApplication {
             return hashCode;
         }
 
-        public static bool operator ==(UVArea bbox1, UVArea bbox2) {
+        public static bool operator ==(UVBounds bbox1, UVBounds bbox2) {
             return bbox1.Equals(bbox2);
         }
 
-        public static bool operator !=(UVArea bbox1, UVArea bbox2) {
+        public static bool operator !=(UVBounds bbox1, UVBounds bbox2) {
             return !bbox1.Equals(bbox2);
         }
 
-        // Converts a Vector4 to a UVArea.
-        public static implicit operator UVArea(Vector4 v) {
-            return new UVArea(v);
+        // Converts a Vector4 to UVBounds.
+        public static implicit operator UVBounds(Vector4 v) {
+            return new UVBounds(v);
         }
 
-        // Converts a Vector4 to a UVArea.
-        public static implicit operator Vector4(UVArea bbox) {
+        // Converts a Vector4 to UVBounds.
+        public static implicit operator Vector4(UVBounds bbox) {
             return new Vector4(bbox[0], bbox[1], bbox[2], bbox[3]);
         }
 

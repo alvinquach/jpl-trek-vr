@@ -238,37 +238,37 @@ namespace Tests {
 
         [Test]
         public void RelativeUV_SameBoundingBox_DefaultResults() {
-            UVArea result = BoundingBoxUtils.RelativeUV(_boundingBoxA, _boundingBoxA);
-            Assert.AreEqual(UVArea.Default, result);
+            UVBounds result = BoundingBoxUtils.RelativeUV(_boundingBoxA, _boundingBoxA);
+            Assert.AreEqual(UVBounds.Default, result);
         }
 
         [Test]
         public void RelativeUV_BoundingBoxCSameSize_CorrectResults() {
             BoundingBox selectedArea = new BoundingBox(-15.0f, -30.0f, 75.0f, 60.0f);
-            UVArea expected = new UVArea(1/3f, 1/3f, 4/3f, 4/3f);
-            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, selectedArea);
+            UVBounds expected = new UVBounds(1/3f, 1/3f, 4/3f, 4/3f);
+            UVBounds actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, selectedArea);
             Assert.AreEqual(expected, actual);
         }
 
         [Test]
         public void RelativeUV_BoundingBoxCSameAspect_CorrectResults() {
             BoundingBox selectedArea = new BoundingBox(-30.0f, 0.0f, 15.0f, 45.0f);
-            UVArea expected = new UVArea(1/6f, 1/2f, 2/3f, 1f);
-            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, selectedArea);
+            UVBounds expected = new UVBounds(1/6f, 1/2f, 2/3f, 1f);
+            UVBounds actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, selectedArea);
             Assert.AreEqual(expected, actual);
         }
 
         [Test]
         public void RelativeUV_BoundingBoxCE_CorrectResults() {
-            UVArea expected = new UVArea(5/18f, 0f, 11/18f, 1f);
-            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, _boundingBoxE);
+            UVBounds expected = new UVBounds(5/18f, 0f, 11/18f, 1f);
+            UVBounds actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, _boundingBoxE);
             Assert.AreEqual(expected, actual);
         }
 
         [Test]
         public void RelativeUV_BoundingBoxEC_CorrectResults() {
-            UVArea expected = new UVArea(-5/6f, 0f, 13/6f, 1f);
-            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxE, _boundingBoxC);
+            UVBounds expected = new UVBounds(-5/6f, 0f, 13/6f, 1f);
+            UVBounds actual = BoundingBoxUtils.RelativeUV(_boundingBoxE, _boundingBoxC);
             Assert.AreEqual(expected, actual);
         }
 
@@ -276,16 +276,16 @@ namespace Tests {
         public void RelativeUV_BoundingBoxFSameSize1_CorrectResults() {
             new BoundingBox(-135.0f, -30.0f, 135.0f, 30.0f);
             BoundingBox selectedArea = new BoundingBox(90.0f, -30.0f, 180.0f, 30.0f);
-            UVArea expected = new UVArea(-1/2f, 0f, 1/2f, 1f);
-            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxF, selectedArea);
+            UVBounds expected = new UVBounds(-1/2f, 0f, 1/2f, 1f);
+            UVBounds actual = BoundingBoxUtils.RelativeUV(_boundingBoxF, selectedArea);
             Assert.AreEqual(expected, actual);
         }
 
         [Test]
         public void RelativeUV_BoundingBoxFSameSize2_CorrectResults() {
             BoundingBox selectedArea = new BoundingBox(120.0f, 0.0f, -150.0f, 60.0f);
-            UVArea expected = new UVArea(-1/6f, -1/2f, 5/6f, 1/2f);
-            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxF, selectedArea);
+            UVBounds expected = new UVBounds(-1/6f, -1/2f, 5/6f, 1/2f);
+            UVBounds actual = BoundingBoxUtils.RelativeUV(_boundingBoxF, selectedArea);
             Assert.AreEqual(expected, actual);
         }
 

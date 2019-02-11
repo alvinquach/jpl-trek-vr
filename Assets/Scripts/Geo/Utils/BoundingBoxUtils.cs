@@ -129,15 +129,15 @@ namespace TrekVRApplication {
 
         }
 
-        public static UVArea RelativeUV(BoundingBox boundingBox, BoundingBox selectedArea) {
+        public static UVBounds RelativeUV(BoundingBox boundingBox, BoundingBox selectedArea) {
             if (boundingBox == selectedArea) {
-                return UVArea.Default;
+                return UVBounds.Default;
             }
             float uStart = (selectedArea.LonStart - boundingBox.LonStart) / boundingBox.LonSwing;
             float uEnd = 1 - (boundingBox.LonEnd - selectedArea.LonEnd) / boundingBox.LonSwing;
             float vStart = (boundingBox.LatEnd - selectedArea.LatEnd) / boundingBox.LatSwing;
             float vEnd = 1 - (selectedArea.LatStart - boundingBox.LatStart) / boundingBox.LatSwing;
-            return new UVArea(uStart, vStart, uEnd, vEnd);
+            return new UVBounds(uStart, vStart, uEnd, vEnd);
         }
 
         /// <summary>
