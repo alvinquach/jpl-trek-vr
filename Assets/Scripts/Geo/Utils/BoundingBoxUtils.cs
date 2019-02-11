@@ -44,6 +44,16 @@ namespace TrekVRApplication {
             return CoordinateUtils.LatLonToDirection(medianLatLong);
         }
 
+        public static BoundingBox ExpandToSquare(BoundingBox boundingBox) {
+            try {
+                return ExpandToSquare(boundingBox, RelativePosition.TopLeft);
+            }
+            catch (Exception) {
+                boundingBox.LatStart = -90.0f;
+                return ExpandToSquare(boundingBox, RelativePosition.BottomRight);
+            }
+        }
+
         public static BoundingBox ExpandToSquare(BoundingBox boundingBox, RelativePosition relativeTo = RelativePosition.Center) {
             float totalLon = boundingBox.LonSwing;
             float totalLat = boundingBox.LatSwing;
@@ -53,11 +63,6 @@ namespace TrekVRApplication {
 
             // Expand vertically
             if (totalLon > totalLat) {
-
-                // Largest latitude swing is 180°.
-                if (totalLon > 180.0f) {
-                    throw new Exception("Latitude swing cannot be greater than 180°");
-                }
 
                 float latStart = boundingBox.LatStart;
                 float latEnd = boundingBox.LatEnd;
