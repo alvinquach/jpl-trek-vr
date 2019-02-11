@@ -198,6 +198,42 @@ namespace Tests {
             Assert.AreEqual(expected, actual);
         }
 
+        [Test]
+        public void RelativeUV_SameBoundingBox_DefaultResults() {
+            UVArea result = BoundingBoxUtils.RelativeUV(_boundingBoxA, _boundingBoxA);
+            Assert.AreEqual(UVArea.Default, result);
+        }
+
+        [Test]
+        public void RelativeUV_BoundingBoxCSameSize_CorrectResults() {
+            BoundingBox selectedArea = new BoundingBox(-15.0f, -30.0f, 75.0f, 60.0f);
+            UVArea expected = new UVArea(1/3f, 1/3f, 4/3f, 4/3f);
+            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, selectedArea);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void RelativeUV_BoundingBoxCSameAspect_CorrectResults() {
+            BoundingBox selectedArea = new BoundingBox(-30.0f, 0.0f, 15.0f, 45.0f);
+            UVArea expected = new UVArea(1/6f, 1/2f, 2/3f, 1f);
+            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, selectedArea);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void RelativeUV_BoundingBoxCE_CorrectResults() {
+            UVArea expected = new UVArea(5/8f, 0f, 23/24f, 1f);
+            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, _boundingBoxE);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void RelativeUV_BoundingBoxEC_CorrectResults() {
+            UVArea expected = new UVArea(-5/6f, 0f, 13/6f, 1f);
+            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxE, _boundingBoxC);
+            Assert.AreEqual(expected, actual);
+        }
+
         /// <summary>
         ///     Compares two floating point precision numbers up to the given
         ///     decimal place. Asserts whether they are equal.

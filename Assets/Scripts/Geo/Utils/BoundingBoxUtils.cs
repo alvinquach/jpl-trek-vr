@@ -48,6 +48,13 @@ namespace TrekVRApplication {
             return boundingBox;
         }
 
+        public static UVArea RelativeUV(BoundingBox boundingBox, BoundingBox selectedArea) {
+            if (boundingBox == selectedArea) {
+                return UVArea.Default;
+            }
+            return UVArea.Default;
+        }
+
         /// <summary>
         ///     Calculates the largest dimension (width or height) of the terrain slice
         ///     enclosed by the bounding box if the terrain slice is rotated such that
