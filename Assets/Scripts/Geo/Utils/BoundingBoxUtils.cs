@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace TrekVRApplication {
@@ -128,7 +128,11 @@ namespace TrekVRApplication {
             if (boundingBox == selectedArea) {
                 return UVArea.Default;
             }
-            return UVArea.Default;
+            float uStart = (selectedArea.LonStart - boundingBox.LonStart) / boundingBox.LonSwing;
+            float uEnd = 1 - (boundingBox.LonEnd - selectedArea.LonEnd) / boundingBox.LonSwing;
+            float vStart = (boundingBox.LatEnd - selectedArea.LatEnd) / boundingBox.LatSwing;
+            float vEnd = 1 - (selectedArea.LatStart - boundingBox.LatStart) / boundingBox.LatSwing;
+            return new UVArea(uStart, vStart, uEnd, vEnd);
         }
 
         /// <summary>

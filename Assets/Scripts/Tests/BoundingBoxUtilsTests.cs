@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using TrekVRApplication;
 using UnityEngine;
@@ -253,7 +253,7 @@ namespace Tests {
 
         [Test]
         public void RelativeUV_BoundingBoxCE_CorrectResults() {
-            UVArea expected = new UVArea(5/8f, 0f, 23/24f, 1f);
+            UVArea expected = new UVArea(5/18f, 0f, 11/18f, 1f);
             UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxC, _boundingBoxE);
             Assert.AreEqual(expected, actual);
         }
@@ -262,6 +262,23 @@ namespace Tests {
         public void RelativeUV_BoundingBoxEC_CorrectResults() {
             UVArea expected = new UVArea(-5/6f, 0f, 13/6f, 1f);
             UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxE, _boundingBoxC);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void RelativeUV_BoundingBoxFSameSize1_CorrectResults() {
+            new BoundingBox(-135.0f, -30.0f, 135.0f, 30.0f);
+            BoundingBox selectedArea = new BoundingBox(90.0f, -30.0f, 180.0f, 30.0f);
+            UVArea expected = new UVArea(-1/2f, 0f, 1/2f, 1f);
+            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxF, selectedArea);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void RelativeUV_BoundingBoxFSameSize2_CorrectResults() {
+            BoundingBox selectedArea = new BoundingBox(120.0f, 0.0f, -150.0f, 60.0f);
+            UVArea expected = new UVArea(-1/6f, -1/2f, 5/6f, 1/2f);
+            UVArea actual = BoundingBoxUtils.RelativeUV(_boundingBoxF, selectedArea);
             Assert.AreEqual(expected, actual);
         }
 
