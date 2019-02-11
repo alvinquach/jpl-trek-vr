@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using TrekVRApplication;
 using UnityEngine;
@@ -14,47 +14,48 @@ namespace Tests {
         private readonly BoundingBox _boundingBoxC = new BoundingBox(-45.0f, 0.0f, 45.0f, 90f);
         private readonly BoundingBox _boundingBoxD = new BoundingBox(-135.0f, -90.0f, 45.0f, 0.0f);
         private readonly BoundingBox _boundingBoxE = new BoundingBox(-20.0f, -0.0f, 10.0f, 90.0f);
+        private readonly BoundingBox _boundingBoxF = new BoundingBox(-135.0f, -30.0f, 135.0f, 30.0f);
 
         [Test]
         public void ParseBoundingBox_BoundingBoxA_ParsesCorrectly() {
             string boundingBoxString = "6.90,3.10,42.00,25.00";
             BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(boundingBoxString);
-            Assert.AreEqual(boundingBox, _boundingBoxA);
+            Assert.AreEqual(_boundingBoxA, boundingBox);
         }
 
         [Test]
         public void ParseBoundingBox_BoundingBoxAReversed_ParsesCorrectly() {
             string boundingBoxString = "42.00,25.00,6.90,3.10";
             BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(boundingBoxString);
-            Assert.AreEqual(boundingBox, _boundingBoxA);
+            Assert.AreEqual(_boundingBoxA, boundingBox);
         }
 
         [Test]
         public void ParseBoundingBox_BoundingBoxB_ParsesCorrectly() {
             string boundingBoxString = "-12.3,-45.6,78.9,0";
             BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(boundingBoxString);
-            Assert.AreEqual(boundingBox, _boundingBoxB);
+            Assert.AreEqual(_boundingBoxB, boundingBox);
         }
 
         [Test]
         public void ParseBoundingBox_BoundingBoxBReversed_ParsesCorrectly() {
             string boundingBoxString = "78.9,0,-12.3,-45.6";
             BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(boundingBoxString);
-            Assert.AreEqual(boundingBox, _boundingBoxB);
+            Assert.AreEqual(_boundingBoxB, boundingBox);
         }
 
         [Test]
         public void ParseBoundingBox_BoundingBoxCLatWrapped_ParsesCorrectly() {
             string boundingBoxString = "-45,0,45,99";
             BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(boundingBoxString);
-            Assert.AreEqual(boundingBox, _boundingBoxC);
+            Assert.AreEqual(_boundingBoxC, boundingBox);
         }
 
         [Test]
         public void ParseBoundingBox_BoundingBoxCLongWrapped_ParsesCorrectly() {
             string boundingBoxString = "315,0,45,90";
             BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(boundingBoxString);
-            Assert.AreEqual(boundingBox, _boundingBoxC);
+            Assert.AreEqual(_boundingBoxC, boundingBox);
         }
 
         [Test]
@@ -197,6 +198,34 @@ namespace Tests {
         public void ExpandToSquare_BoundingBoxERight_CorrectResults() {
             BoundingBox expected = new BoundingBox(-80.0f, -0.0f, 10.0f, 90.0f);
             BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxE, RelativePosition.Right);
+            CompareBoundingBoxes(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_asdf() {
+            BoundingBox expected = new BoundingBox(-80.0f, -0.0f, 10.0f, 90.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxE, RelativePosition.Right);
+            CompareBoundingBoxes(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxFCenter_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-135.0f, -45.0f, 135.0f, 45.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxF, RelativePosition.Center);
+            CompareBoundingBoxes(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxFTop_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-135.0f, -60.0f, 135.0f, 30.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxF, RelativePosition.Top);
+            CompareBoundingBoxes(expected, actual);
+        }
+
+        [Test]
+        public void ExpandToSquare_BoundingBoxFBottom_CorrectResults() {
+            BoundingBox expected = new BoundingBox(-135.0f, -30.0f, 135.0f, 60.0f);
+            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxF, RelativePosition.Bottom);
             CompareBoundingBoxes(expected, actual);
         }
 

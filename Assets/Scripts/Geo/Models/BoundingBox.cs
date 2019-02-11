@@ -44,6 +44,23 @@ namespace TrekVRApplication {
             }
         }
 
+        public float LonSwing {
+            get {
+                if (this[0] > this[2]) {
+                    return 360 + this[2] - this[0];
+                }
+                else {
+                    return this[2] - this[0];
+                }
+            }
+        }
+
+        public float LatSwing {
+            get {
+                return this[3] - this[1];
+            }
+        }
+
         public float this[int index] {
             get {
                 switch (index) {
@@ -80,7 +97,8 @@ namespace TrekVRApplication {
         }
 
         private void SortBoundingBox() {
-            if (this[2] < this[0]) {
+            if ((this[2] < this[0] && this[0] - this[2] < 180f)
+                || (this[0] < this[2] && this[2] - this[0] > 180f)) {
                 float lon = this[0];
                 this[0] = this[2];
                 this[2] = lon;

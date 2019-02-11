@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace TrekVRApplication {
@@ -45,8 +45,8 @@ namespace TrekVRApplication {
         }
 
         public static BoundingBox ExpandToSquare(BoundingBox boundingBox, RelativePosition relativeTo = RelativePosition.Center) {
-            float totalLon = boundingBox.LonEnd - boundingBox.LonStart;
-            float totalLat = boundingBox.LatEnd - boundingBox.LatStart;
+            float totalLon = boundingBox.LonSwing;
+            float totalLat = boundingBox.LatSwing;
             if (totalLon == totalLat) {
                 return boundingBox;
             }
