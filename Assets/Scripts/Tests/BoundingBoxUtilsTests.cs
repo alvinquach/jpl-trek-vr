@@ -209,13 +209,6 @@ namespace Tests {
         }
 
         [Test]
-        public void ExpandToSquare_asdf() {
-            BoundingBox expected = new BoundingBox(-80.0f, -0.0f, 10.0f, 90.0f);
-            BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxE, RelativePosition.Right);
-            CompareBoundingBoxes(expected, actual);
-        }
-
-        [Test]
         public void ExpandToSquare_BoundingBoxFCenter_CorrectResults() {
             BoundingBox expected = new BoundingBox(-135.0f, -45.0f, 135.0f, 45.0f);
             BoundingBox actual = BoundingBoxUtils.ExpandToSquare(_boundingBoxF, RelativePosition.Center);
