@@ -60,7 +60,7 @@ namespace TrekVRApplication {
                     float scaled = value * _metadata.heightScale;
 
                     verts[vertexIndex] = new Vector3(vx * dimScale - hOffset, scaled, vy * dimScale - vOffset);
-                    uvs[vertexIndex] = GenerateStandardUV(vx, vy, hVertCount, vVertCount);
+                    uvs[vertexIndex] = GenerateStandardUV(vx, vy, hVertCount, vVertCount, Vector2.one, Vector2.zero);
                     min = scaled < min ? scaled : min;
                     vertexIndex++;
                 }

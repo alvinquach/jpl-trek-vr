@@ -17,10 +17,16 @@ namespace TrekVRApplication {
         }
 
         private BoundingBox _boundingBox;
+        private BoundingBox _squareBoundingBox;
 
         public BoundingBox BoundingBox {
             get { return _boundingBox; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _boundingBox = value; }
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    _boundingBox = value;
+                    _squareBoundingBox = BoundingBoxUtils.ExpandToSquare(value);
+                }
+            }
         }
 
         private TaskStatus _viewTransitionTaskStatus = TaskStatus.NotStarted;
@@ -58,13 +64,18 @@ namespace TrekVRApplication {
             _initTaskStatus = TaskStatus.Started;
 
             TerrainModelMetadata metadata = GenerateMetadata();
-            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox);
+            UVBounds uvBounds = BoundingBoxUtils.RelativeUV(_squareBoundingBox, _boundingBox);
+            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
+
+            // Generate a base mesh first to be displayed temporarily
+            // while the DEM data is being loaded.
             generateBaseMeshTask.Execute((meshData) => {
                 QueueTask(() => ProcessMeshData(meshData));
                 _initTaskStatus = TaskStatus.Completed;
             });
 
-            _dataElevationModelWebService.GetDEM(_boundingBox, 1024, (demFilePath) => {
+            // Load the DEM data, and then generate another mesh after using the data.
+            _dataElevationModelWebService.GetDEM(_squareBoundingBox, 1024, (demFilePath) => {
                 _demFilePath = demFilePath; // Should this be allowed?
                 GenerateTerrainMeshTask generateMeshTask = InstantiateGenerateMeshTask();
                 generateMeshTask.Execute((meshData) => {
@@ -79,7 +90,7 @@ namespace TrekVRApplication {
                 });
             });
 
-            _mosaicWebService.GetMosaic(_boundingBox, 1024, (textureFilePath) => {
+            _mosaicWebService.GetMosaic(_squareBoundingBox, 1024, (textureFilePath) => {
                 _albedoFilePath = textureFilePath; // Should this be allowed?
 
                 // TODO Restructure base class to remove this duplicate logic.
@@ -125,8 +136,8 @@ namespace TrekVRApplication {
 
         protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
             TerrainModelMetadata metadata = GenerateMetadata();
-            //return new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox);
-            return new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox);
+            UVBounds uvBounds = BoundingBoxUtils.RelativeUV(_squareBoundingBox, _boundingBox);
+            return new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
         }
 
         protected override TerrainModelMetadata GenerateMetadata() {

@@ -68,7 +68,7 @@ namespace TrekVRApplication {
 
                     // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
                     verts[vertexIndex] = Quaternion.Euler(0, -90 - vx * lonStepSize, 0) * ((_metadata.radius + _metadata.heightScale * value) * baseLatVertex);
-                    uvs[vertexIndex] = GenerateStandardUV(vx, vy, lonVertCount, latVertCount);
+                    uvs[vertexIndex] = GenerateStandardUV(vx, vy, lonVertCount, latVertCount, Vector2.one, Vector2.zero);
                     vertexIndex++;
                 }
             }

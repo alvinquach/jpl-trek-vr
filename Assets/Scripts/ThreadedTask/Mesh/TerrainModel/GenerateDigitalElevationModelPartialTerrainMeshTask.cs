@@ -11,9 +11,13 @@ namespace TrekVRApplication {
     public class GenerateDigitalElevationModelPartialTerrainMeshTask : GenerateDigitalElevationModelTerrainMeshTask {
 
         protected BoundingBox _boundingBox;
+        protected UVBounds _uvBounds;
 
-        public GenerateDigitalElevationModelPartialTerrainMeshTask(TerrainModelMetadata metadata, BoundingBox boundingBox) : base(metadata) {
+        public GenerateDigitalElevationModelPartialTerrainMeshTask(TerrainModelMetadata metadata,
+            BoundingBox boundingBox, UVBounds uvBounds) : base(metadata) {
+
             _boundingBox = boundingBox;
+            _uvBounds = uvBounds;
         }
 
         protected override MeshData GenerateForLod(Image<float> image, int downsample) {
@@ -75,7 +79,11 @@ namespace TrekVRApplication {
 
                     // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
                     verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - vx, 0) * (scaled * baseLatVertex) - offset);
-                    uvs[vertexIndex] = GenerateStandardUV(xIndex, latVertCount - yIndex, lonVertCount, latVertCount);
+
+                    Vector2 uvScale = new Vector2(_uvBounds.U2 - _uvBounds.U1, _uvBounds.V2 - _uvBounds.V1);
+                    Vector2 uvOffset = new Vector2(_uvBounds.U1, _uvBounds.V1);
+                    uvs[vertexIndex] = GenerateStandardUV(xIndex, latVertCount - yIndex, lonVertCount, latVertCount, uvScale, uvOffset);
+
                     xIndex++;
                     vertexIndex++;
                 }

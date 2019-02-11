@@ -61,8 +61,8 @@ namespace TrekVRApplication {
         }
 
         /// <summary>Generates the list of UV coordinates.</summary>
-        protected Vector2 GenerateStandardUV(int x, int y, int width, int height) {
-            return new Vector2(x / (width - 1f), y / (height - 1f));
+        protected Vector2 GenerateStandardUV(int x, int y, int width, int height, Vector2 scale, Vector2 offset) {
+            return new Vector2(scale.x * x / (width - 1) - offset.x, scale.y * y / (height - 1) - offset.y);
         }
 
     }
