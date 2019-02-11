@@ -45,7 +45,83 @@ namespace TrekVRApplication {
         }
 
         public static BoundingBox ExpandToSquare(BoundingBox boundingBox, RelativePosition relativeTo = RelativePosition.Center) {
-            return boundingBox;
+            float totalLon = boundingBox.LonEnd - boundingBox.LonStart;
+            float totalLat = boundingBox.LatEnd - boundingBox.LatStart;
+            if (totalLon == totalLat) {
+                return boundingBox;
+            }
+
+            // Expand vertically
+            if (totalLon > totalLat) {
+
+                // Largest latitude swing is 180°.
+                if (totalLon > 180.0f) {
+                    throw new Exception("Latitude swing cannot be greater than 180°");
+                }
+
+                float latStart = boundingBox.LatStart;
+                float latEnd = boundingBox.LatEnd;
+                float diff = totalLon - totalLat;
+
+                switch (relativeTo) {
+                    case RelativePosition.TopLeft:
+                    case RelativePosition.Top:
+                    case RelativePosition.TopRight:
+                        latStart -= diff;
+                        break;
+                    case RelativePosition.Left:
+                    case RelativePosition.Center:
+                    case RelativePosition.Right:
+                        latStart -= diff / 2;
+                        latEnd += diff / 2;
+                        break;
+                    case RelativePosition.BottomLeft:
+                    case RelativePosition.Bottom:
+                    case RelativePosition.BottomRight:
+                        latEnd += diff;
+                        break;
+                }
+
+                // Check if the start latitude or end latitude are out of bounds.
+                if (latStart < -90.0f) {
+                    throw new Exception("Start latitude out of range.");
+                }
+                if (latEnd > 90.0f) {
+                    throw new Exception("End latitude out of range.");
+                }
+
+                return new BoundingBox(boundingBox.LonStart, latStart, boundingBox.LonEnd, latEnd);
+            }
+
+            // Expand horizontally
+            else {
+
+                float lonStart = boundingBox.LonStart;
+                float lonEnd = boundingBox.LonEnd;
+                float diff = totalLat - totalLon;
+
+                switch (relativeTo) {
+                    case RelativePosition.TopLeft:
+                    case RelativePosition.Left:
+                    case RelativePosition.BottomLeft:
+                        lonEnd += diff;
+                        break;
+                    case RelativePosition.Top:
+                    case RelativePosition.Center:
+                    case RelativePosition.Bottom:
+                        lonEnd += diff / 2;
+                        lonStart -= diff / 2;
+                        break;
+                    case RelativePosition.TopRight:
+                    case RelativePosition.Right:
+                    case RelativePosition.BottomRight:
+                        lonStart -= diff;
+                        break;
+                }
+
+                return new BoundingBox(lonStart, boundingBox.LatStart, lonEnd, boundingBox.LatEnd);
+            }
+
         }
 
         public static UVArea RelativeUV(BoundingBox boundingBox, BoundingBox selectedArea) {
