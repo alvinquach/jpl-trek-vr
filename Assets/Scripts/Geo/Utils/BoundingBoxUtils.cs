@@ -129,7 +129,7 @@ namespace TrekVRApplication {
 
         }
 
-        public static UVBounds RelativeUV(BoundingBox boundingBox, BoundingBox selectedArea) {
+        public static UVBounds CalculateUVBounds(BoundingBox boundingBox, BoundingBox selectedArea) {
             if (boundingBox == selectedArea) {
                 return UVBounds.Default;
             }

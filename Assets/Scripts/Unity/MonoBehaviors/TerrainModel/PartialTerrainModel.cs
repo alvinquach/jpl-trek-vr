@@ -64,7 +64,7 @@ namespace TrekVRApplication {
             _initTaskStatus = TaskStatus.Started;
 
             TerrainModelMetadata metadata = GenerateMetadata();
-            UVBounds uvBounds = BoundingBoxUtils.RelativeUV(_squareBoundingBox, _boundingBox);
+            UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(_squareBoundingBox, _boundingBox);
             GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
 
             // Generate a base mesh first to be displayed temporarily
@@ -136,7 +136,7 @@ namespace TrekVRApplication {
 
         protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
             TerrainModelMetadata metadata = GenerateMetadata();
-            UVBounds uvBounds = BoundingBoxUtils.RelativeUV(_squareBoundingBox, _boundingBox);
+            UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(_squareBoundingBox, _boundingBox);
             return new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
         }
 
