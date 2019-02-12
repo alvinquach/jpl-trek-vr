@@ -27,10 +27,15 @@ namespace TrekVRApplication {
                 throw new Exception($"Downsample rate of {downsample} is not a power of 2.");
             }
 
-            // Vertex counts in the horizontal and vertical directions are the
-            // same as the downsampled texture width and height, respectively.
-            int lonVertCount = image.Width / downsample;
-            int latVertCount = image.Height / downsample;
+            // Calculate image bounds based on UV bounds.
+            int imageStartX = Mathf.RoundToInt(_uvBounds.U1 * image.Width / downsample);
+            int imageEndX = Mathf.RoundToInt(_uvBounds.U2 * (image.Width / downsample - 1));
+            int imageStartY = Mathf.RoundToInt(_uvBounds.V1 * image.Height / downsample);
+            int imageEndY = Mathf.RoundToInt(_uvBounds.V2 * (image.Height / downsample - 1));
+
+            // Each pixel in the selected area of the downsampled image represents a vertex.
+            int lonVertCount = imageEndX - imageStartX + 1;
+            int latVertCount = imageEndY - imageStartY + 1;
 
             float latStart = _boundingBox[1] * Mathf.Deg2Rad;
             float latStop = _boundingBox[3] * Mathf.Deg2Rad;
@@ -56,8 +61,7 @@ namespace TrekVRApplication {
 
                 // The y-coordinate on the image that corresponds to the current row of vertices.
                 // Note this is actually inverted since we are traversing from bottom up.
-                int y = (latVertCount - yIndex - 1) * downsample;
-
+                int y = (latVertCount - yIndex - 1 + imageStartY) * downsample;
 
                 // Create a new vertex using the latitude angle. The coordinates of this
                 // vertex will serve as a base for all the other vertices in this latitude.
@@ -67,7 +71,7 @@ namespace TrekVRApplication {
                 for (float vx = lonStart; xIndex < lonVertCount; vx += lonIncrement) {
 
                     // The x-coordinate on the image that corresponds to the current vertex.
-                    int x = xIndex * downsample;
+                    int x = (xIndex + imageStartX) * downsample;
 
                     // Get the raw intensity value from the image.
                     float value = downsample == 1 ?
