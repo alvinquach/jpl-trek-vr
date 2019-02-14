@@ -53,17 +53,24 @@ namespace TrekVRApplication {
         }
 
         protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
-            if (_menu.gameObject.activeSelf) {
-                _menu.gameObject.SetActive(false);
+            if (_menu.Visible) {
+                _menu.Visible = false;
             }
             else {
-                //Camera eye = _cameraRig.GetComponentInChildren<Camera>();
-                //Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0 ,1)));
-                //Vector3 menuPosition = forward.GetPoint(_menu.distance);
-                //menuPosition.y = _menu.height;
-                //_menu.transform.position = menuPosition;
-                //_menu.transform.forward = menuPosition - eye.transform.position;
-                _menu.gameObject.SetActive(true);
+                Camera eye = _cameraRig.GetComponentInChildren<Camera>();
+                Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0 ,1)));
+
+                // TODO Get rid of magic numbers.
+                Vector3 menuPosition = forward.GetPoint(3.1f);
+                menuPosition.y = 1.2f;
+                _menu.transform.position = menuPosition;
+
+                // TODO Get rid of magic numbers.
+                Vector3 menuOrientation = forward.GetPoint(3.1f);
+                menuOrientation.y = 0;
+                _menu.transform.forward = menuPosition - eye.transform.position;
+
+                _menu.Visible = true;
             }
         }
 
