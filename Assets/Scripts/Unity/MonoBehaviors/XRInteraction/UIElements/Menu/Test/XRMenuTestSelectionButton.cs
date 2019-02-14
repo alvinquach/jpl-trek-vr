@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using System;
 
 namespace TrekVRApplication {
 
     /// <summary>
     ///     Button script for testing various functionality.
     /// </summary>
+    [Obsolete("Menu interaction is now done using an embedded browser. Use XRBrowser instead.")]
     public class XRMenuTestSelectionButton : XRMenuElement {
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {

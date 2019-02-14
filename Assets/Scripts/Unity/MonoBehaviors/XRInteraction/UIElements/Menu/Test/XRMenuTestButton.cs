@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using UnityEngine;
 
 namespace TrekVRApplication {
@@ -6,6 +6,7 @@ namespace TrekVRApplication {
     /// <summary>
     ///     Button script for testing various functionality.
     /// </summary>
+    [Obsolete("Menu interaction is now done using an embedded browser. Use XRBrowser instead.")]
     public class XRMenuTestButton : XRMenuElement {
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = new MockDigitalElevationModelWebService();

@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
+using System;
 
 namespace TrekVRApplication {
 
+    [Obsolete("Menu interaction is now done using an embedded browser.")]
     public class XRMenu : MonoBehaviour {
 
         public float distance = 2.0f;
