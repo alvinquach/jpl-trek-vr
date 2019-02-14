@@ -15,6 +15,8 @@ namespace TrekVRApplication {
 
         private bool _padClicked = false;
 
+        private XRInteractableObject _activeObject;
+
         #region Controller event handlers
 
         protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
@@ -23,7 +25,7 @@ namespace TrekVRApplication {
                 XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.triggerDown) {
                     // TODO Verify sender class.
-                    obj.OnTriggerDown(this, hit.point, hit.normal, e);
+                    obj.OnTriggerDown(this, hit, e);
                     //obj.OnTriggerDoubleClick(this, hit.point, e);
                 }
             }
@@ -35,7 +37,7 @@ namespace TrekVRApplication {
                 XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.triggerUp) {
                     // TODO Verify sender class.
-                    obj.OnTriggerUp(this, hit.point, hit.normal, e);
+                    obj.OnTriggerUp(this, hit, e);
                 }
             }
         }
@@ -71,7 +73,7 @@ namespace TrekVRApplication {
                 XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.gripDown) {
                     // TODO Verify sender class.
-                    obj.OnGripDown(this, hit.point, hit.normal, e);
+                    obj.OnGripDown(this, hit, e);
                 }
             }
         }
@@ -82,7 +84,7 @@ namespace TrekVRApplication {
                 XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.gripUp) {
                     // TODO Verify sender class.
-                    obj.OnGripUp(this, hit.point, hit.normal, e);
+                    obj.OnGripUp(this, hit, e);
                 }
             }
         }
@@ -106,12 +108,29 @@ namespace TrekVRApplication {
 
             }
 
+            // TODO Save raycast result as member variable so that we dont need another raycast when buttons are pressed.
             RaycastHit hit;
-            // TODO Save raycast result as global variable so that we dont need another raycast when buttons are pressed.
+
             if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
+
                 XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
-                if (obj != null) {
-                    obj.OnCursorOver(this, hit.point, hit.normal);
+                if (_activeObject != obj) {
+
+                    // If there was previously a different object being hovered over, then
+                    //  we send a OnCursorLeave event to it before setting the new object
+                    if (_activeObject) {
+                        _activeObject.OnCursorLeave(this, hit);
+                    }
+
+                    if (obj) {
+                        obj.OnCursorEnter(this, hit);
+                    }
+
+                    _activeObject = obj;
+                }
+
+                if (_activeObject) {
+                    _activeObject.OnCursorOver(this, hit);
                     cursor.transform.position = hit.point;
                     cursor.SetActive(true);
                 }
@@ -120,6 +139,8 @@ namespace TrekVRApplication {
                 }
             }
             else {
+                // TODO Send a cursor leave event
+                _activeObject = null;
                 cursor.SetActive(false);
             }
 

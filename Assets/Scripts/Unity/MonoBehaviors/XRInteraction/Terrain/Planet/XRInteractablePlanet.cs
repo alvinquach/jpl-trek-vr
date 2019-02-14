@@ -84,33 +84,33 @@ namespace TrekVRApplication {
 
         #region Event handlers
 
-        public override void OnGripDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
-            if (Vector3.Distance(sender.transform.position, point) > _maxGrabDistance) {
+        public override void OnGripDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+            if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance) {
                 return;
             }
             _grabber = sender;
-            _grabPoint = point;
-            _grabRadius = Vector3.Distance(transform.position, point); // This should not change until another grab is made.
+            _grabPoint = hit.point;
+            _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
             _grabbed = true;
-            Debug.Log("Grabbed something at " + point);
+            Debug.Log("Grabbed something at " + hit.point);
 
             _grabber.cursor.transform.localScale *= 2;
         }
 
-        public override void OnGripUp(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+        public override void OnGripUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             Ungrab();
         }
 
-        public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+        public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
 
             if (_interactionMode == XRInteractablePlanetMode.Navigate) {
                 Camera eye = sender.CameraRig.GetComponentInChildren<Camera>();
-                NavigateTo(point - transform.position, eye.transform.position);
+                NavigateTo(hit.point - transform.position, eye.transform.position);
             }
 
             else if (_interactionMode == XRInteractablePlanetMode.Select) {
 
-                Vector3 direction = transform.InverseTransformPoint(point);
+                Vector3 direction = transform.InverseTransformPoint(hit.point);
                 Vector3 flattened = new Vector3(direction.x, 0, direction.z);
                 float angle;
 
@@ -153,7 +153,7 @@ namespace TrekVRApplication {
             }
         }
 
-        public override void OnCursorOver(XRController sender, Vector3 point, Vector3 normal) {
+        public override void OnCursorOver(XRController sender, RaycastHit hit) {
 
             /*
              * Under select mode, there are currently two things that happen when the cursor
@@ -168,13 +168,13 @@ namespace TrekVRApplication {
             if (_interactionMode == XRInteractablePlanetMode.Select) {
 
                 // Update the position and angle of the coordinate selection label.
-                _coordSelectionLabel.transform.position = point;
-                _coordSelectionLabel.transform.forward = -normal;
+                _coordSelectionLabel.transform.position = hit.point;
+                _coordSelectionLabel.transform.forward = -hit.normal;
 
                 // Get the current coordinate indicator to set its angles.
                 LineRenderer currentCoordinateIndicator = GetCurrentSelectionIndicator();
 
-                Vector3 direction = transform.InverseTransformPoint(point);
+                Vector3 direction = transform.InverseTransformPoint(hit.point);
                 Vector3 flattened = new Vector3(direction.x, 0, direction.z);
 
                 // Longitude selection

@@ -11,8 +11,8 @@ namespace TrekVRApplication {
 
         public float longitude;
 
-        //public override void OnTriggerDoubleClick(PrimaryXRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
-        public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+        //public override void OnTriggerDoubleClick(PrimaryXRController sender, RaycastHit hit, ClickedEventArgs e) {
+        public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
 
             if (_planet != null) {
                 Camera eye = sender.CameraRig.GetComponentInChildren<Camera>();

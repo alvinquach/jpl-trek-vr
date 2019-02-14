@@ -10,7 +10,7 @@ namespace TrekVRApplication {
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = new MockDigitalElevationModelWebService();
 
-        public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+        public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
             if (terrainModelManager.DefaultPlanetModelIsVisible()) {
                 _dataElevationModelWebService.GetDEM(new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f), 1024, (filepath) => {

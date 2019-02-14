@@ -7,7 +7,7 @@ namespace TrekVRApplication {
     /// </summary>
     public class XRMenuTestSelectionButton : XRMenuElement {
 
-        public override void OnTriggerDown(XRController sender, Vector3 point, Vector3 normal, ClickedEventArgs e) {
+        public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
             if (terrainModelController.DefaultPlanetModelIsVisible()) {
                 XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
