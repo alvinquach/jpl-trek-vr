@@ -12,6 +12,18 @@ namespace TrekVRApplication {
 
         private Browser _browser;
 
+        /// <summary>
+        ///     Whether to set the browser game object to inactive after
+        ///     Awake() is called. Browser game objects should start out
+        ///     as active in order to get browser content load.
+        /// </summary>
+        [Tooltip(
+            "Browser game object should start out as active in order to let" + 
+            "browser content load. Check this box to immediately hide the" + 
+            "browser after Awake() is called."
+        )]
+        public bool hideAfterInit;
+
         public bool MouseHasFocus { get; private set; } = false;
 
         public Vector2 MousePosition { get; private set; } = new Vector2(float.NaN, float.NaN);
@@ -30,12 +42,31 @@ namespace TrekVRApplication {
 
         private void Awake() {
 
+            // BrowserCursor cannot be instantiated in constructor,
+            // so it has to be done in the Awake() function instead.
             BrowserCursor = new BrowserCursor();
 
-            _browser = gameObject.GetComponent<Browser>();
+            _browser = GetComponent<Browser>();
 
             if (_browser) {
                 _browser.UIHandler = this;
+            }
+
+            if (hideAfterInit) {
+                MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+                if (meshRenderer) {
+                    meshRenderer.enabled = false;
+                }
+
+                MeshCollider meshCollider = GetComponent<MeshCollider>();
+                if (meshCollider) {
+                    meshCollider.enabled = false;
+                }
+
+                _browser.WhenReady(() => {
+                    gameObject.SetActive(false);
+                    meshRenderer.enabled = meshCollider.enabled = true;
+                });
             }
 
         }

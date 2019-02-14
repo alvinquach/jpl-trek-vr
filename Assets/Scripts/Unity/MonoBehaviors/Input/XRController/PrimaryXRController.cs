@@ -8,7 +8,7 @@ namespace TrekVRApplication {
         private float _maxInteractionDistance = 20.0f;
 
         [SerializeField]
-        private XRMenu _menu;
+        private XRBrowser _menu;
 
         [SerializeField]
         private float _speedMultiplier = 0.1f;
@@ -57,12 +57,12 @@ namespace TrekVRApplication {
                 _menu.gameObject.SetActive(false);
             }
             else {
-                Camera eye = _cameraRig.GetComponentInChildren<Camera>();
-                Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0 ,1)));
-                Vector3 menuPosition = forward.GetPoint(_menu.distance);
-                menuPosition.y = _menu.height;
-                _menu.transform.position = menuPosition;
-                _menu.transform.forward = menuPosition - eye.transform.position;
+                //Camera eye = _cameraRig.GetComponentInChildren<Camera>();
+                //Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0 ,1)));
+                //Vector3 menuPosition = forward.GetPoint(_menu.distance);
+                //menuPosition.y = _menu.height;
+                //_menu.transform.position = menuPosition;
+                //_menu.transform.forward = menuPosition - eye.transform.position;
                 _menu.gameObject.SetActive(true);
             }
         }
