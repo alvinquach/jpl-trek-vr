@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using ZenFulcrum.EmbeddedBrowser;
 
 namespace TrekVRApplication {
 
@@ -108,6 +109,9 @@ namespace TrekVRApplication {
         private string ToJsonString(object data) {
             if (data is string) {
                 return (string)data;
+            }
+            else if (data is JSONNode) {
+                return ((JSONNode)data).AsJSON;
             }
             return JsonConvert.SerializeObject(data);
         }
