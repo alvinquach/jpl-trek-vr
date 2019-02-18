@@ -84,7 +84,7 @@ namespace Tests {
             Vector3 expected = new Vector3(0.5f, -Mathf.Sqrt(0.5f), 0.5f);
             Vector3 actual = BoundingBoxUtils.MedianDirection(_boundingBoxD);
             for (int i = 0; i < 3; i++) {
-                CompareFloats(expected[i], actual[i]);
+                TestUtils.CompareFloats(expected[i], actual[i], _floatCompareDecimalPrecision);
             }
         }
 
@@ -284,21 +284,8 @@ namespace Tests {
 
         private void CompareBoundingBoxes(BoundingBox a, BoundingBox b) {
             for (int i = 0; i < 4; i++) {
-                CompareFloats(a[i], b[i]);
+                TestUtils.CompareFloats(a[i], b[i], _floatCompareDecimalPrecision);
             }
-        }
-
-        /// <summary>
-        ///     Compares two floating point precision numbers up to the given
-        ///     decimal place. Asserts whether they are equal.
-        /// </summary>
-        /// <param name="a">The first floating point number</param>
-        /// <param name="b">The second floating point number</param>
-        private void CompareFloats(float a, float b) {
-            float multiplier = Mathf.Pow(10, _floatCompareDecimalPrecision);
-            a *= multiplier;
-            b *= multiplier;
-            Assert.AreEqual(Mathf.RoundToInt(a), Mathf.RoundToInt(b));
         }
 
     }
