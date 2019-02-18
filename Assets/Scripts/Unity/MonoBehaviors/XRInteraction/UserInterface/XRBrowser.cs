@@ -9,6 +9,9 @@ namespace TrekVRApplication {
     ///     Implementation of ZFBrowser's IBrowserUI interface used to provide
     ///     user input to the embedded browser.
     /// </summary>
+    [RequireComponent(typeof(MeshCollider))]
+    [RequireComponent(typeof(MeshRenderer))]
+    [RequireComponent(typeof(Browser))]
     public class XRBrowser : XRInteractableObject, IBrowserUI {
 
         private Browser _browser;
@@ -60,9 +63,6 @@ namespace TrekVRApplication {
             BrowserCursor = new BrowserCursor();
 
             _browser = GetComponent<Browser>();
-            if (!_browser) {
-                // TODO Instantiate browser and attach as compenent.
-            }
             _browser.UIHandler = this;
             _browser.onLoad += loadData => {
                 ZFBrowserUtils.RegisterStandardFunctions(_browser);
