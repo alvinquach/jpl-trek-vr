@@ -10,6 +10,8 @@ namespace TrekVRApplication {
         public bool triggerDoubleClick = true;
         public bool triggerDown = true;
         public bool triggerUp = true;
+        public bool padClick = true;
+        public bool padTouch = true;
         public bool gripDown = true;
         public bool gripUp = true;
         public bool cursorOver = true;
@@ -33,6 +35,16 @@ namespace TrekVRApplication {
         public virtual void OnCursorEnter(XRController sender, RaycastHit hit) { }
 
         public virtual void OnCursorLeave(XRController sender, RaycastHit hit) { }
+
+        public virtual void OnPadDown(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
+
+        public virtual void OnPadUp(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
+
+        public virtual void OnPadTouch(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
+
+        public virtual void OnPadUntouch(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
+
+        public virtual void OnPadSwipe(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
 
         // Use this for initialization
         void Start() {

@@ -9,7 +9,7 @@ namespace Tests {
         private ScrollTransformer _scrollTransformer;
 
         [SetUp]
-        public void Asdf() {
+        public void Setup() {
             _scrollTransformer = new ScrollTransformer();
         }
 

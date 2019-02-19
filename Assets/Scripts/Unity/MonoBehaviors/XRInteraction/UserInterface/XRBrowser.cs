@@ -14,6 +14,15 @@ namespace TrekVRApplication {
     [RequireComponent(typeof(Browser))]
     public class XRBrowser : XRInteractableObject, IBrowserUI {
 
+        // TODO Make this a user option
+        private const float ScrollSpeedMultiplier = 13.37f;
+
+        private ScrollTransformer _scrollTransformer;
+
+        private Vector2 _previousPadPosition = new Vector2(float.NaN, float.NaN);
+
+        private float _nextXScroll;
+
         private Browser _browser;
 
         private MeshRenderer _meshRenderer;
@@ -75,6 +84,10 @@ namespace TrekVRApplication {
                 SetVisiblity(false);
             }
 
+            _scrollTransformer = new ScrollTransformer();
+            _scrollTransformer.enableX = false; // Disable scrolling in the x-direction.
+            _scrollTransformer.OutputBounds *= ScrollSpeedMultiplier;
+
         }
 
         #endregion
@@ -105,10 +118,60 @@ namespace TrekVRApplication {
             MouseHasFocus = false;
         }
 
+        public override void OnPadUntouch(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+            _previousPadPosition = new Vector2(float.NaN, float.NaN);
+        }
+
+        public override void OnPadSwipe(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+            Vector2 padPosition = new Vector2(-e.padX, e.padY);
+            if (!float.IsNaN(_previousPadPosition.x) && !float.IsNaN(_previousPadPosition.y)) {
+                Vector2 delta = padPosition - _previousPadPosition;
+                _scrollTransformer.AddInputSample(delta);
+            }
+            _previousPadPosition = padPosition;
+        }
+
+
         #endregion
 
         public void InputUpdate() {
-            // TODO Implement this
+
+            // If there was a previous scroll command for the x-direction,
+            // then complete it in this update.
+            if (!float.IsNaN(_nextXScroll)) {
+                MouseScroll = new Vector2(_nextXScroll, 0);
+                _nextXScroll = float.NaN;
+            }
+
+            // Check is new scroll command is ready for this update.
+            else if (_scrollTransformer.OutputSampleReady) {
+                Vector2 scroll = _scrollTransformer.GetOutputSample();
+
+                // If the scroll in the y-direction is non-zero, then do it first and
+                // save the x-direction for the next update if it is also non-zero.
+                if (!MathUtils.CompareFloats(scroll.y, 0)) {
+                    MouseScroll = new Vector2(0, scroll.y);
+
+                    if (!MathUtils.CompareFloats(scroll.x, 0)) {
+                        _nextXScroll = scroll.x;
+                    }
+                }
+
+                // If y-direction is zero, then do x-direction instead, even if it's also zero.
+                else {
+                    MouseScroll = new Vector2(scroll.x, 0);
+                }
+            }
+
+            // If there was no previous x-direction scroll command, and there
+            // is no new scroll command, then reset.
+            else {
+                _nextXScroll = float.NaN;
+                MouseScroll = Vector2.zero;
+            }
+
+            Debug.Log($"Scroll: ({MouseScroll.x}, {MouseScroll.y})");
+
         }
 
         private void SetVisiblity(bool visible) {

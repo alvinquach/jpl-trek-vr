@@ -4,6 +4,14 @@ namespace TrekVRApplication {
 
     public static class MathUtils {
 
+        /// <summary>
+        ///     Look up table for 10^n where n less than 8 for 
+        ///     faster computation.
+        /// </summary>
+        private static int[] PowerOf10Table = new int[] {
+            1, 10, 100, 1000, 10000, 100000, 1000000, 10000000
+        };
+
         public static int Clamp(int value, int min, int max) {
             return value < min ? min : value > max ? max : value;
         }
@@ -47,6 +55,24 @@ namespace TrekVRApplication {
         /// <returns>The equivalent angle between -PI and PI radians.</returns>
         public static float WrapAnglePi(float angle) {
             return (angle + Mathf.PI) % (2 * Mathf.PI) - Mathf.PI;
+        }
+
+        /// <summary>
+        ///     Compares two floating point precision numbers up to the given
+        ///     decimal place.
+        /// </summary>
+        /// <param name="a">The first floating point number</param>
+        /// <param name="b">The second floating point number</param>
+        public static bool CompareFloats(float a, float b, int precision = 3) {
+            float multiplier;
+            if (precision < 8) {
+                multiplier = PowerOf10Table[precision];
+            } else {
+                multiplier = Mathf.Pow(10, precision);
+            }
+            a *= multiplier;
+            b *= multiplier;
+            return Mathf.RoundToInt(a) == Mathf.RoundToInt(b);
         }
 
     }

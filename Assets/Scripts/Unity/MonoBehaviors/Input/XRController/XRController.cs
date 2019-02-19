@@ -54,7 +54,7 @@ namespace TrekVRApplication {
                     padX = Controller.controllerState.rAxis0.x,
                     padY = Controller.controllerState.rAxis0.y
                 };
-                PadInputHandler(this, e);
+                PadSwipeHandler(Controller, e);
             }
         }
 
@@ -82,7 +82,7 @@ namespace TrekVRApplication {
         // registered to SteamVR_TrackedController as event handlers.
         protected virtual void PadTouchedHandler(object sender, ClickedEventArgs e) { }
         protected virtual void PadUntouchedHandler(object sender, ClickedEventArgs e) { }
-        protected virtual void PadInputHandler(object sender, ClickedEventArgs e) { }
+        protected virtual void PadSwipeHandler(object sender, ClickedEventArgs e) { }
 
     }
 

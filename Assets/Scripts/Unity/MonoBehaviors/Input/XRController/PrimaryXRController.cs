@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -33,46 +34,59 @@ namespace TrekVRApplication {
         #region Controller event handlers
 
         protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
-            if (_hit) {
-                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
-                if (obj != null && obj.triggerDown) {
-                    // TODO Verify sender class.
-                    obj.OnTriggerDown(this, _hitInfo, e);
-                    //obj.OnTriggerDoubleClick(this, hit.point, e);
-                }
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.triggerDown) {
+                obj.OnTriggerDown(this, _hitInfo, e);
             }
         }
 
         protected override void TriggerUnclickedHandler(object sender, ClickedEventArgs e) {
-            if (_hit) {
-                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
-                if (obj != null && obj.triggerUp) {
-                    // TODO Verify sender class.
-                    obj.OnTriggerUp(this, _hitInfo, e);
-                }
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.triggerUp) {
+                obj.OnTriggerUp(this, _hitInfo, e);
             }
         }
 
         protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
             //Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = true;
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.padClick) {
+                obj.OnPadDown(this, _hitInfo, e);
+            }
         }
 
         protected override void PadUnclickedHandler(object sender, ClickedEventArgs e) {
             //Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = false;
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.padClick) {
+                obj.OnPadUp(this, _hitInfo, e);
+            }
         }
 
         protected override void PadTouchedHandler(object sender, ClickedEventArgs e) {
-            Debug.Log("Pad touched at (" + e.padX + ", " + e.padY + ")");
+            //Debug.Log("Pad touched at (" + e.padX + ", " + e.padY + ")");
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.padTouch) {
+                obj.OnPadTouch(this, _hitInfo, e);
+            }
         }
 
         protected override void PadUntouchedHandler(object sender, ClickedEventArgs e) {
-            Debug.Log("Pad untouched at (" + e.padX + ", " + e.padY + ")");
+            //Debug.Log("Pad untouched at (" + e.padX + ", " + e.padY + ")");
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.padTouch) {
+                obj.OnPadUntouch(this, _hitInfo, e);
+            }
         }
 
-        protected override void PadInputHandler(object sender, ClickedEventArgs e) {
-            Debug.Log("Pad input received at (" + e.padX + ", " + e.padY + ")");
+        protected override void PadSwipeHandler(object sender, ClickedEventArgs e) {
+            //Debug.Log("Pad input received at (" + e.padX + ", " + e.padY + ")");
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.padTouch) {
+                obj.OnPadSwipe(this, _hitInfo, e);
+            }
         }
 
         protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
@@ -81,7 +95,7 @@ namespace TrekVRApplication {
             }
             else {
                 Camera eye = _cameraRig.GetComponentInChildren<Camera>();
-                Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0 ,1)));
+                Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
 
                 // TODO Get rid of magic numbers.
                 Vector3 menuPosition = forward.GetPoint(3.1f);
@@ -98,22 +112,18 @@ namespace TrekVRApplication {
         }
 
         protected override void GrippedHandler(object sender, ClickedEventArgs e) {
-            if (_hit) {
-                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
-                if (obj != null && obj.gripDown) {
-                    // TODO Verify sender class.
-                    obj.OnGripDown(this, _hitInfo, e);
-                }
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.gripDown) {
+                // TODO Verify sender class.
+                obj.OnGripDown(this, _hitInfo, e);
             }
         }
 
         protected override void UngrippedHandler(object sender, ClickedEventArgs e) {
-            if (_hit) {
-                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
-                if (obj != null && obj.gripUp) {
-                    // TODO Verify sender class.
-                    obj.OnGripUp(this, _hitInfo, e);
-                }
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.gripUp) {
+                // TODO Verify sender class.
+                obj.OnGripUp(this, _hitInfo, e);
             }
         }
 
@@ -143,9 +153,8 @@ namespace TrekVRApplication {
             _hit = Physics.Raycast(transform.position, transform.forward, out hitInfo, _maxInteractionDistance);
             _hitInfo = hitInfo;
 
-            if (_hit) {
-
-                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj) {
                 if (_activeObject != obj) {
 
                     // If there was previously a different object being hovered over, then
@@ -176,6 +185,13 @@ namespace TrekVRApplication {
                 cursor.SetActive(false);
             }
 
+        }
+
+        private XRInteractableObject GetInteractableObjectIfHit() {
+            if (!_hit) {
+                return null;
+            }
+            return _hitInfo.transform.GetComponent<XRInteractableObject>();
         }
 
     }
