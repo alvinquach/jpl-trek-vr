@@ -4,6 +4,19 @@ namespace TrekVRApplication {
 
     public class PrimaryXRController : XRController {
 
+        /// <summary>
+        ///     Whether there was a hit in the current frame.
+        /// </summary>
+        private bool _hit;
+
+        /// <summary>
+        ///     The hit info for the current frame.
+        /// </summary>
+        private RaycastHit _hitInfo;
+
+        /// <summary>
+        ///     Max distance from the controller to detect hits.
+        /// </summary>
         [SerializeField]
         private float _maxInteractionDistance = 20.0f;
 
@@ -20,24 +33,22 @@ namespace TrekVRApplication {
         #region Controller event handlers
 
         protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
-                XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
+            if (_hit) {
+                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.triggerDown) {
                     // TODO Verify sender class.
-                    obj.OnTriggerDown(this, hit, e);
+                    obj.OnTriggerDown(this, _hitInfo, e);
                     //obj.OnTriggerDoubleClick(this, hit.point, e);
                 }
             }
         }
 
         protected override void TriggerUnclickedHandler(object sender, ClickedEventArgs e) {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
-                XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
+            if (_hit) {
+                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.triggerUp) {
                     // TODO Verify sender class.
-                    obj.OnTriggerUp(this, hit, e);
+                    obj.OnTriggerUp(this, _hitInfo, e);
                 }
             }
         }
@@ -50,6 +61,18 @@ namespace TrekVRApplication {
         protected override void PadUnclickedHandler(object sender, ClickedEventArgs e) {
             //Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = false;
+        }
+
+        protected override void PadTouchedHandler(object sender, ClickedEventArgs e) {
+            Debug.Log("Pad touched at (" + e.padX + ", " + e.padY + ")");
+        }
+
+        protected override void PadUntouchedHandler(object sender, ClickedEventArgs e) {
+            Debug.Log("Pad untouched at (" + e.padX + ", " + e.padY + ")");
+        }
+
+        protected override void PadInputHandler(object sender, ClickedEventArgs e) {
+            Debug.Log("Pad input received at (" + e.padX + ", " + e.padY + ")");
         }
 
         protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
@@ -75,23 +98,21 @@ namespace TrekVRApplication {
         }
 
         protected override void GrippedHandler(object sender, ClickedEventArgs e) {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
-                XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
+            if (_hit) {
+                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.gripDown) {
                     // TODO Verify sender class.
-                    obj.OnGripDown(this, hit, e);
+                    obj.OnGripDown(this, _hitInfo, e);
                 }
             }
         }
 
         protected override void UngrippedHandler(object sender, ClickedEventArgs e) {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
-                XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
+            if (_hit) {
+                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
                 if (obj != null && obj.gripUp) {
                     // TODO Verify sender class.
-                    obj.OnGripUp(this, hit, e);
+                    obj.OnGripUp(this, _hitInfo, e);
                 }
             }
         }
@@ -99,13 +120,15 @@ namespace TrekVRApplication {
         #endregion
 
 
-        private void Update() {
+        protected override void Update() {
+
+            base.Update();
 
             // Update player movement
             if (_padClicked) {
 
                 // Get the pad position from the controller device.
-                SteamVR_Controller.Device device = SteamVR_Controller.Input((int)controller.controllerIndex);
+                SteamVR_Controller.Device device = SteamVR_Controller.Input((int)Controller.controllerIndex);
                 Vector2 axis = device.GetAxis();
 
                 // Move the player based on controller direction and pad position.
@@ -115,30 +138,32 @@ namespace TrekVRApplication {
 
             }
 
-            // TODO Save raycast result as member variable so that we dont need another raycast when buttons are pressed.
-            RaycastHit hit;
+            // Calculate the raycast hit for the current frame.
+            RaycastHit hitInfo;
+            _hit = Physics.Raycast(transform.position, transform.forward, out hitInfo, _maxInteractionDistance);
+            _hitInfo = hitInfo;
 
-            if (Physics.Raycast(transform.position, transform.forward, out hit, _maxInteractionDistance)) {
+            if (_hit) {
 
-                XRInteractableObject obj = hit.transform.GetComponent<XRInteractableObject>();
+                XRInteractableObject obj = _hitInfo.transform.GetComponent<XRInteractableObject>();
                 if (_activeObject != obj) {
 
                     // If there was previously a different object being hovered over, then
                     //  we send a OnCursorLeave event to it before setting the new object
                     if (_activeObject) {
-                        _activeObject.OnCursorLeave(this, hit);
+                        _activeObject.OnCursorLeave(this, _hitInfo);
                     }
 
                     if (obj) {
-                        obj.OnCursorEnter(this, hit);
+                        obj.OnCursorEnter(this, _hitInfo);
                     }
 
                     _activeObject = obj;
                 }
 
                 if (_activeObject) {
-                    _activeObject.OnCursorOver(this, hit);
-                    cursor.transform.position = hit.point;
+                    _activeObject.OnCursorOver(this, _hitInfo);
+                    cursor.transform.position = _hitInfo.point;
                     cursor.SetActive(true);
                 }
                 else {
