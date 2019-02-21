@@ -100,7 +100,7 @@ namespace TrekVRApplication {
                 Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
 
                 Vector3 menuPosition = eye.transform.position;
-                menuPosition.y = 0;
+                menuPosition.y = MainModalMenu.Elevation;
                 menu.transform.position = menuPosition;
 
                 Vector3 menuOrientation = eye.transform.forward;

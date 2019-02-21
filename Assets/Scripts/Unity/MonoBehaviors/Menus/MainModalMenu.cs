@@ -5,8 +5,9 @@ namespace TrekVRApplication {
     public class MainModalMenu : BrowserMenu {
 
         public const float AngleSweep = 180;
-        public const float Height = 1.8f;
-        public const float Radius = 2.5f;
+        public const float Height = 3.1f;
+        public const float Radius = 3.1f;
+        public const float Elevation = 0.069f;
         public const int Resolution = 720;
 
         protected override string RootUrl { get; } = "localGame://index.html";
@@ -18,7 +19,7 @@ namespace TrekVRApplication {
 
         protected override void Awake() {
             transform.localEulerAngles = new Vector3(0, 180);
-            _generateMenuMeshTask = new GenerateCylindricalMenuMeshTask(AngleSweep, Height, Radius, 12, 2);
+            _generateMenuMeshTask = new GenerateCylindricalMenuMeshTask(AngleSweep, Height, Radius);
             base.Awake();
         }
 

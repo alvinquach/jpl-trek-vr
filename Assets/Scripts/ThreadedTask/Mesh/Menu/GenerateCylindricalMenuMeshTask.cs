@@ -8,7 +8,7 @@ namespace TrekVRApplication {
         private float _angleSweep;
         private float _height;
         private float _radius;
-        private int _sides = 32;
+        private int _sides = 96;
         private int _heightSegments = 1;
         private RelativePosition _alignment;
 
