@@ -154,11 +154,14 @@ namespace TrekVRApplication {
 
                 Mesh mesh = new Mesh();
 
-                // Set the index format of the mesh to 32-bits, so that the mesh can have more than 65k vertices.
-                mesh.indexFormat = IndexFormat.UInt32;
-
                 // Assign mesh data
                 MeshData lodMeshData = meshData[i];
+
+                // If needed, set the index format of the mesh to 32-bits,
+                // so that the mesh can have more than 65k vertices.
+                if (lodMeshData.Vertices.Length > (1 << 16)) {
+                    mesh.indexFormat = IndexFormat.UInt32;
+                }
 
                 float start = Time.realtimeSinceStartup;
                 mesh.vertices = lodMeshData.Vertices;
