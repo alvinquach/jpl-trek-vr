@@ -85,8 +85,9 @@ namespace TrekVRApplication {
                     verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - vx, 0) * (scaled * baseLatVertex) - offset);
 
                     Vector2 uvScale = new Vector2(_uvBounds.U2 - _uvBounds.U1, _uvBounds.V2 - _uvBounds.V1);
-                    Vector2 uvOffset = new Vector2(_uvBounds.U1, _uvBounds.V1);
-                    uvs[vertexIndex] = GenerateStandardUV(xIndex, latVertCount - yIndex, lonVertCount, latVertCount, uvScale, uvOffset);
+                    Vector2 uvOffset = new Vector2(-_uvBounds.U1, -_uvBounds.V1);
+                    uvs[vertexIndex] = MeshGenerationUtils.GenerateUVCoord(xIndex, latVertCount - yIndex,
+                        lonVertCount, latVertCount,uvScale, uvOffset);
 
                     xIndex++;
                     vertexIndex++;
@@ -97,7 +98,7 @@ namespace TrekVRApplication {
             return new MeshData() {
                 Vertices = verts,
                 TexCoords = uvs,
-                Triangles = GenerateTriangles(lonVertCount, latVertCount)
+                Triangles = MeshGenerationUtils.GenerateTriangles(lonVertCount, latVertCount)
             };
         }
 

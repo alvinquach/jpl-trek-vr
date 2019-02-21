@@ -13,9 +13,16 @@ namespace TrekVRApplication {
         public static UserInterfaceManager Instance { get; private set; }
 
         [SerializeField]
-        private Browser _browser;
+        private Material _material;
+        public Material UIMaterial {
+            get { return _material; }
+        }
+
+        public MainModalMenu MainModalMenu { get; private set; }
 
         void Awake() {
+
+            Debug.Log("UserInterfaceManager Awake");
 
             if (!Instance) {
                 Instance = this;
@@ -24,9 +31,9 @@ namespace TrekVRApplication {
                 // TODO Throw exception
             }
 
-            //if (_browser) {
-            //    _browser.UIHandler = new BrowserInputHandler();
-            //}
+            GameObject menu = new GameObject();
+            menu.name = typeof(MainModalMenu).Name;
+            MainModalMenu = menu.AddComponent<MainModalMenu>();
 
         }
 

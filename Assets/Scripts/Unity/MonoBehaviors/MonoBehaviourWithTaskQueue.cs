@@ -18,7 +18,14 @@ namespace TrekVRApplication {
             }
         }
 
-        /// <summary>Adds a task to the queue.</summary>
+        /// <summary>
+        ///     Adds a task to the queue. This is needed when a task needs
+        ///     to be executed after another task has completed outside of
+        ///     the main thread. Since modification of MonoBehaviour objects
+        ///     are limited outisde of the main thread, any additional tasks
+        ///     that update MonoBehaviour objects need to be queued up to be
+        ///     executed on the main thread.
+        /// </summary>
         protected void QueueTask(Action task) {
             _taskQueue.Enqueue(task);
         }
@@ -44,7 +51,14 @@ namespace TrekVRApplication {
             }
         }
 
-        /// <summary>Adds a task to the queue.</summary>
+        /// <summary>
+        ///     Adds a task to the queue. This is needed when a task needs
+        ///     to be executed after another task has completed outside of
+        ///     the main thread. Since modification of MonoBehaviour objects
+        ///     are limited outisde of the main thread, any additional tasks
+        ///     that update MonoBehaviour objects need to be queued up to be
+        ///     executed on the main thread.
+        /// </summary>
         protected void QueueTask(Action<T> task, T param) {
             _taskQueue.Enqueue(new TaskWrapper() {
                 task = task,

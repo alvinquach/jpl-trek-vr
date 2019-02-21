@@ -23,8 +23,6 @@ namespace TrekVRApplication {
 
         private float _nextXScroll;
 
-        private Browser _browser;
-
         private MeshRenderer _meshRenderer;
 
         private MeshCollider _meshCollider;
@@ -39,13 +37,15 @@ namespace TrekVRApplication {
             "browser content load. Check this box to immediately hide the" + 
             "browser after Awake() is called."
         )]
-        public bool hideAfterInit;
+        public bool hideAfterInit = true;
 
         private bool _visible;
         public bool Visible {
             get { return _visible; }
             set { SetVisiblity(value); }
         }
+
+        public Browser Browser { get; private set; }
 
         public bool MouseHasFocus { get; private set; }
 
@@ -67,14 +67,16 @@ namespace TrekVRApplication {
 
         private void Awake() {
 
+            Debug.Log("XRBrowser awake");
+
             // BrowserCursor cannot be instantiated in constructor,
             // so it has to be done in the Awake() function instead.
             BrowserCursor = new BrowserCursor();
 
-            _browser = GetComponent<Browser>();
-            _browser.UIHandler = this;
-            _browser.onLoad += loadData => {
-                ZFBrowserUtils.RegisterStandardFunctions(_browser);
+            Browser = GetComponent<Browser>();
+            Browser.UIHandler = this;
+            Browser.onLoad += loadData => {
+                ZFBrowserUtils.RegisterStandardFunctions(Browser);
             };
 
             _meshRenderer = GetComponent<MeshRenderer>();
@@ -107,12 +109,12 @@ namespace TrekVRApplication {
         }
 
         public override void OnCursorEnter(XRController sender, RaycastHit hit) {
-            _browser.EnableInput = true;
+            Browser.EnableInput = true;
             MouseHasFocus = true;
         }
 
         public override void OnCursorLeave(XRController sender, RaycastHit hit) {
-            _browser.EnableInput = false;
+            Browser.EnableInput = false;
             MouseButtons = 0;
             MousePosition = new Vector3(float.NaN, float.NaN);
             MouseHasFocus = false;
@@ -170,14 +172,12 @@ namespace TrekVRApplication {
                 MouseScroll = Vector2.zero;
             }
 
-            Debug.Log($"Scroll: ({MouseScroll.x}, {MouseScroll.y})");
-
         }
 
         private void SetVisiblity(bool visible) {
             _visible = visible;
-            _browser.EnableInput = visible;
-            _browser.EnableRendering = visible;
+            Browser.EnableInput = visible;
+            Browser.EnableRendering = visible;
 
             // If visiblilty was set to false then hide the mesh renderer
             // and mesh collider immediately.

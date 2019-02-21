@@ -21,8 +21,9 @@ namespace TrekVRApplication {
         [SerializeField]
         private float _maxInteractionDistance = 20.0f;
 
-        [SerializeField]
-        private XRBrowser _menu;
+        private MainModalMenu MainModalMenu {
+            get { return UserInterfaceManager.Instance.MainModalMenu; }
+        }
 
         [SerializeField]
         private float _speedMultiplier = 0.1f;
@@ -90,24 +91,23 @@ namespace TrekVRApplication {
         }
 
         protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
-            if (_menu.Visible) {
-                _menu.Visible = false;
+            XRBrowser menu = MainModalMenu.XRBrowser;
+            if (menu.Visible) {
+                menu.Visible = false;
             }
             else {
                 Camera eye = _cameraRig.GetComponentInChildren<Camera>();
                 Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
 
-                // TODO Get rid of magic numbers.
-                Vector3 menuPosition = forward.GetPoint(3.1f);
-                menuPosition.y = 1.2f;
-                _menu.transform.position = menuPosition;
+                Vector3 menuPosition = eye.transform.position;
+                menuPosition.y = 0;
+                menu.transform.position = menuPosition;
 
-                // TODO Get rid of magic numbers.
-                Vector3 menuOrientation = forward.GetPoint(3.1f);
+                Vector3 menuOrientation = eye.transform.forward;
                 menuOrientation.y = 0;
-                _menu.transform.forward = menuPosition - eye.transform.position;
+                menu.transform.forward = menuOrientation;
 
-                _menu.Visible = true;
+                menu.Visible = true;
             }
         }
 

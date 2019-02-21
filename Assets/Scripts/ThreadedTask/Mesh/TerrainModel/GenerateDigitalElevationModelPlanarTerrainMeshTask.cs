@@ -60,7 +60,7 @@ namespace TrekVRApplication {
                     float scaled = value * _metadata.heightScale;
 
                     verts[vertexIndex] = new Vector3(vx * dimScale - hOffset, scaled, vy * dimScale - vOffset);
-                    uvs[vertexIndex] = GenerateStandardUV(vx, vy, hVertCount, vVertCount, Vector2.one, Vector2.zero);
+                    uvs[vertexIndex] = MeshGenerationUtils.GenerateUVCoord(vx, vy, hVertCount, vVertCount);
                     min = scaled < min ? scaled : min;
                     vertexIndex++;
                 }
@@ -74,7 +74,7 @@ namespace TrekVRApplication {
             return new MeshData() {
                 Vertices = verts,
                 TexCoords = uvs,
-                Triangles = GenerateTriangles(hVertCount, vVertCount)
+                Triangles = MeshGenerationUtils.GenerateTriangles(hVertCount, vVertCount)
             };
         }
 
