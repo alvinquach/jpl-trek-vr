@@ -75,9 +75,7 @@ namespace TrekVRApplication {
 
             Browser = GetComponent<Browser>();
             Browser.UIHandler = this;
-            Browser.onLoad += loadData => {
-                ZFBrowserUtils.RegisterStandardFunctions(Browser);
-            };
+
 
             _meshRenderer = GetComponent<MeshRenderer>();
             _meshCollider = GetComponent<MeshCollider>();

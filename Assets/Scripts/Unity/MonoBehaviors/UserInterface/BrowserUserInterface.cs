@@ -4,9 +4,7 @@ using ZenFulcrum.EmbeddedBrowser;
 
 namespace TrekVRApplication {
 
-    public abstract class BrowserMenu : MonoBehaviourWithTaskQueue {
-
-        public XRBrowser XRBrowser { get; protected set; }
+    public abstract class BrowserUserInterface : MonoBehaviourWithTaskQueue {
 
         protected TaskStatus _initStatus = TaskStatus.NotStarted;
 
@@ -18,6 +16,11 @@ namespace TrekVRApplication {
 
         protected abstract int GetHeight();
 
+        protected Browser _browser;
+        public Browser Browser {
+            get { return _browser; }
+        }
+
         protected virtual void Awake() {
             Debug.Log(GenerateMenuMeshTask.GetType());
             GenerateMenuMeshTask?.Execute(meshData => {
@@ -26,6 +29,32 @@ namespace TrekVRApplication {
                     Init(mesh);
                 });
             });
+        }
+
+        protected virtual void Init(Mesh mesh) {
+
+            // This method can only be called once per instance.
+            if (_initStatus != TaskStatus.NotStarted) {
+                return;
+            }
+
+            _initStatus = TaskStatus.Started;
+
+            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+            meshFilter.mesh = mesh;
+
+            MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+            meshCollider.sharedMesh = mesh;
+
+            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            meshRenderer.material = UserInterfaceManager.Instance.UIMaterial;
+
+            _browser = gameObject.AddComponent<Browser>();
+            _browser.onLoad += OnBrowserLoad;
+            _browser.Url = RootUrl;
+            _browser.Resize(GetWidth(), GetHeight());
+
+            _initStatus = TaskStatus.Completed;
         }
 
         protected virtual Mesh ProcessMeshData(MeshData meshData) {
@@ -46,33 +75,7 @@ namespace TrekVRApplication {
             return mesh;
         }
 
-        protected virtual void Init(Mesh mesh) {
-
-
-            // This method can only be called once per instance.
-            if (_initStatus != TaskStatus.NotStarted) {
-                return;
-            }
-
-            _initStatus = TaskStatus.Started;
-
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            meshFilter.mesh = mesh;
-
-            MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
-            meshCollider.sharedMesh = mesh;
-
-            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.material = UserInterfaceManager.Instance.UIMaterial;
-
-            Browser browser = gameObject.AddComponent<Browser>();
-            browser.Url = RootUrl;
-            browser.Resize(GetWidth(), GetHeight());
-
-            XRBrowser = gameObject.AddComponent<XRBrowser>();
-
-            _initStatus = TaskStatus.Completed;
-        }
+        protected virtual void OnBrowserLoad(JSONNode loadData) { }
 
     }
 

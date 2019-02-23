@@ -18,7 +18,7 @@ namespace TrekVRApplication {
             get { return _material; }
         }
 
-        public MainModalMenu MainModalMenu { get; private set; }
+        public MainModal MainModal { get; private set; }
 
         void Awake() {
 
@@ -32,8 +32,8 @@ namespace TrekVRApplication {
             }
 
             GameObject menu = new GameObject();
-            menu.name = typeof(MainModalMenu).Name;
-            MainModalMenu = menu.AddComponent<MainModalMenu>();
+            menu.name = typeof(MainModal).Name;
+            MainModal = menu.AddComponent<MainModal>();
 
         }
 
