@@ -23,28 +23,6 @@ namespace TrekVRApplication {
 
         private float _nextXScroll;
 
-        private MeshRenderer _meshRenderer;
-
-        private MeshCollider _meshCollider;
-
-        /// <summary>
-        ///     Whether to set the browser game object to inactive after
-        ///     Awake() is called. Browser game objects should start out
-        ///     as active in order to get browser content load.
-        /// </summary>
-        [Tooltip(
-            "Browser game object should start out as active in order to let" + 
-            "browser content load. Check this box to immediately hide the" + 
-            "browser after Awake() is called."
-        )]
-        public bool hideAfterInit = true;
-
-        private bool _visible;
-        public bool Visible {
-            get { return _visible; }
-            set { SetVisiblity(value); }
-        }
-
         public Browser Browser { get; private set; }
 
         public bool MouseHasFocus { get; private set; }
@@ -76,18 +54,9 @@ namespace TrekVRApplication {
             Browser = GetComponent<Browser>();
             Browser.UIHandler = this;
 
-
-            _meshRenderer = GetComponent<MeshRenderer>();
-            _meshCollider = GetComponent<MeshCollider>();
-
-            if (hideAfterInit) {
-                SetVisiblity(false);
-            }
-
             _scrollTransformer = new ScrollTransformer();
             _scrollTransformer.enableX = false; // Disable scrolling in the x-direction.
             _scrollTransformer.OutputBounds *= ScrollSpeedMultiplier;
-
         }
 
         #endregion
@@ -172,44 +141,14 @@ namespace TrekVRApplication {
 
         }
 
-        private void SetVisiblity(bool visible) {
-            _visible = visible;
-            Browser.EnableInput = visible;
-            Browser.EnableRendering = visible;
-
-            // If visiblilty was set to false then hide the mesh renderer
-            // and mesh collider immediately.
-            if (!_visible) {
+        public void SetVisiblityState(bool visible) {
+            if (!visible) {
                 MouseButtons = 0;
                 MousePosition = new Vector3(float.NaN, float.NaN);
                 MouseHasFocus = false;
-                if (_meshRenderer) {
-                    _meshRenderer.enabled = false;
-                }
-                if (_meshCollider) {
-                    _meshCollider.enabled = false;
-                }
             }
-
-            // If visiblilty was set to true, the mesh renderer and mesh 
-            // collider need to be unhidden, but is delayed to give the
-            // browser a chance re-render the contents first.
             else {
-                // TODO Add variables to set the behavior of the browser
-                // after unhiding (ie. whether to go back to root menu
-                // or keep displaying same page).
-                StartCoroutine(OnUnhide());
-            }
-        }
-
-        private IEnumerator OnUnhide() {
-            yield return new WaitForSeconds(0.1f); // TODO Fix magic number.
-            MouseHasFocus = true;
-            if (_meshRenderer) {
-                _meshRenderer.enabled = true;
-            }
-            if (_meshCollider) {
-                _meshCollider.enabled = true;
+                MouseHasFocus = true;
             }
         }
 

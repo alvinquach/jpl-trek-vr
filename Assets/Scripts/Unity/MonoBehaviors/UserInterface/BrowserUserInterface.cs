@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Rendering;
 using ZenFulcrum.EmbeddedBrowser;
 
@@ -8,6 +9,21 @@ namespace TrekVRApplication {
 
         protected TaskStatus _initStatus = TaskStatus.NotStarted;
 
+        protected MeshRenderer _meshRenderer;
+
+        /// <summary>
+        ///     Whether to set the browser game object to inactive after
+        ///     Awake() is called. Browser game objects should start out
+        ///     as active in order to get browser content load.
+        /// </summary>
+        public bool hideAfterInit = true;
+
+        protected bool _visible;
+        public virtual bool Visible {
+            get { return _visible; }
+            set { SetVisiblity(value, _meshRenderer); }
+        }
+
         protected abstract GenerateMenuMeshTask GenerateMenuMeshTask { get; }
 
         protected abstract string RootUrl { get; }
@@ -15,6 +31,7 @@ namespace TrekVRApplication {
         protected abstract int GetWidth();
 
         protected abstract int GetHeight();
+
 
         protected Browser _browser;
         public Browser Browser {
@@ -27,6 +44,9 @@ namespace TrekVRApplication {
                 QueueTask(() => {
                     Mesh mesh = ProcessMeshData(meshData[0]);
                     Init(mesh);
+                    if (hideAfterInit) {
+                        SetVisiblity(false);
+                    }
                     _initStatus = TaskStatus.Completed;
 
                 });
@@ -45,8 +65,8 @@ namespace TrekVRApplication {
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;
 
-            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.material = UserInterfaceManager.Instance.UIMaterial;
+            _meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            _meshRenderer.material = UserInterfaceManager.Instance.UIMaterial;
 
             _browser = gameObject.AddComponent<Browser>();
             _browser.onLoad += OnBrowserLoad;
@@ -74,6 +94,52 @@ namespace TrekVRApplication {
         }
 
         protected virtual void OnBrowserLoad(JSONNode loadData) { }
+
+        protected virtual void SetVisiblity(bool visible, params object[] objects) {
+            _visible = visible;
+            Browser.EnableInput = visible;
+            Browser.EnableRendering = visible;
+
+            // If visiblilty was set to false then hide the mesh renderer
+            // and mesh collider immediately.
+            if (!_visible) {
+                foreach (object obj in objects) {
+                    SetEnabled(obj, false);
+                }
+            }
+
+            // If visiblilty was set to true, the mesh renderer and mesh 
+            // collider need to be unhidden, but is delayed to give the
+            // browser a chance re-render the contents first.
+            else {
+                // TODO Add variables to set the behavior of the browser
+                // after unhiding (ie. whether to go back to root menu
+                // or keep displaying same page).
+                StartCoroutine(OnUnhide(objects));
+            }
+        }
+
+        private IEnumerator OnUnhide(params object[] objects) {
+            yield return new WaitForSeconds(0.1f); // TODO Fix magic number.
+            foreach (object obj in objects) {
+                SetEnabled(obj, true);
+            }
+        }
+
+        private void SetEnabled(object obj, bool enabled) {
+            if (obj == null) {
+                return;
+            }
+            if (obj is Renderer) {
+                ((Renderer) obj).enabled = enabled;
+            }
+            else if (obj is Collider) {
+                ((Collider) obj).enabled = enabled;
+            }
+            else if (obj is Behaviour) {
+                ((Behaviour)obj).enabled = enabled;
+            }
+        }
 
     }
 

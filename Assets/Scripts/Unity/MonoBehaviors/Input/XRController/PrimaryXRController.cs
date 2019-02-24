@@ -91,9 +91,8 @@ namespace TrekVRApplication {
         }
 
         protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
-            XRBrowser menu = MainModal.XRBrowser;
-            if (menu.Visible) {
-                menu.Visible = false;
+            if (MainModal.Visible) {
+                MainModal.Visible = false;
             }
             else {
                 Camera eye = _cameraRig.GetComponentInChildren<Camera>();
@@ -101,13 +100,13 @@ namespace TrekVRApplication {
 
                 Vector3 menuPosition = eye.transform.position;
                 menuPosition.y = MainModal.Elevation;
-                menu.transform.position = menuPosition;
+                MainModal.transform.position = menuPosition;
 
                 Vector3 menuOrientation = eye.transform.forward;
                 menuOrientation.y = 0;
-                menu.transform.forward = menuOrientation;
+                MainModal.transform.forward = menuOrientation;
 
-                menu.Visible = true;
+                MainModal.Visible = true;
             }
         }
 
