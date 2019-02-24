@@ -3,49 +3,36 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public class GenerateCylindricalMenuMeshTask : GenerateMenuMeshTask {
+    public class GeneratePlanarMenuMeshTask : GenerateMenuMeshTask {
 
-        private float _angleSweep;
+        private float _width;
         private float _height;
-        private float _radius;
-        private int _sides = 96;
-        private int _heightSegments = 1;
+        private int _widthSegments = 2;
+        private int _heightSegments = 2;
         private RelativePosition _alignment;
 
-        public GenerateCylindricalMenuMeshTask(float angleSweep, float height, float radius,
-            RelativePosition alignment = RelativePosition.Bottom) {
+        public GeneratePlanarMenuMeshTask(float width, float height,
+            RelativePosition alignment = RelativePosition.TopLeft) {
 
-            _angleSweep = angleSweep * Mathf.Deg2Rad;
+            _width = width;
             _height = height;
-            _radius = radius;
             _alignment = alignment;
         }
 
-        public GenerateCylindricalMenuMeshTask(float angleSweep, float height, float radius, int sides,
-            RelativePosition alignment = RelativePosition.Bottom) : this(angleSweep, height, radius, alignment) {
+        public GeneratePlanarMenuMeshTask(float width, float height, int widthSegments, int heightSegments,
+            RelativePosition alignment = RelativePosition.Bottom) : this(width, height, alignment) {
 
-            if (sides < 2) {
-                throw new Exception("The number of sides must be at least 2.");
-            }
-            _sides = sides;
-        }
-
-        public GenerateCylindricalMenuMeshTask(float angleSweep, float height, float radius, int sides, int heightSegments,
-            RelativePosition alignment = RelativePosition.Bottom) : this(angleSweep, height, radius, sides, alignment) {
-
-            if (sides < 1) {
-                throw new Exception("The number of vertical segments must be at least 1.");
-            }
+            _widthSegments = widthSegments;
             _heightSegments = heightSegments;
         }
 
         protected override void Generate() {
 
-            int hVertCount = _sides + 1;
+            int hVertCount = _widthSegments + 1;
             int vVertCount = _heightSegments + 1;
 
-            float startAngle = GetStartAngle();
-            float angleStep = _angleSweep / _sides;
+            float startWidth = GetStartX();
+            float widthStep = _width / _widthSegments;
 
             float startHeight = GetStartY();
             float heightStep = _height / _heightSegments;
@@ -55,8 +42,7 @@ namespace TrekVRApplication {
             int vertexIndex = 0;
 
             for (int x = 0; x < hVertCount; x++) {
-                float angle = angleStep * x + startAngle;
-                Vector3 baseVertex = _radius * new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+                Vector3 baseVertex =  new Vector3(widthStep * x + startWidth, 0, 0);
 
                 for (int y = 0; y < vVertCount; y++) {
                     Vector3 vertex = baseVertex + new Vector3(0, startHeight - heightStep * y, 0);
@@ -78,18 +64,18 @@ namespace TrekVRApplication {
             };
         }
 
-        private float GetStartAngle() {
+        private float GetStartX() {
             switch (_alignment) {
                 case RelativePosition.TopLeft:
                 case RelativePosition.Left:
                 case RelativePosition.BottomLeft:
-                    return _angleSweep / 2;
+                    return -_width;
                 case RelativePosition.TopRight:
                 case RelativePosition.Right:
                 case RelativePosition.BottomRight:
-                    return -_angleSweep / 2;
-                default:
                     return 0;
+                default:
+                    return -_width / 2;
             }
         }
 
