@@ -10,6 +10,10 @@ namespace TrekVRApplication {
 
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
+
+            MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+            meshCollider.sharedMesh = mesh;
+
             XRBrowser = gameObject.AddComponent<XRBrowser>();
         }
 

@@ -27,6 +27,8 @@ namespace TrekVRApplication {
                 QueueTask(() => {
                     Mesh mesh = ProcessMeshData(meshData[0]);
                     Init(mesh);
+                    _initStatus = TaskStatus.Completed;
+
                 });
             });
         }
@@ -43,9 +45,6 @@ namespace TrekVRApplication {
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;
 
-            MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
-            meshCollider.sharedMesh = mesh;
-
             MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
             meshRenderer.material = UserInterfaceManager.Instance.UIMaterial;
 
@@ -54,7 +53,6 @@ namespace TrekVRApplication {
             _browser.Url = RootUrl;
             _browser.Resize(GetWidth(), GetHeight());
 
-            _initStatus = TaskStatus.Completed;
         }
 
         protected virtual Mesh ProcessMeshData(MeshData meshData) {

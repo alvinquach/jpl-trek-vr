@@ -18,7 +18,21 @@ namespace TrekVRApplication {
             get { return _material; }
         }
 
+        [SerializeField]
+        private PrimaryXRController _primaryController;
+
+        [SerializeField]
+        private SecondaryXRController _secondaryController;
+
+        #region BrowserUserInterface instances
+
         public MainModal MainModal { get; private set; }
+
+        public ControllerModal PrimaryControllerModal { get; private set; }
+
+        public ControllerModal SecondaryControllerModal { get; private set; }
+
+        #endregion
 
         void Awake() {
 
@@ -31,9 +45,23 @@ namespace TrekVRApplication {
                 // TODO Throw exception
             }
 
-            GameObject menu = new GameObject();
-            menu.name = typeof(MainModal).Name;
-            MainModal = menu.AddComponent<MainModal>();
+            GameObject gameObject = new GameObject();
+            gameObject.name = typeof(MainModal).Name;
+            MainModal = gameObject.AddComponent<MainModal>();
+
+            if (_primaryController) {
+                gameObject = new GameObject();
+                gameObject.name = typeof(ControllerModal).Name;
+                gameObject.transform.parent = _primaryController.transform;
+                PrimaryControllerModal = gameObject.AddComponent<ControllerModal>();
+            }
+
+            if (_secondaryController) {
+                gameObject = new GameObject();
+                gameObject.name = typeof(ControllerModal).Name;
+                gameObject.transform.parent = _secondaryController.transform;
+                SecondaryControllerModal = gameObject.AddComponent<ControllerModal>();
+            }
 
         }
 
