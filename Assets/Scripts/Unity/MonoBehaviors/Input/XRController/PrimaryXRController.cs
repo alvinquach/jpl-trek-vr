@@ -39,6 +39,7 @@ namespace TrekVRApplication {
             if (obj && obj.triggerDown) {
                 obj.OnTriggerDown(this, _hitInfo, e);
             }
+            base.TriggerClickedHandler(sender, e);
         }
 
         protected override void TriggerUnclickedHandler(object sender, ClickedEventArgs e) {
@@ -46,6 +47,7 @@ namespace TrekVRApplication {
             if (obj && obj.triggerUp) {
                 obj.OnTriggerUp(this, _hitInfo, e);
             }
+            base.TriggerUnclickedHandler(sender, e);
         }
 
         protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
@@ -55,6 +57,7 @@ namespace TrekVRApplication {
             if (obj && obj.padClick) {
                 obj.OnPadDown(this, _hitInfo, e);
             }
+            base.PadClickedHandler(sender, e);
         }
 
         protected override void PadUnclickedHandler(object sender, ClickedEventArgs e) {
@@ -64,6 +67,7 @@ namespace TrekVRApplication {
             if (obj && obj.padClick) {
                 obj.OnPadUp(this, _hitInfo, e);
             }
+            base.PadUnclickedHandler(sender, e);
         }
 
         protected override void PadTouchedHandler(object sender, ClickedEventArgs e) {
@@ -72,6 +76,7 @@ namespace TrekVRApplication {
             if (obj && obj.padTouch) {
                 obj.OnPadTouch(this, _hitInfo, e);
             }
+            base.PadTouchedHandler(sender, e);
         }
 
         protected override void PadUntouchedHandler(object sender, ClickedEventArgs e) {
@@ -80,6 +85,7 @@ namespace TrekVRApplication {
             if (obj && obj.padTouch) {
                 obj.OnPadUntouch(this, _hitInfo, e);
             }
+            base.PadUntouchedHandler(sender, e);
         }
 
         protected override void PadSwipeHandler(object sender, ClickedEventArgs e) {
@@ -88,6 +94,7 @@ namespace TrekVRApplication {
             if (obj && obj.padTouch) {
                 obj.OnPadSwipe(this, _hitInfo, e);
             }
+            base.PadSwipeHandler(sender, e);
         }
 
         protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
@@ -108,6 +115,7 @@ namespace TrekVRApplication {
 
                 MainModal.Visible = true;
             }
+            base.MenuButtonClickedHandler(sender, e);
         }
 
         protected override void GrippedHandler(object sender, ClickedEventArgs e) {
@@ -116,6 +124,7 @@ namespace TrekVRApplication {
                 // TODO Verify sender class.
                 obj.OnGripDown(this, _hitInfo, e);
             }
+            base.GrippedHandler(sender, e);
         }
 
         protected override void UngrippedHandler(object sender, ClickedEventArgs e) {
@@ -124,6 +133,7 @@ namespace TrekVRApplication {
                 // TODO Verify sender class.
                 obj.OnGripUp(this, _hitInfo, e);
             }
+            base.UngrippedHandler(sender, e);
         }
 
         #endregion

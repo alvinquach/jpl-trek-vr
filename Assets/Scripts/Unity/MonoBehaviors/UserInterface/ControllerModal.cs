@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -15,16 +14,16 @@ namespace TrekVRApplication {
         public const int Resolution = 1024;
 
         private XRController _controller;
+        private bool _isPrimary;
 
         private GeneratePlanarMenuMeshTask _generateMenuMeshTask;
         protected override GenerateMenuMeshTask GenerateMenuMeshTask {
             get { return _generateMenuMeshTask; }
         }
 
-        private string _rootUrl;
-        protected override string RootUrl {
-            get { return _rootUrl; }
-        }
+        protected override string DefaultUrl { get; } = $"{ZFBrowserConstants.BaseUrl}/#{ControllerModalActivity.Default.GetModalUrl()}";
+
+        public ControllerModalActivity CurrentActivity { get; private set; }
 
         protected override void Awake() {
 
@@ -32,16 +31,14 @@ namespace TrekVRApplication {
             if (!_controller) {
                 // TODO Throw exception
             }
-            bool isPrimary = _controller.GetType() == typeof(PrimaryXRController);
-            
-            _rootUrl = isPrimary ? "localhost:4200" : "localhost:4200"; // TODO Set this properly.
+            _isPrimary = _controller.GetType() == typeof(PrimaryXRController);
 
             // Position the modal relative to the controller
-            transform.localPosition = new Vector3((isPrimary ? 1 : -1) * XOffset, YOffset, ZOffset);
+            transform.localPosition = new Vector3((_isPrimary ? 1 : -1) * XOffset, YOffset, ZOffset);
             transform.localEulerAngles = new Vector3(-90, -180, 0);
 
-            _generateMenuMeshTask = new GeneratePlanarMenuMeshTask(Width, Height, 
-                isPrimary ? RelativePosition.Left : RelativePosition.Right);
+            _generateMenuMeshTask = new GeneratePlanarMenuMeshTask(Width, Height,
+                _isPrimary ? RelativePosition.Left : RelativePosition.Right);
 
             base.Awake();
         }
@@ -52,6 +49,46 @@ namespace TrekVRApplication {
 
         protected override int GetWidth() {
             return Mathf.RoundToInt(Width / Height * Resolution);
+        }
+
+        public void StartActivity(ControllerModalActivity activity) {
+            if (activity == CurrentActivity) {
+                return;
+            }
+            if (_isPrimary && activity.IsSecondaryOnly()) {
+                Debug.LogError($"Activity {activity} is only available for the secondary controller.");
+                return;
+            }
+            if (!_isPrimary && activity.IsPrimaryOnly()) {
+                Debug.LogError($"Activity {activity} is only available for the primary controller.");
+                return;
+            }
+
+            // TODO We might need to manually navigate to the URL via Angular router.
+            Browser.LoadURL($"{ZFBrowserConstants.BaseUrl}/#{ControllerModalActivity.Default.GetModalUrl()}", false);
+
+            // Switch away from current activity.
+            if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
+                TerrainModelManager terrainModelController = TerrainModelManager.Instance;
+                XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                planet.InteractionMode = XRInteractablePlanetMode.Navigate;
+            }
+
+            // Switch to new acivity.
+            if (activity == ControllerModalActivity.BBoxSelection) {
+                TerrainModelManager terrainModelController = TerrainModelManager.Instance;
+                if (terrainModelController.DefaultPlanetModelIsVisible()) {
+                    XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                    planet.InteractionMode = XRInteractablePlanetMode.Select;
+                    UserInterfaceManager.Instance.MainModal.Visible = false;
+                } else {
+                    Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
+                    return;
+                }
+            }
+
+            Visible = activity != ControllerModalActivity.Default;
+            CurrentActivity = activity;
         }
 
     }

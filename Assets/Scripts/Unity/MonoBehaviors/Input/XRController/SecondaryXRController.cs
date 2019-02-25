@@ -12,6 +12,7 @@ namespace TrekVRApplication {
 
         protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
             _flashlight?.Toggle();
+            base.TriggerClickedHandler(sender, e);
         }
 
         protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
@@ -23,10 +24,12 @@ namespace TrekVRApplication {
             else {
                 _roomLights?.Dim();
             }
+            base.PadClickedHandler(sender, e);
         }
 
         protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
             _flashlight?.CycleNextColor();
+            base.MenuButtonClickedHandler(sender, e);
         }
 
     }

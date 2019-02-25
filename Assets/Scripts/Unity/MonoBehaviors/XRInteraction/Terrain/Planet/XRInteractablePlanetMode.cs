@@ -1,4 +1,8 @@
-﻿public enum XRInteractablePlanetMode {
-    Navigate,
-    Select
+﻿namespace TrekVRApplication {
+
+    public enum XRInteractablePlanetMode {
+        Navigate,
+        Select
+    }
+
 }

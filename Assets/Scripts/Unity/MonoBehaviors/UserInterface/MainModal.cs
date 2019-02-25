@@ -11,10 +11,11 @@ namespace TrekVRApplication {
         public const float Elevation = 0.069f;
         public const int Resolution = 720;
 
-        private UnityWebFunctions _unityWebFunctions;
+        private UnityBrowserWebFunctions _webFunctions;
+        private UnityBrowserControllerFunctions _controllerFunctions;
 
-        protected override string RootUrl { get; } = "localGame://index.html";
-        //protected override string RootUrl { get; } = "localhost:4200";
+
+        protected override string DefaultUrl { get; } = ZFBrowserConstants.BaseUrl;
 
         private GenerateCylindricalMenuMeshTask _generateMenuMeshTask;
         protected override GenerateMenuMeshTask GenerateMenuMeshTask {
@@ -37,11 +38,13 @@ namespace TrekVRApplication {
 
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
-            _unityWebFunctions = new UnityWebFunctions(_browser);
+            _webFunctions = new UnityBrowserWebFunctions(_browser);
+            _controllerFunctions = new UnityBrowserControllerFunctions(_browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {
-            _unityWebFunctions.RegisterFunctions();
+            _webFunctions.RegisterFunctions();
+            _controllerFunctions.RegisterFunctions();
         }
 
     }

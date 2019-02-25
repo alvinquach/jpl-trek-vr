@@ -15,6 +15,8 @@ namespace TrekVRApplication {
 
         private static TextureCompressionFormat DefaultFormat = TextureCompressionFormat.DXT5;
 
+        // TODO Use switch cases instead of maps.
+
         private static readonly IDictionary<TextureCompressionFormat, TextureFormat> UnityFormatMap = 
             new Dictionary<TextureCompressionFormat, TextureFormat>() {
                 { TextureCompressionFormat.DXT1, TextureFormat.DXT1 },

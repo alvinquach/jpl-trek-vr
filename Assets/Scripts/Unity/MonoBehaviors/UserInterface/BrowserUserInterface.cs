@@ -26,7 +26,7 @@ namespace TrekVRApplication {
 
         protected abstract GenerateMenuMeshTask GenerateMenuMeshTask { get; }
 
-        protected abstract string RootUrl { get; }
+        protected abstract string DefaultUrl { get; }
 
         protected abstract int GetWidth();
 
@@ -70,7 +70,7 @@ namespace TrekVRApplication {
 
             _browser = gameObject.AddComponent<Browser>();
             _browser.onLoad += OnBrowserLoad;
-            _browser.Url = RootUrl;
+            _browser.Url = DefaultUrl;
             _browser.Resize(GetWidth(), GetHeight());
 
         }
@@ -95,6 +95,10 @@ namespace TrekVRApplication {
 
         protected virtual void OnBrowserLoad(JSONNode loadData) { }
 
+        /// <summary>
+        ///     For use by the 'Visible' property setter only. Do not call this method
+        ///     outside of the setter. Set the visiblity value through the property instead.
+        /// </summary>
         protected virtual void SetVisiblity(bool visible, params object[] objects) {
             _visible = visible;
             Browser.EnableInput = visible;

@@ -2,6 +2,9 @@
 
     public class ZFBrowserConstants {
 
+        public const string BaseUrl = "localhost:4200";
+        //public const string BaseUrl = "localGame://index.html";
+
         public const string AngularGlobalData = "AngularGlobalVariables";
         public const string UnityGlobalData = "UnityGlobalVariables";
 

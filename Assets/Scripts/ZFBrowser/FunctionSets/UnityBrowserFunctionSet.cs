@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
+using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
-    public abstract class UnityFunctionSet {
+    public abstract class UnityBrowserFunctionSet {
 
         protected readonly ICollection<Type> SupportedTypes = new HashSet<Type> {
             typeof(string),
@@ -21,9 +22,11 @@ namespace TrekVRApplication {
             public bool acceptJsonNodeArgs = false;
         }
 
+        protected abstract string FunctionsReadyVariable { get; }
+
         protected readonly Browser _browser;
 
-        public UnityFunctionSet(Browser browser) {
+        public UnityBrowserFunctionSet(Browser browser) {
             _browser = browser;
         }
 
@@ -97,6 +100,10 @@ namespace TrekVRApplication {
 
                 }
 
+            }
+
+            if (!string.IsNullOrEmpty(FunctionsReadyVariable)) {
+                _browser.EvalJS($"{UnityGlobalObjectPath}.{FunctionsReadyVariable} = true;");
             }
 
         }
