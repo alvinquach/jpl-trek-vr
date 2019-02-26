@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -51,7 +50,7 @@ namespace TrekVRApplication {
         }
 
         protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
-            //Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
+            Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = true;
             XRInteractableObject obj = GetInteractableObjectIfHit();
             if (obj && obj.padClick) {
@@ -61,7 +60,7 @@ namespace TrekVRApplication {
         }
 
         protected override void PadUnclickedHandler(object sender, ClickedEventArgs e) {
-            //Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
+            Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = false;
             XRInteractableObject obj = GetInteractableObjectIfHit();
             if (obj && obj.padClick) {
@@ -97,27 +96,6 @@ namespace TrekVRApplication {
             base.PadSwipeHandler(sender, e);
         }
 
-        protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
-            if (MainModal.Visible) {
-                MainModal.Visible = false;
-            }
-            else {
-                Camera eye = _cameraRig.GetComponentInChildren<Camera>();
-                Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
-
-                Vector3 menuPosition = eye.transform.position;
-                menuPosition.y = MainModal.Elevation;
-                MainModal.transform.position = menuPosition;
-
-                Vector3 menuOrientation = eye.transform.forward;
-                menuOrientation.y = 0;
-                MainModal.transform.forward = menuOrientation;
-
-                MainModal.Visible = true;
-            }
-            base.MenuButtonClickedHandler(sender, e);
-        }
-
         protected override void GrippedHandler(object sender, ClickedEventArgs e) {
             XRInteractableObject obj = GetInteractableObjectIfHit();
             if (obj && obj.gripDown) {
@@ -138,7 +116,6 @@ namespace TrekVRApplication {
 
         #endregion
 
-
         protected override void Update() {
 
             base.Update();
@@ -152,8 +129,9 @@ namespace TrekVRApplication {
 
                 // Move the player based on controller direction and pad position.
                 // Movement is limited along the xz-plane.
+                Transform cameraRig = UserInterfaceManager.Instance.XRCamera.transform.parent;
                 Vector3 direction = Vector3.Scale(transform.forward, new Vector3(1, 0, 1));
-                _cameraRig.transform.position += (axis.y > 0 ? 1 : -1) * _speedMultiplier * direction;
+                cameraRig.position += (axis.y > 0 ? 1 : -1) * _speedMultiplier * direction;
 
             }
 

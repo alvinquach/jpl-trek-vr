@@ -14,6 +14,17 @@ namespace TrekVRApplication {
         private UnityBrowserWebFunctions _webFunctions;
         private UnityBrowserControllerFunctions _controllerFunctions;
 
+        public override bool Visible {
+            get {
+                return _visible;
+            }
+            set {
+                if (value) {
+                    OpenModal();
+                }
+                base.Visible = value;
+            }
+        }
 
         protected override string DefaultUrl { get; } = ZFBrowserConstants.BaseUrl;
 
@@ -45,6 +56,19 @@ namespace TrekVRApplication {
         protected override void OnBrowserLoad(JSONNode loadData) {
             _webFunctions.RegisterFunctions();
             _controllerFunctions.RegisterFunctions();
+        }
+
+        private void OpenModal() {
+            Camera eye = UserInterfaceManager.Instance.XRCamera;
+            Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
+
+            Vector3 menuPosition = eye.transform.position;
+            menuPosition.y = MainModal.Elevation;
+            transform.position = menuPosition;
+
+            Vector3 menuOrientation = eye.transform.forward;
+            menuOrientation.y = 0;
+            transform.forward = menuOrientation;
         }
 
     }

@@ -17,7 +17,7 @@ namespace TrekVRApplication {
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
 
             if (_planet != null) {
-                Camera eye = sender.CameraRig.GetComponentInChildren<Camera>();
+                Camera eye = UserInterfaceManager.Instance.XRCamera;
                 _planet.NavigateTo(new Vector2(latitude, longitude), eye.transform.position);
             }
 

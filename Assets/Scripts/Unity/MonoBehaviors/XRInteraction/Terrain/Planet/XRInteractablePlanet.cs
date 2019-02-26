@@ -104,7 +104,7 @@ namespace TrekVRApplication {
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
 
             if (_interactionMode == XRInteractablePlanetMode.Navigate) {
-                Camera eye = sender.CameraRig.GetComponentInChildren<Camera>();
+                Camera eye = UserInterfaceManager.Instance.XRCamera;
                 NavigateTo(hit.point - transform.position, eye.transform.position);
             }
 
@@ -413,6 +413,7 @@ namespace TrekVRApplication {
             _latSelectionEndIndicator.enabled = false;
             _coordSelectionLabel.gameObject.SetActive(false);
             _interactionMode = XRInteractablePlanetMode.Navigate;
+            UserInterfaceManager.Instance.PrimaryControllerModal.StartActivity(ControllerModalActivity.Default);
         }
 
         private LineRenderer GetCurrentSelectionIndicator() {

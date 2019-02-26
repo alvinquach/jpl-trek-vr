@@ -33,6 +33,9 @@ namespace TrekVRApplication {
             }
             _isPrimary = _controller.GetType() == typeof(PrimaryXRController);
 
+            // Register event handlers
+            _controller.OnMenuButtonClicked += MenuButtonClickedHandler;
+
             // Position the modal relative to the controller
             transform.localPosition = new Vector3((_isPrimary ? 1 : -1) * XOffset, YOffset, ZOffset);
             transform.localEulerAngles = new Vector3(-90, -180, 0);
@@ -43,6 +46,10 @@ namespace TrekVRApplication {
             base.Awake();
         }
 
+        private void OnDestroy() {
+            _controller.OnMenuButtonClicked -= MenuButtonClickedHandler;
+        }
+
         protected override int GetHeight() {
             return Resolution;
         }
@@ -50,6 +57,17 @@ namespace TrekVRApplication {
         protected override int GetWidth() {
             return Mathf.RoundToInt(Width / Height * Resolution);
         }
+
+        #region Controller event handlers
+
+        private void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
+            if (CurrentActivity == ControllerModalActivity.Default) {
+                MainModal mainModal = UserInterfaceManager.Instance.MainModal;
+                mainModal.Visible = !mainModal.Visible;
+            }
+        }
+
+        #endregion
 
         public void StartActivity(ControllerModalActivity activity) {
             if (activity == CurrentActivity) {
@@ -92,5 +110,4 @@ namespace TrekVRApplication {
         }
 
     }
-
 }

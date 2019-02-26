@@ -20,8 +20,15 @@ namespace TrekVRApplication {
 
         protected bool _visible;
         public virtual bool Visible {
-            get { return _visible; }
-            set { SetVisiblity(value, _meshRenderer); }
+            get {
+                return _visible;
+}
+            set {
+                _visible = value;
+                Browser.EnableInput = value;
+                Browser.EnableRendering = value;
+                SetObjectsVisiblity(value, _meshRenderer);
+            }
         }
 
         protected abstract GenerateMenuMeshTask GenerateMenuMeshTask { get; }
@@ -45,7 +52,7 @@ namespace TrekVRApplication {
                     Mesh mesh = ProcessMeshData(meshData[0]);
                     Init(mesh);
                     if (hideAfterInit) {
-                        SetVisiblity(false);
+                        Visible = false;
                     }
                     _initStatus = TaskStatus.Completed;
 
@@ -99,10 +106,7 @@ namespace TrekVRApplication {
         ///     For use by the 'Visible' property setter only. Do not call this method
         ///     outside of the setter. Set the visiblity value through the property instead.
         /// </summary>
-        protected virtual void SetVisiblity(bool visible, params object[] objects) {
-            _visible = visible;
-            Browser.EnableInput = visible;
-            Browser.EnableRendering = visible;
+        protected virtual void SetObjectsVisiblity(bool visible, params object[] objects) {
 
             // If visiblilty was set to false then hide the mesh renderer
             // and mesh collider immediately.

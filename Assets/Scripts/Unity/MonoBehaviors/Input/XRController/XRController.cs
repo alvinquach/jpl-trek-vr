@@ -10,11 +10,6 @@ namespace TrekVRApplication {
         [SerializeField]
         public GameObject cursor;
 
-        [SerializeField]
-        protected GameObject _cameraRig;
-
-        public GameObject CameraRig { get { return _cameraRig; } }
-
         public SteamVR_TrackedController Controller { get; private set; }
 
         #region External event handlers
