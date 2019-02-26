@@ -27,8 +27,7 @@ namespace TrekVRApplication {
                 UserInterfaceManager.Instance.PrimaryControllerModal :
                 UserInterfaceManager.Instance.SecondaryControllerModal;
 
-            ControllerModalActivity activity;
-            if (!Enum.TryParse(activityName, out activity)) {
+            if (!Enum.TryParse(activityName, out ControllerModalActivity activity)) {
                 Debug.LogError($"{activityName} is not a valid activity.");
                 return;
             }

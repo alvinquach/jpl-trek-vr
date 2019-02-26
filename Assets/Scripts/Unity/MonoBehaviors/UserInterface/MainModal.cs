@@ -12,6 +12,7 @@ namespace TrekVRApplication {
         public const int Resolution = 720;
 
         private UnityBrowserWebFunctions _webFunctions;
+        private UnityBrowserSearchFunctions _searchFunctions;
         private UnityBrowserControllerFunctions _controllerFunctions;
 
         public override bool Visible {
@@ -50,11 +51,13 @@ namespace TrekVRApplication {
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
             _webFunctions = new UnityBrowserWebFunctions(_browser);
+            _searchFunctions = new UnityBrowserSearchFunctions(_browser);
             _controllerFunctions = new UnityBrowserControllerFunctions(_browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {
             _webFunctions.RegisterFunctions();
+            _searchFunctions.RegisterFunctions();
             _controllerFunctions.RegisterFunctions();
         }
 

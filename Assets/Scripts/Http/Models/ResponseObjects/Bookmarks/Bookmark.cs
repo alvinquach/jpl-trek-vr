@@ -1,5 +1,8 @@
-﻿namespace TrekVRApplication {
+﻿using System;
 
+namespace TrekVRApplication {
+
+    [Obsolete]
     public class Bookmark {
 
         public string productLabel;

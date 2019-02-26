@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace TrekVRApplication {
 
+    [Obsolete("Use the TrekSearchWebService instead.")]
     public class TrekBookmarksWebService : IBookmarksWebService {
 
         public static TrekBookmarksWebService Instance { get; } = new TrekBookmarksWebService();

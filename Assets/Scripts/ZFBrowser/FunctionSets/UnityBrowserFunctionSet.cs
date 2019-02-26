@@ -40,7 +40,7 @@ namespace TrekVRApplication {
                     continue;
                 }
 
-                string functionName = LowerCamelCase(method.Name);
+                string functionName = StringUtils.FirstCharacterToLower(method.Name);
 
                 ParameterInfo[] parameters = method.GetParameters();
 
@@ -113,10 +113,6 @@ namespace TrekVRApplication {
                 return (T)obj;
             }
             return default;
-        }
-
-        private string LowerCamelCase(string methodName) {
-            return char.ToLower(methodName[0]) + methodName.Substring(1);
         }
 
     }

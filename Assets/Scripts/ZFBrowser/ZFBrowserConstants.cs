@@ -8,6 +8,7 @@
         public const string AngularGlobalObjectName = "AngularGlobalVariables";
         public const string UnityGlobalObjectName = "UnityGlobalVariables";
         public const string HttpServiceName = "UnityHttpService";
+        public const string SearchServiceName = "UnitySearchService";
 
         public static readonly string AngularGlobalObjectPath = $"window.{AngularGlobalObjectName}";
         public static readonly string AngularComponentContainerPath = $"{AngularGlobalObjectPath}.componentsMap";

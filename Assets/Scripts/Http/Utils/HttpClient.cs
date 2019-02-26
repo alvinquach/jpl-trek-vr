@@ -113,7 +113,7 @@ namespace TrekVRApplication {
             else if (data is JSONNode) {
                 return ((JSONNode)data).AsJSON;
             }
-            return JsonConvert.SerializeObject(data);
+            return JsonConvert.SerializeObject(data, JsonConfig.SerializerSettings);
         }
 
         private string GetContentType(object data) {

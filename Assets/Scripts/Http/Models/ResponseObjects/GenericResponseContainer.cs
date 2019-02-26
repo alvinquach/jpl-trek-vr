@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TrekVRApplication {
 
+    [Obsolete]
     public class GenericResponseContainer {
 
         public Dictionary<string, object> responseHeader;
