@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -7,10 +7,10 @@ namespace TrekVRApplication {
         // Offsets relative to the controller
         private const float XOffset = 0.05f;
         private const float YOffset = 0;
-        private const float ZOffset = -0.05f;
+        private const float ZOffset = 0.05f;
 
-        public const float Width = 0.2f;
-        public const float Height = 0.2f;
+        public const float Width = 0.25f;
+        public const float Height = 0.25f;
         public const int Resolution = 1024;
 
         private XRController _controller;
