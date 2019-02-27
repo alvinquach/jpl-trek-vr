@@ -75,11 +75,14 @@ namespace TrekVRApplication {
             _meshRenderer = gameObject.AddComponent<MeshRenderer>();
             _meshRenderer.material = UserInterfaceManager.Instance.UIMaterial;
 
+            // Some hacky stuff
+            ZFBrowserConfig.AddFlags();
+
             _browser = gameObject.AddComponent<Browser>();
             _browser.onLoad += OnBrowserLoad;
             _browser.Url = DefaultUrl;
             _browser.Resize(GetWidth(), GetHeight());
-
+            
         }
 
         protected virtual Mesh ProcessMeshData(MeshData meshData) {
