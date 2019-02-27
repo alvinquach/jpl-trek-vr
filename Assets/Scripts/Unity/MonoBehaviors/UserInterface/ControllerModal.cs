@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -64,6 +64,10 @@ namespace TrekVRApplication {
             if (CurrentActivity == ControllerModalActivity.Default) {
                 MainModal mainModal = UserInterfaceManager.Instance.MainModal;
                 mainModal.Visible = !mainModal.Visible;
+            }
+            else if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
+                XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                planet.CancelSelection();
             }
         }
 

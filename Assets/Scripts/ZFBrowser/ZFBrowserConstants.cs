@@ -6,6 +6,8 @@
         //public const string BaseUrl = "localGame://index.html";
 
         public const string AngularGlobalObjectName = "AngularGlobalVariables";
+        public const string BoundingBoxSelectionModalName = "ControllerModalBoundingBoxSelectionComponent";
+
         public const string UnityGlobalObjectName = "UnityGlobalVariables";
         public const string HttpServiceName = "UnityHttpService";
         public const string SearchServiceName = "UnitySearchService";

@@ -1,6 +1,8 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using ZenFulcrum.EmbeddedBrowser;
+using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
@@ -11,6 +13,7 @@ namespace TrekVRApplication {
         private const float CoordinateIndicatorThickness = 0.001337f;
         private const float CoordinateIndicatorActiveThickness = 0.0069f;
         private const float CoordinateIndicatorRadiusOffset = 0.01337f;
+        private const int ControllerModalBoundingBoxUpdateInterval = 10;
 
         private XRInteractablePlanetMode _interactionMode = XRInteractablePlanetMode.Navigate;
         public XRInteractablePlanetMode InteractionMode {
@@ -79,6 +82,8 @@ namespace TrekVRApplication {
         private LineRenderer _lonSelectionEndIndicator;
         private LineRenderer _latSelectionEndIndicator;
         private POILabel _coordSelectionLabel;
+
+        private int _framesSinceLastControllerModalUpdate = 0;
 
         #endregion
 
@@ -150,6 +155,8 @@ namespace TrekVRApplication {
                     nextCoordinateIndicator.startWidth = CoordinateIndicatorActiveThickness;
                     nextCoordinateIndicator.enabled = true;
                 }
+
+                SendBoundingBoxUpdateToControllerModal(new BoundingBox(_selectionBoundingBox));
             }
         }
 
@@ -177,9 +184,11 @@ namespace TrekVRApplication {
                 Vector3 direction = transform.InverseTransformPoint(hit.point);
                 Vector3 flattened = new Vector3(direction.x, 0, direction.z);
 
+                float angle;
+
                 // Longitude selection
                 if (_selectionIndex % 2 == 0) {
-                    float angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
+                    angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
                     if (Vector3.Cross(flattened, Vector3.forward).y > 0) {
                         angle = -angle;
                     }
@@ -190,7 +199,7 @@ namespace TrekVRApplication {
 
                 // Latitude selection
                 else {
-                    float angle = Vector3.Angle(direction, flattened);
+                    angle = Vector3.Angle(direction, flattened);
                     if (direction.y < 0) {
                         angle = -angle;
                     }
@@ -202,6 +211,14 @@ namespace TrekVRApplication {
 
                     _coordSelectionLabel.Text = $"Lat: {angle.ToString("0.00")}°";
                 }
+
+                // Send updated to controller modal.
+                if (_framesSinceLastControllerModalUpdate >= ControllerModalBoundingBoxUpdateInterval) {
+                    BoundingBox bbox = new BoundingBox(_selectionBoundingBox);
+                    bbox[_selectionIndex] = angle;
+                    SendBoundingBoxUpdateToControllerModal(bbox);
+                } 
+                _framesSinceLastControllerModalUpdate++;
             }
         }
 
@@ -388,7 +405,7 @@ namespace TrekVRApplication {
                 return;
             }
             if (cancelAll) {
-                ExitSelectionMode();
+                ExitSelectionMode(true);
             }
             else {
                 if (_selectionIndex > 0) {
@@ -396,6 +413,7 @@ namespace TrekVRApplication {
                 }
                 else {
                     _interactionMode = XRInteractablePlanetMode.Navigate;
+                    ExitSelectionMode(true);
                 }
             }
         }
@@ -404,7 +422,7 @@ namespace TrekVRApplication {
             _selectionBoundingBox = new Vector4(float.NaN, float.NaN, float.NaN, float.NaN);
         }
 
-        private void ExitSelectionMode() {
+        private void ExitSelectionMode(bool openMainModal = false) {
             ResetSelectionBoundingBox();
             _selectionIndex = 0;
             _lonSelectionStartIndicator.enabled = false;
@@ -414,6 +432,9 @@ namespace TrekVRApplication {
             _coordSelectionLabel.gameObject.SetActive(false);
             _interactionMode = XRInteractablePlanetMode.Navigate;
             UserInterfaceManager.Instance.PrimaryControllerModal.StartActivity(ControllerModalActivity.Default);
+            if (openMainModal) {
+                UserInterfaceManager.Instance.MainModal.Visible = true;
+            }
         }
 
         private LineRenderer GetCurrentSelectionIndicator() {
@@ -432,6 +453,15 @@ namespace TrekVRApplication {
                 default:
                     return null;
             }
+        }
+
+        private void SendBoundingBoxUpdateToControllerModal(BoundingBox bbox) {
+            Browser browser = UserInterfaceManager.Instance.PrimaryControllerModal.Browser;
+            string js =
+                $"let component = {AngularComponentContainerPath}.{BoundingBoxSelectionModalName};" +
+                $"component && component.updateBoundingBox({bbox.ToString(", ", 7)}, {_selectionIndex});";
+            browser.EvalJSCSP(js);
+            _framesSinceLastControllerModalUpdate = 0;
         }
 
         #endregion
