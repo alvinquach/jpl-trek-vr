@@ -14,12 +14,26 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void StartPrimaryControllerActivity(string activityName) {
+            Debug.Log("AAAAAAAAAAAAAAA");
             StartControllerActivity(activityName, true);
         }
 
         [RegisterToBrowser]
         public void StartSecondaryControllerActivity(string activityName) {
             StartControllerActivity(activityName, false);
+        }
+
+        // TODO Move this
+        [RegisterToBrowser]
+        public void NavigateTo(string bbox) {
+            Transform planetTransform = TerrainModelManager.Instance.GetDefaultPlanetModelTransform();
+            XRInteractablePlanet planet = planetTransform.GetComponent<XRInteractablePlanet>();
+            if (planet != null) {
+                BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(bbox);
+                Vector2 latLon = BoundingBoxUtils.MedianLatLon(boundingBox);
+                Camera eye = UserInterfaceManager.Instance.XRCamera;
+                planet.NavigateTo(latLon, eye.transform.position);
+            }
         }
 
         private void StartControllerActivity(string activityName, bool primary) {

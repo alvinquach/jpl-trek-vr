@@ -61,13 +61,23 @@ namespace TrekVRApplication {
         #region Controller event handlers
 
         private void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
-            if (CurrentActivity == ControllerModalActivity.Default) {
-                MainModal mainModal = UserInterfaceManager.Instance.MainModal;
-                mainModal.Visible = !mainModal.Visible;
+            if (!_isPrimary) {
+                return;
             }
-            else if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
-                XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                planet.CancelSelection();
+            MainModal mainModal = UserInterfaceManager.Instance.MainModal;
+            switch (CurrentActivity) {
+                case ControllerModalActivity.Default:
+                    mainModal.Visible = !mainModal.Visible;
+                    break;
+                case ControllerModalActivity.BBoxSelection:
+                    XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                    planet.CancelSelection();
+                    break;
+                case ControllerModalActivity.BookmarkResults:
+                case ControllerModalActivity.ProductResults:
+                    mainModal.Visible = true;
+                    StartActivity(ControllerModalActivity.Default);
+                    break;
             }
         }
 
@@ -103,9 +113,13 @@ namespace TrekVRApplication {
                     planet.InteractionMode = XRInteractablePlanetMode.Select;
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                 } else {
+                    terrainModelController.ShowDefaultPlanetModel(); // Hacky demo code
                     Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
                     return;
                 }
+            }
+            else if (activity == ControllerModalActivity.BookmarkResults || activity == ControllerModalActivity.ProductResults) {
+                UserInterfaceManager.Instance.MainModal.Visible = false;
             }
 
             Visible = activity != ControllerModalActivity.Default;

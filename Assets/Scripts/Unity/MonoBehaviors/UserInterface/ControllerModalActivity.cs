@@ -2,7 +2,9 @@
 
     public enum ControllerModalActivity {
         Default,
-        BBoxSelection
+        BBoxSelection,
+        BookmarkResults,
+        ProductResults
     }
 
     public static class ControllerModalActivityEnumExtensions {
@@ -11,6 +13,10 @@
             switch (activity) {
                 case ControllerModalActivity.BBoxSelection:
                     return "/controller-modal/bbox-selection";
+                case ControllerModalActivity.BookmarkResults:
+                    return "/controller-modal/bookmarks";
+                case ControllerModalActivity.ProductResults:
+                    return "/controller-modal/products";
                 default:
                     return "/controller-modal";
             }
