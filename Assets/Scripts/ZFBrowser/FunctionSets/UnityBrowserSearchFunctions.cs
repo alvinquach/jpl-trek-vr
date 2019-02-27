@@ -27,7 +27,6 @@ namespace TrekVRApplication {
         [RegisterToBrowser]
         public void Search(JSONNode test, string requestId) {
             SearchParameters searchParams = JsonConvert.DeserializeObject<SearchParameters>(test.AsJSON, JsonConfig.SerializerSettings);
-            Debug.Log("AAAAAA " + searchParams.ItemType);
             _searchService.Search(searchParams, res => {
                 SendResponse(_browser, requestId, res);
             });
