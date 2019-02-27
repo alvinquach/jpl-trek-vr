@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
@@ -15,7 +15,7 @@ namespace TrekVRApplication {
     public class XRBrowser : XRInteractableObject, IBrowserUI {
 
         // TODO Make this a user option
-        private const float ScrollSpeedMultiplier = 13.37f;
+        private const float ScrollSpeedMultiplier = 5.0f;
 
         private ScrollTransformer _scrollTransformer;
 
