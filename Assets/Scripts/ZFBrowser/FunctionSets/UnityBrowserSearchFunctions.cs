@@ -25,6 +25,34 @@ namespace TrekVRApplication {
         }
 
         [RegisterToBrowser]
+        public void GetBookmarks(string requestId) {
+            _searchService.GetBookmarks(res => {
+                SendResponse(_browser, requestId, res);
+            });
+        }
+
+        [RegisterToBrowser]
+        public void GetDatasets(string requestId) {
+            _searchService.GetDatasets(res => {
+                SendResponse(_browser, requestId, res);
+            });
+        }
+
+        [RegisterToBrowser]
+        public void GetNomenclature(string requestId) {
+            _searchService.GetNomenclature(res => {
+                SendResponse(_browser, requestId, res);
+            });
+        }
+
+        [RegisterToBrowser]
+        public void GetProducts(string requestId) {
+            _searchService.GetProducts(res => {
+                SendResponse(_browser, requestId, res);
+            });
+        }
+
+        [RegisterToBrowser]
         public void Search(JSONNode test, string requestId) {
             SearchParameters searchParams = JsonConvert.DeserializeObject<SearchParameters>(test.AsJSON, JsonConfig.SerializerSettings);
             _searchService.Search(searchParams, res => {

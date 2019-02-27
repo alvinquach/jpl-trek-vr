@@ -14,8 +14,11 @@ namespace TrekVRApplication {
 
         #region Cached results
 
-        private SearchResult _facetinfo;
+        private SearchResult _facetInfo;
         private SearchResult _bookmarks;
+        private SearchResult _datasets;
+        private SearchResult _nomenclature;
+        private SearchResult _products;
 
         #endregion
 
@@ -24,28 +27,104 @@ namespace TrekVRApplication {
         }
 
         public void ClearCache() {
-            _facetinfo = null;
+            _facetInfo = null;
             _bookmarks = null;
         }
 
-        public void GetFacetInfo(Action<SearchResult> callback) {
-            if (_facetinfo) {
-                callback?.Invoke(_facetinfo);
+        public void GetFacetInfo(Action<SearchResult> callback, bool forceRefresh = false) {
+            if (forceRefresh) {
+                _facetInfo = null;
+            }
+            if (_facetInfo) {
+                callback?.Invoke(_facetInfo);
                 return;
             }
-
             IDictionary<string, string> paramsMap = new Dictionary<string, string>() {
                 { "start", "0" },
                 { "rows", "0" } // Only get the facet data.
             };
-
             string searchUrl = HttpRequestUtils.AppendParams(BaseUrl, paramsMap);
-
             HttpClient.Instance.Get(searchUrl, (res) => {
                 string responseBody = HttpClient.GetReponseBody(res);
-                _facetinfo = DeserializeReuslts(responseBody);
-                callback?.Invoke(_facetinfo);
+                _facetInfo = DeserializeReuslts(responseBody);
+                callback?.Invoke(_facetInfo);
             });
+        }
+
+        public void GetBookmarks(Action<SearchResult> callback, bool forceRefresh = false) {
+            if (forceRefresh) {
+                _bookmarks = null;
+            }
+            if (_bookmarks) {
+                callback?.Invoke(_bookmarks);
+                return;
+            }
+            Search(
+                new SearchParameters() {
+                    ItemType = SearchItemType.Bookmark
+                }, 
+                (res) => {
+                    _bookmarks = res;
+                    callback?.Invoke(_bookmarks);
+                }
+            );
+        }
+
+        public void GetDatasets(Action<SearchResult> callback, bool forceRefresh = false) {
+            if (forceRefresh) {
+                _datasets = null;
+            }
+            if (_datasets) {
+                callback?.Invoke(_datasets);
+                return;
+            }
+            Search(
+                new SearchParameters() {
+                    ItemType = SearchItemType.Dataset
+                },
+                (res) => {
+                    _datasets = res;
+                    callback?.Invoke(_datasets);
+                }
+            );
+        }
+
+        public void GetNomenclature(Action<SearchResult> callback, bool forceRefresh = false) {
+            if (forceRefresh) {
+                _nomenclature = null;
+            }
+            if (_nomenclature) {
+                callback?.Invoke(_nomenclature);
+                return;
+            }
+            Search(
+                new SearchParameters() {
+                    ItemType = SearchItemType.Nomenclature
+                },
+                (res) => {
+                    _nomenclature = res;
+                    callback?.Invoke(_nomenclature);
+                }
+            );
+        }
+
+        public void GetProducts(Action<SearchResult> callback, bool forceRefresh = false) {
+            if (forceRefresh) {
+                _products = null;
+            }
+            if (_products) {
+                callback?.Invoke(_products);
+                return;
+            }
+            Search(
+                new SearchParameters() {
+                    ItemType = SearchItemType.Product
+                },
+                (res) => {
+                    _products = res;
+                    callback?.Invoke(_products);
+                }
+            );
         }
 
         public void Search(SearchParameters searchParams, Action<SearchResult> callback) {
