@@ -13,7 +13,7 @@ namespace TrekVRApplication {
 
         void GetDatasets(Action<SearchResult> callback, bool forceRefresh = false);
 
-        void GetNomenclature(Action<SearchResult> callback, bool forceRefresh = false);
+        void GetNomenclatures(Action<SearchResult> callback, bool forceRefresh = false);
 
         void GetProducts(Action<SearchResult> callback, bool forceRefresh = false);
 

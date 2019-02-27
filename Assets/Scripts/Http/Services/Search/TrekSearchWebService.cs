@@ -17,7 +17,7 @@ namespace TrekVRApplication {
         private SearchResult _facetInfo;
         private SearchResult _bookmarks;
         private SearchResult _datasets;
-        private SearchResult _nomenclature;
+        private SearchResult _nomenclatures;
         private SearchResult _products;
 
         #endregion
@@ -89,12 +89,12 @@ namespace TrekVRApplication {
             );
         }
 
-        public void GetNomenclature(Action<SearchResult> callback, bool forceRefresh = false) {
+        public void GetNomenclatures(Action<SearchResult> callback, bool forceRefresh = false) {
             if (forceRefresh) {
-                _nomenclature = null;
+                _nomenclatures = null;
             }
-            if (_nomenclature) {
-                callback?.Invoke(_nomenclature);
+            if (_nomenclatures) {
+                callback?.Invoke(_nomenclatures);
                 return;
             }
             Search(
@@ -102,8 +102,8 @@ namespace TrekVRApplication {
                     ItemType = SearchItemType.Nomenclature
                 },
                 (res) => {
-                    _nomenclature = res;
-                    callback?.Invoke(_nomenclature);
+                    _nomenclatures = res;
+                    callback?.Invoke(_nomenclatures);
                 }
             );
         }

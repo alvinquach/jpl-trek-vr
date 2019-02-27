@@ -39,8 +39,8 @@ namespace TrekVRApplication {
         }
 
         [RegisterToBrowser]
-        public void GetNomenclature(string requestId) {
-            _searchService.GetNomenclature(res => {
+        public void GetNomenclatures(string requestId) {
+            _searchService.GetNomenclatures(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
