@@ -9,6 +9,10 @@ namespace TrekVRApplication {
             browser.RegisterFunction($"{UnityGlobalObjectPath}.{functionName}", function);
         }
 
+        public static void NavigateTo(Browser browser, string url) {
+            browser.EvalJS($"{AngularGlobalObjectPath}.navigateTo('{url}');");
+        }
+
     }
 
 }

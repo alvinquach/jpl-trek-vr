@@ -82,8 +82,7 @@ namespace TrekVRApplication {
                 return;
             }
 
-            // TODO We might need to manually navigate to the URL via Angular router.
-            Browser.LoadURL($"{ZFBrowserConstants.BaseUrl}/#{activity.GetModalUrl()}", false);
+            ZFBrowserUtils.NavigateTo(Browser, activity.GetModalUrl());
 
             // Switch away from current activity.
             if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
