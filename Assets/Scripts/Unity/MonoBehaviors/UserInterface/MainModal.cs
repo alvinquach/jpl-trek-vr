@@ -5,10 +5,10 @@ namespace TrekVRApplication {
 
     public class MainModal : XRBrowserUserInterface {
 
-        public const float AngleSweep = 180;
-        public const float Height = 3.1f;
-        public const float Radius = 3.1f;
-        public const float Elevation = 0.069f;
+        public const float AngleSweep = 135;
+        public const float Height = 0.69f;
+        public const float Radius = 1.0f;
+        public const float Elevation = 1.337f;
         public const int Resolution = 720;
 
         private UnityBrowserWebFunctions _webFunctions;

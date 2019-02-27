@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 
@@ -14,7 +14,6 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void StartPrimaryControllerActivity(string activityName) {
-            Debug.Log("AAAAAAAAAAAAAAA");
             StartControllerActivity(activityName, true);
         }
 
