@@ -2,8 +2,8 @@
 
     public class ZFBrowserConstants {
 
-        public const string BaseUrl = "localhost:4200";
-        //public const string BaseUrl = "localGame://index.html";
+        //public const string BaseUrl = "localhost:4200";
+        public const string BaseUrl = "localGame://index.html";
 
         public const string AngularGlobalObjectName = "AngularGlobalVariables";
         public const string BoundingBoxSelectionModalName = "ControllerModalBoundingBoxSelectionComponent";
