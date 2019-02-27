@@ -10,16 +10,6 @@ namespace TrekVRApplication.SearchResponse {
         public object responseHeader; // TODO Create model for this.
         public Response response;
         public FacetCounts facet_counts;
-
-        public static bool operator true(Result o) {
-            return o != null;
-        }
-        public static bool operator false(Result o) {
-            return o == null;
-        }
-        public static bool operator !(Result o) {
-            return o ? false : true;
-        }
     }
 
     public class Response {

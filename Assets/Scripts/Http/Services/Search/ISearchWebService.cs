@@ -7,13 +7,9 @@ namespace TrekVRApplication {
 
         void ClearCache();
 
-        void GetFacetInfo(Action<SearchResponse.Result> callback);
+        void GetFacetInfo(Action<SearchResult> callback);
 
-        void GetBookmarks(Action<SearchResponse.Result> callback);
-
-        void Search(Action<SearchResponse.Result> callback);
-
-        void Search(string search, Action<SearchResponse.Result> callback);
+        void Search(SearchParameters searchParms, Action<SearchResult> callback);
 
     }
 

@@ -11,7 +11,12 @@ namespace TrekVRApplication {
             get {
                 if (_serializerSettings == null) {
                     _serializerSettings = new JsonSerializerSettings();
-                    _serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    _serializerSettings.ContractResolver = new DefaultContractResolver {
+                        NamingStrategy = new CamelCaseNamingStrategy {
+                            ProcessDictionaryKeys = false,
+                            OverrideSpecifiedNames = true
+                        }
+                    };
                     _serializerSettings.Converters.Add(new StringEnumConverter());
                 }
                 return _serializerSettings;

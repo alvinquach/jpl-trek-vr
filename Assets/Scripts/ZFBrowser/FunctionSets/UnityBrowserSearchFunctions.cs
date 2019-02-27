@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using System;
 using TrekVRApplication.SearchResponse;
+using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
 
@@ -23,14 +25,16 @@ namespace TrekVRApplication {
         }
 
         [RegisterToBrowser]
-        public void GetBookmarks(string requestId) {
-            _searchService.GetBookmarks(res => {
+        public void Search(JSONNode test, string requestId) {
+            SearchParameters searchParams = JsonConvert.DeserializeObject<SearchParameters>(test.AsJSON, JsonConfig.SerializerSettings);
+            Debug.Log("AAAAAA " + searchParams.ItemType);
+            _searchService.Search(searchParams, res => {
                 SendResponse(_browser, requestId, res);
             });
         }
 
-        public static void SendResponse(Browser browser, string requestId, Result data) {
-            string response = JsonConvert.SerializeObject(new SearchResult(data), JsonConfig.SerializerSettings);
+        public static void SendResponse(Browser browser, string requestId, SearchResult data) {
+            string response = JsonConvert.SerializeObject(data, JsonConfig.SerializerSettings);
             response = response.Replace(@"\", @"\\"); // Need to replace single backslash with double when evaluating JS.
             browser.EvalJS($"{AngularInjectableContainerPath}.{SearchServiceName}.fulfillSearchRequest(`{requestId}`, `{response}`);");
         }

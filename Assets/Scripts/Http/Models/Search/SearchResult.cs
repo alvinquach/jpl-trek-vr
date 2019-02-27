@@ -22,6 +22,16 @@ namespace TrekVRApplication {
             FacetInfo = new SearchFacetInfo(res.facet_counts.facet_fields);
         }
 
+        public static bool operator true(SearchResult o) {
+            return o != null;
+        }
+        public static bool operator false(SearchResult o) {
+            return o == null;
+        }
+        public static bool operator !(SearchResult o) {
+            return o ? false : true;
+        }
+
     }
 
 }
