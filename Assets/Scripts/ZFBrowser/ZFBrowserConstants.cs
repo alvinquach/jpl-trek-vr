@@ -4,6 +4,8 @@
 
         //public const string BaseUrl = "localhost:4200";
         public const string BaseUrl = "localGame://index.html";
+        public const string MainModalUrl = "/main-modal";
+        public const string ControllerModalUrl = "/controller-modal";
 
         public const string AngularGlobalObjectName = "AngularGlobalVariables";
         public const string BoundingBoxSelectionModalName = "ControllerModalBoundingBoxSelectionComponent";

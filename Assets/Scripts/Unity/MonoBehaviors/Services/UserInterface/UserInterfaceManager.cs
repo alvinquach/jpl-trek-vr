@@ -40,7 +40,7 @@ namespace TrekVRApplication {
 
         #endregion
 
-        void Awake() {
+        private void Awake() {
 
             Debug.Log("UserInterfaceManager Awake");
 
@@ -59,16 +59,40 @@ namespace TrekVRApplication {
                 gameObject = new GameObject();
                 gameObject.name = typeof(ControllerModal).Name;
                 gameObject.transform.parent = _primaryController.transform;
-                PrimaryControllerModal = gameObject.AddComponent<ControllerModal>();
+                PrimaryControllerModal = gameObject.AddComponent<PrimaryControllerModal>();
             }
 
             if (_secondaryController) {
                 gameObject = new GameObject();
                 gameObject.name = typeof(ControllerModal).Name;
                 gameObject.transform.parent = _secondaryController.transform;
-                SecondaryControllerModal = gameObject.AddComponent<ControllerModal>();
+                SecondaryControllerModal = gameObject.AddComponent<SecondaryControllerModal>();
             }
 
+        }
+
+        public void HideControllerModals() {
+            PrimaryControllerModal.StartActivity(ControllerModalActivity.Default);
+            SecondaryControllerModal.StartActivity(ControllerModalActivity.Default);
+        }
+
+        public void HideControllerModalsWithActivity(ControllerModalActivity activity) {
+            if (PrimaryControllerModal.CurrentActivity == activity) {
+                PrimaryControllerModal.StartActivity(ControllerModalActivity.Default);
+            }
+            if (SecondaryControllerModal.CurrentActivity == activity) {
+                SecondaryControllerModal.StartActivity(ControllerModalActivity.Default);
+            }
+        }
+
+        public ControllerModal GetControllerModalWithActivity(ControllerModalActivity activity) {
+            if (PrimaryControllerModal.CurrentActivity == activity) {
+                return PrimaryControllerModal;
+            }
+            if (SecondaryControllerModal.CurrentActivity == activity) {
+                return SecondaryControllerModal;
+            }
+            return null;
         }
 
     }

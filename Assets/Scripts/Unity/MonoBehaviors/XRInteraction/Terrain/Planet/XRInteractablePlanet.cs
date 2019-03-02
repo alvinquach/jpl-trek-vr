@@ -431,7 +431,7 @@ namespace TrekVRApplication {
             _latSelectionEndIndicator.enabled = false;
             _coordSelectionLabel.gameObject.SetActive(false);
             _interactionMode = XRInteractablePlanetMode.Navigate;
-            UserInterfaceManager.Instance.PrimaryControllerModal.StartActivity(ControllerModalActivity.Default);
+            UserInterfaceManager.Instance.HideControllerModalsWithActivity(ControllerModalActivity.BBoxSelection);
             if (openMainModal) {
                 UserInterfaceManager.Instance.MainModal.Visible = true;
             }
@@ -456,10 +456,14 @@ namespace TrekVRApplication {
         }
 
         private void SendBoundingBoxUpdateToControllerModal(BoundingBox bbox) {
-            Browser browser = UserInterfaceManager.Instance.PrimaryControllerModal.Browser;
+            Browser browser = UserInterfaceManager.Instance
+                .GetControllerModalWithActivity(ControllerModalActivity.BBoxSelection)
+                .Browser;
+
             string js =
                 $"let component = {AngularComponentContainerPath}.{BoundingBoxSelectionModalName};" +
                 $"component && component.updateBoundingBox({bbox.ToString(", ", 7)}, {_selectionIndex});";
+
             browser.EvalJSCSP(js);
             _framesSinceLastControllerModalUpdate = 0;
         }
