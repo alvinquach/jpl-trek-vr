@@ -8,7 +8,6 @@ namespace TrekVRApplication {
         public const float AngleSweep = 135;
         public const float Height = 0.69f;
         public const float Radius = 1.0f;
-        public const float Elevation = 1.337f;
         public const int Resolution = 720;
 
         private UnityBrowserWebFunctions _webFunctions;
@@ -66,7 +65,7 @@ namespace TrekVRApplication {
             Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
 
             Vector3 menuPosition = eye.transform.position;
-            menuPosition.y = MainModal.Elevation;
+            menuPosition.y -= Mathf.Clamp(Height / 2, 0, float.PositiveInfinity); // TODO Max value
             transform.position = menuPosition;
 
             Vector3 menuOrientation = eye.transform.forward;
