@@ -37,11 +37,11 @@ namespace TrekVRApplication {
             _controller.OnMenuButtonClicked += MenuButtonClickedHandler;
 
             // Position the modal relative to the controller
-            transform.localPosition = new Vector3((_isPrimary ? 1 : -1) * XOffset, YOffset, ZOffset);
+            transform.localPosition = new Vector3((_isPrimary ? -1 : 1) * XOffset, YOffset, ZOffset);
             transform.localEulerAngles = new Vector3(-90, -180, 0);
 
             _generateMenuMeshTask = new GeneratePlanarMenuMeshTask(Width, Height,
-                _isPrimary ? RelativePosition.Left : RelativePosition.Right);
+                _isPrimary ? RelativePosition.Right : RelativePosition.Left);
 
             base.Awake();
         }
