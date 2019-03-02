@@ -20,7 +20,7 @@ namespace TrekVRApplication {
 
             if (Input.GetKeyUp(KeyCode.F)) {
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                if (terrainModelManager.DefaultPlanetModelIsVisible()) {
+                if (terrainModelManager.GlobalPlanetModelIsVisible()) {
                     BoundingBox bbox = new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f);
                     _dataElevationModelWebService.GetDEM(bbox, 1024, (demFilepath) => {
                         _mosaicWebService.GetMosaic(bbox, 1024, (textureFilepath) => {
@@ -30,7 +30,7 @@ namespace TrekVRApplication {
                     });
                 }
                 else {
-                    terrainModelManager.ShowDefaultPlanetModel();
+                    terrainModelManager.ShowGlobalPlanetModel();
                 }
             }
 

@@ -25,7 +25,7 @@ namespace TrekVRApplication {
         // TODO Move this
         [RegisterToBrowser]
         public void NavigateTo(string bbox) {
-            Transform planetTransform = TerrainModelManager.Instance.GetDefaultPlanetModelTransform();
+            Transform planetTransform = TerrainModelManager.Instance.GetGlobalPlanetModelTransform();
             XRInteractablePlanet planet = planetTransform.GetComponent<XRInteractablePlanet>();
             if (planet != null) {
                 BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(bbox);

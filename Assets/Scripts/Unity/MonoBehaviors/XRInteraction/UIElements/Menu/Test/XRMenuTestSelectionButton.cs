@@ -11,7 +11,7 @@ namespace TrekVRApplication {
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-            if (terrainModelController.DefaultPlanetModelIsVisible()) {
+            if (terrainModelController.GlobalPlanetModelIsVisible()) {
                 XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                 if (planet.InteractionMode == XRInteractablePlanetMode.Navigate) {
                     planet.InteractionMode = XRInteractablePlanetMode.Select;
@@ -21,7 +21,7 @@ namespace TrekVRApplication {
                 }
             }
             else {
-                terrainModelController.ShowDefaultPlanetModel();
+                terrainModelController.ShowGlobalPlanetModel();
             }
         }
 

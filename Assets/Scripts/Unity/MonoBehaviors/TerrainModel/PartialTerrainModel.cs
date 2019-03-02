@@ -102,7 +102,7 @@ namespace TrekVRApplication {
                         Texture2D texture = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
                         texture.GetRawTextureData<byte>().CopyFrom(data);
                         texture.Apply();
-                        Material.SetTexture("_MainTex", texture); // Assume Material is not null or default.
+                        _material.SetTexture("_MainTex", texture); // Assume Material is not null or default.
                     });
 
                 });
@@ -112,7 +112,7 @@ namespace TrekVRApplication {
 
         protected override void ProcessMeshData(MeshData[] meshData) {
             base.ProcessMeshData(meshData);
-            transform.rotation = TerrainModelManager.Instance.GetDefaultPlanetModelTransform().rotation;
+            transform.rotation = TerrainModelManager.Instance.GetGlobalPlanetModelTransform().rotation;
             transform.localPosition = transform.rotation * (0.25f * 3.39f * BoundingBoxUtils.MedianDirection(_boundingBox));
 
             // Start the view transition.

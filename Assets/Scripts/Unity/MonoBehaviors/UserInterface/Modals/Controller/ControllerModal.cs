@@ -79,12 +79,12 @@ namespace TrekVRApplication {
             // Switch to new acivity.
             if (activity == ControllerModalActivity.BBoxSelection) {
                 TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-                if (terrainModelController.DefaultPlanetModelIsVisible()) {
+                if (terrainModelController.GlobalPlanetModelIsVisible()) {
                     XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                     planet.InteractionMode = XRInteractablePlanetMode.Select;
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                 } else {
-                    terrainModelController.ShowDefaultPlanetModel(); // Hacky demo code
+                    terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code
                     Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
                     return;
                 }

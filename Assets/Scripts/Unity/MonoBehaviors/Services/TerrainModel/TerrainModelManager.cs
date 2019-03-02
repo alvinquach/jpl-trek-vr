@@ -9,6 +9,8 @@ namespace TrekVRApplication {
     [DisallowMultipleComponent]
     public class TerrainModelManager : MonoBehaviour {
 
+        private const float ModelScale = 2.5e-7f;
+
         /// <summary>
         ///     The maximum number of models that this controller can manage,
         ///     excluding the default planet model. Once the number of models
@@ -32,13 +34,31 @@ namespace TrekVRApplication {
         /// </summary>
         public Material DefaultMaterial {
             get { return _defaultMaterial; }
-            set { _defaultMaterial = value; }
         }
 
-        // TODO Generate this instead of drag and drop from Unity.
-        // Also store it inside a wrapper?
+        #region Global planet fields/properties.
+
         [SerializeField]
-        private GlobalTerrainModel _defaultPlanetModel;
+        private string _globalPlanetDEMFilepath;
+
+        [SerializeField]
+        private string _globalPlanetAlbedoFilepath;
+
+        [SerializeField]
+        private int _globalPlanetBaseDownsampleLevel = 1;
+
+        [SerializeField]
+        private int _globalPlanetLODLevels = 2;
+
+        private GlobalTerrainModel _globalPlanetModel;
+
+        public Material GlobalPlanetMaterial { get; set; }
+
+        public Material GlobalPlanetDisabledMaterial { get; set; }
+
+        public Texture GlobalPlanetTexture { get; set; }
+
+        #endregion
 
         // TODO Find out how the initial capacity for lists works in C#.
         private List<TerrainModel> _terrainModels = new List<TerrainModel>();
@@ -51,31 +71,40 @@ namespace TrekVRApplication {
                 Instance = this;
             }
 
-            if (!_terrainModelsContainer) {
-                GameObject terrainModelsContainer = GameObject.Find(GameObjectName.TerrainModelsContainer);
-                _terrainModelsContainer = terrainModelsContainer ? terrainModelsContainer : gameObject;
-            }
+            // Create a game object that will contain all the terrain model game objects.
+            _terrainModelsContainer = new GameObject();
+            _terrainModelsContainer.name = GameObjectName.TerrainModelsContainer;
 
-            if (_defaultPlanetModel) {
+            // Create the global planet game object.
+            GameObject globalPlanetModelGameObject = new GameObject();
+            globalPlanetModelGameObject.transform.parent = _terrainModelsContainer.transform;
+            globalPlanetModelGameObject.name = typeof(Mars).Name;
+            _globalPlanetModel = globalPlanetModelGameObject.AddComponent<GlobalTerrainModel>();
 
-                // TEMPORARY -- DO THIS PROPERLY
-                _defaultPlanetModel.DemFilePath = Path.Combine(
-                    FilePath.StreamingAssetsRoot,
-                    FilePath.JetPropulsionLaboratory,
-                    FilePath.DigitalElevationModel,
-                    _defaultPlanetModel.DemFilePath
-                );
+            // TEMPORARY -- DO THIS PROPERLY
+            _globalPlanetModel.DemFilePath = Path.Combine(
+                FilePath.StreamingAssetsRoot,
+                FilePath.JetPropulsionLaboratory,
+                FilePath.DigitalElevationModel,
+                _globalPlanetDEMFilepath
+            );
 
-                // ALSO TEMPORARY
-                _defaultPlanetModel.AlbedoFilePath = Path.Combine(
-                    FilePath.StreamingAssetsRoot,
-                    FilePath.JetPropulsionLaboratory,
-                    FilePath.Texture,
-                    _defaultPlanetModel.AlbedoFilePath
-                );
+            // ALSO TEMPORARY
+            _globalPlanetModel.AlbedoFilePath = Path.Combine(
+                FilePath.StreamingAssetsRoot,
+                FilePath.JetPropulsionLaboratory,
+                FilePath.Texture,
+                _globalPlanetAlbedoFilepath
+            );
 
-                _defaultPlanetModel.Visible = true;
-            }
+            _globalPlanetModel.HeightScale = ModelScale;
+            _globalPlanetModel.Radius = Mars.Radius * ModelScale;
+            _globalPlanetModel.BaseDownSampleLevel = _globalPlanetBaseDownsampleLevel;
+            _globalPlanetModel.LodLevels = _globalPlanetLODLevels;
+            _globalPlanetModel.Visible = true;
+
+            // Shift up 1 meter.
+            _terrainModelsContainer.transform.position = Vector3.up;
 
         }
 
@@ -136,19 +165,19 @@ namespace TrekVRApplication {
         }
 
         /// <summary>
-        ///     Whether the default planet model is currently visible as per this controller.
+        ///     Whether the global planet model is currently visible as per this controller.
         /// </summary>
-        public bool DefaultPlanetModelIsVisible() {
-            return _defaultPlanetModel.Visible;
+        public bool GlobalPlanetModelIsVisible() {
+            return _globalPlanetModel.Visible;
         }
 
         /// <summary>
-        ///     Shows the default planet model and hides the other TerrainModelBase objects
+        ///     Shows the global planet model and hides the other TerrainModelBase objects
         ///     that are managed by this controller.
         /// </summary>
-        public void ShowDefaultPlanetModel() {
+        public void ShowGlobalPlanetModel() {
             _terrainModels.ForEach(t => t.Visible = false);
-            _defaultPlanetModel.Visible = true;
+            _globalPlanetModel.Visible = true;
         }
 
         /// <summary>
@@ -168,7 +197,7 @@ namespace TrekVRApplication {
             HideAll();
             terrainModel.Visible = true;
             if (cloneRotation) {
-                terrainModel.transform.rotation = _defaultPlanetModel.transform.rotation;
+                terrainModel.transform.rotation = _globalPlanetModel.transform.rotation;
             }
             return true;
         }
@@ -178,19 +207,19 @@ namespace TrekVRApplication {
         ///     GameObjects to inactive. Includes the default planet model.
         /// </summary>
         public void HideAll() {
-            _defaultPlanetModel.Visible = false;
+            _globalPlanetModel.Visible = false;
             _terrainModels.ForEach(w => w.Visible = false);
         }
 
         public T GetComponentFromCurrentModel<T>() {
 
             // FIXME Change this so that it actually gets the component
-            // for the current model instead of the default model.
-            return _defaultPlanetModel.GetComponent<T>();
+            // for the current model instead of the global model.
+            return _globalPlanetModel.GetComponent<T>();
         }
 
-        public Transform GetDefaultPlanetModelTransform() {
-            return _defaultPlanetModel.transform;
+        public Transform GetGlobalPlanetModelTransform() {
+            return _globalPlanetModel.transform;
         }
 
         private TerrainModel AddTerrainModel(TerrainModel terrainModel) {

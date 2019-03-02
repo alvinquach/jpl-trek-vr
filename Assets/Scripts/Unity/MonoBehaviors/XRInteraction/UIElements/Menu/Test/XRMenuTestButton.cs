@@ -13,14 +13,14 @@ namespace TrekVRApplication {
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            if (terrainModelManager.DefaultPlanetModelIsVisible()) {
+            if (terrainModelManager.GlobalPlanetModelIsVisible()) {
                 _dataElevationModelWebService.GetDEM(new BoundingBox(-87.8906f, -21.4453f, -55.5469f, 1.4062f), 1024, (filepath) => {
                     TerrainModel terrainModel = terrainModelManager.Create(filepath);
                     terrainModelManager.ShowTerrainModel(terrainModel);
                 });
             }
             else {
-                terrainModelManager.ShowDefaultPlanetModel();
+                terrainModelManager.ShowGlobalPlanetModel();
             }
         }
 

@@ -48,7 +48,7 @@ namespace TrekVRApplication {
             set { if (_initTaskStatus == TaskStatus.NotStarted) _lodLevels = value; }
         }
 
-        public Material Material { get; set; }
+        protected Material _material;
 
         protected TaskStatus _initTaskStatus = TaskStatus.NotStarted;
 
@@ -74,6 +74,8 @@ namespace TrekVRApplication {
 
         #region Unity lifecycle methods
 
+        // Start is used instead of Awake so that property values can 
+        // be assigned before the model intialization starts.
         protected virtual void Start() {
             InitModel();
         }
@@ -106,10 +108,10 @@ namespace TrekVRApplication {
 
             // If material was not set, then generate a meterial for the mesh,
             // or use the default material if it failed to generate.
-            if (Material == null) {
-                Material = GenerateMaterial();
-                if (Material == null) {
-                    Material = TerrainModelManager.Instance.DefaultMaterial;
+            if (_material == null) {
+                _material = GenerateMaterial();
+                if (_material == null) {
+                    _material = TerrainModelManager.Instance.DefaultMaterial;
                 }
             }
 
@@ -146,8 +148,9 @@ namespace TrekVRApplication {
                 lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _lodLevels, 2), new Renderer[] { meshRenderer });
 
                 // Add material to the MeshRenderer.
-                if (Material != null) {
-                    meshRenderer.material = Material;
+                if (_material != null) {
+                    meshRenderer.material = _material;
+                    OnMaterialApplied(_material);
                 }
 
                 MeshFilter meshFilter = child.AddComponent<MeshFilter>();
@@ -228,6 +231,7 @@ namespace TrekVRApplication {
                         Texture2D texture = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
                         texture.GetRawTextureData<byte>().CopyFrom(data);
                         texture.Apply();
+                        OnTextureApplied(texture);
                         material.SetTexture("_MainTex", texture); // Set albedo texture.
 
                         Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
@@ -241,6 +245,10 @@ namespace TrekVRApplication {
         }
 
         protected abstract TerrainModelMetadata GenerateMetadata();
+
+        protected virtual void OnMaterialApplied(Material material) { }
+
+        protected virtual void OnTextureApplied(Texture2D texture) { }
 
     }
 

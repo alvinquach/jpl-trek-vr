@@ -2,6 +2,7 @@
 
 namespace TrekVRApplication {
 
+    [RequireComponent(typeof(XRInteractablePlanet))]
     public class GlobalTerrainModel : TerrainModel {
 
         [SerializeField]
@@ -34,6 +35,14 @@ namespace TrekVRApplication {
                 lodLevels = _lodLevels,
                 baseDownsample = _baseDownsampleLevel
             };
+        }
+
+        protected override void OnMaterialApplied(Material material) {
+            TerrainModelManager.Instance.GlobalPlanetMaterial = material;
+        }
+
+        protected override void OnTextureApplied(Texture2D texture) {
+            TerrainModelManager.Instance.GlobalPlanetTexture = texture;
         }
 
     }
