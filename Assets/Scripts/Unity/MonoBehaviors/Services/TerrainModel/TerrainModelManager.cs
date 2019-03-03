@@ -24,14 +24,25 @@ namespace TrekVRApplication {
         public static TerrainModelManager Instance { get; private set; }
 
         [SerializeField]
-        [Tooltip("The default material that is used as a base for new terrain models.")]
-        private Material _defaultMaterial;
+        [Tooltip("The material that is used as a base for new terrain models' enabled material.")]
+        private Material _baseEnabledMaterial;
 
         /// <summary>
-        ///     The default material that is used as a base for new terrain models.
+        ///     The material that is used as a base for new terrain models' enabled material.
         /// </summary>
-        public Material DefaultMaterial {
-            get { return _defaultMaterial; }
+        public Material BaseEnabledMaterial {
+            get { return _baseEnabledMaterial; }
+        }
+
+        [SerializeField]
+        [Tooltip("The material that is used as a base for new terrain models' disabled material.")]
+        private Material _baseDisabledMaterial;
+
+        /// <summary>
+        ///     The material that is used as a base for new terrain models' disabled material.
+        /// </summary>
+        public Material BaseDisabledMaterial {
+            get { return _baseDisabledMaterial; }
         }
 
         #region Global planet fields/properties.
@@ -48,11 +59,7 @@ namespace TrekVRApplication {
         [SerializeField]
         private int _globalPlanetLODLevels = 2;
 
-        private GlobalTerrainModel _globalPlanetModel;
-
-        public Material GlobalPlanetMaterial { get; set; }
-
-        public Material GlobalPlanetDisabledMaterial { get; set; }
+        public GlobalTerrainModel GlobalPlanetModel { get; private set; }
 
         public Texture GlobalPlanetTexture { get; set; }
 
@@ -62,6 +69,15 @@ namespace TrekVRApplication {
         private List<TerrainModel> _terrainModels = new List<TerrainModel>();
 
         private GameObject _terrainModelsContainer;
+
+        public TerrainModel CurrentVisibleModel {
+            get {
+                if (GlobalPlanetModel.Visible) {
+                    return GlobalPlanetModel;
+                }
+                return _terrainModels.Find(model => model.Visible);
+            }
+        }
 
         void Awake() {
 
@@ -77,10 +93,10 @@ namespace TrekVRApplication {
             GameObject globalPlanetModelGameObject = new GameObject();
             globalPlanetModelGameObject.transform.parent = _terrainModelsContainer.transform;
             globalPlanetModelGameObject.name = typeof(Mars).Name;
-            _globalPlanetModel = globalPlanetModelGameObject.AddComponent<GlobalTerrainModel>();
+            GlobalPlanetModel = globalPlanetModelGameObject.AddComponent<GlobalTerrainModel>();
 
             // TEMPORARY -- DO THIS PROPERLY
-            _globalPlanetModel.DemFilePath = Path.Combine(
+            GlobalPlanetModel.DemFilePath = Path.Combine(
                 FilePath.StreamingAssetsRoot,
                 FilePath.JetPropulsionLaboratory,
                 FilePath.DigitalElevationModel,
@@ -88,17 +104,17 @@ namespace TrekVRApplication {
             );
 
             // ALSO TEMPORARY
-            _globalPlanetModel.AlbedoFilePath = Path.Combine(
+            GlobalPlanetModel.AlbedoFilePath = Path.Combine(
                 FilePath.StreamingAssetsRoot,
                 FilePath.JetPropulsionLaboratory,
                 FilePath.Texture,
                 _globalPlanetAlbedoFilepath
             );
 
-            _globalPlanetModel.Radius = Mars.Radius;
-            _globalPlanetModel.BaseDownSampleLevel = _globalPlanetBaseDownsampleLevel;
-            _globalPlanetModel.LodLevels = _globalPlanetLODLevels;
-            _globalPlanetModel.Visible = true;
+            GlobalPlanetModel.Radius = Mars.Radius;
+            GlobalPlanetModel.BaseDownSampleLevel = _globalPlanetBaseDownsampleLevel;
+            GlobalPlanetModel.LodLevels = _globalPlanetLODLevels;
+            GlobalPlanetModel.Visible = true;
 
             // Shift up 1 meter.
             _terrainModelsContainer.transform.position = Vector3.up;
@@ -165,7 +181,7 @@ namespace TrekVRApplication {
         ///     Whether the global planet model is currently visible as per this controller.
         /// </summary>
         public bool GlobalPlanetModelIsVisible() {
-            return _globalPlanetModel.Visible;
+            return GlobalPlanetModel.Visible;
         }
 
         /// <summary>
@@ -174,7 +190,7 @@ namespace TrekVRApplication {
         /// </summary>
         public void ShowGlobalPlanetModel() {
             _terrainModels.ForEach(t => t.Visible = false);
-            _globalPlanetModel.Visible = true;
+            GlobalPlanetModel.Visible = true;
         }
 
         /// <summary>
@@ -194,7 +210,7 @@ namespace TrekVRApplication {
             HideAll();
             terrainModel.Visible = true;
             if (cloneRotation) {
-                terrainModel.transform.rotation = _globalPlanetModel.transform.rotation;
+                terrainModel.transform.rotation = GlobalPlanetModel.transform.rotation;
             }
             return true;
         }
@@ -204,7 +220,7 @@ namespace TrekVRApplication {
         ///     GameObjects to inactive. Includes the default planet model.
         /// </summary>
         public void HideAll() {
-            _globalPlanetModel.Visible = false;
+            GlobalPlanetModel.Visible = false;
             _terrainModels.ForEach(w => w.Visible = false);
         }
 
@@ -212,11 +228,11 @@ namespace TrekVRApplication {
 
             // FIXME Change this so that it actually gets the component
             // for the current model instead of the global model.
-            return _globalPlanetModel.GetComponent<T>();
+            return GlobalPlanetModel.GetComponent<T>();
         }
 
         public Transform GetGlobalPlanetModelTransform() {
-            return _globalPlanetModel.transform;
+            return GlobalPlanetModel.transform;
         }
 
         private TerrainModel AddTerrainModel(TerrainModel terrainModel) {

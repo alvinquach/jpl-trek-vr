@@ -2,7 +2,8 @@
 
     public enum XRInteractablePlanetMode {
         Navigate,
-        Select
+        Select,
+        Disabled
     }
 
 }

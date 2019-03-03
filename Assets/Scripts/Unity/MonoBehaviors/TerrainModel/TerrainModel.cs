@@ -38,7 +38,31 @@ namespace TrekVRApplication {
             set { if (_initTaskStatus == TaskStatus.NotStarted) _lodLevels = value; }
         }
 
-        protected Material _material;
+        protected LOD[] _lods;
+
+        public virtual Texture2D Albedo { get; protected set; }
+
+        protected virtual Material EnabledMaterial { get; set; }
+
+        protected virtual Material DisabledMaterial { get; set; }
+
+        private Material _currentMaterial;
+        public Material CurrentMaterial {
+            get {
+                return _currentMaterial;
+            }
+            set {
+                Transform lodContainer = transform.Find(GameObjectName.LODGroupContainer);
+                Debug.Log($"{GameObjectName.LODGroupContainer} found = {lodContainer != null}");
+                if (lodContainer) {
+                    MeshRenderer[] meshRenderers = lodContainer.GetComponentsInChildren<MeshRenderer>();
+                    foreach (MeshRenderer meshRenderer in meshRenderers) {
+                        meshRenderer.material = value;
+                    }
+                }
+                _currentMaterial = value;
+            }
+        }
 
         protected TaskStatus _initTaskStatus = TaskStatus.NotStarted;
 
@@ -68,6 +92,11 @@ namespace TrekVRApplication {
         // be assigned before the model intialization starts.
         protected virtual void Start() {
             InitModel();
+            if (UserInterfaceManager.Instance.MainModal.Visible) {
+                UseDisabledMaterial();
+            } else {
+                UseEnabledMaterial();
+            }
         }
 
         // If this method is overriden, then this method should be 
@@ -96,14 +125,8 @@ namespace TrekVRApplication {
 
         protected virtual void ProcessMeshData(MeshData[] meshData) {
 
-            // If material was not set, then generate a meterial for the mesh,
-            // or use the default material if it failed to generate.
-            if (_material == null) {
-                _material = GenerateMaterial();
-                if (_material == null) {
-                    _material = TerrainModelManager.Instance.DefaultMaterial;
-                }
-            }
+            GenerateMaterials();
+            _currentMaterial = UserInterfaceManager.Instance.MainModal.Visible ? DisabledMaterial : EnabledMaterial;
 
             // Minimum base downsampling level should be 1.
             _baseDownsampleLevel = _baseDownsampleLevel < 1 ? 1 : _baseDownsampleLevel;
@@ -138,9 +161,8 @@ namespace TrekVRApplication {
                 lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _lodLevels, 2), new Renderer[] { meshRenderer });
 
                 // Add material to the MeshRenderer.
-                if (_material != null) {
-                    meshRenderer.material = _material;
-                    OnMaterialApplied(_material);
+                if (_currentMaterial != null) {
+                    meshRenderer.material = _currentMaterial;
                 }
 
                 MeshFilter meshFilter = child.AddComponent<MeshFilter>();
@@ -193,10 +215,14 @@ namespace TrekVRApplication {
 
         }
 
-        protected virtual Material GenerateMaterial() {
+        protected virtual void GenerateMaterials() {
 
-            Material material = new Material(Shader.Find("Standard"));
-            material.SetColor("_Color", Color.white); // Set color to white so it doesn't tint the albedo.
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            if (!terrainModelManager.BaseEnabledMaterial || !terrainModelManager.BaseDisabledMaterial) {
+                // TODO Throw exception.
+            }
+            EnabledMaterial = new Material(terrainModelManager.BaseEnabledMaterial);
+            DisabledMaterial = new Material(terrainModelManager.BaseDisabledMaterial);
 
             // TODO Also check if file exists.
             if (!string.IsNullOrEmpty(_albedoFilePath)) {
@@ -218,11 +244,13 @@ namespace TrekVRApplication {
                         Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to generate texture.");
                         start = Time.realtimeSinceStartup;
 
-                        Texture2D texture = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
-                        texture.GetRawTextureData<byte>().CopyFrom(data);
-                        texture.Apply();
-                        OnTextureApplied(texture);
-                        material.SetTexture("_MainTex", texture); // Set albedo texture.
+                        Albedo = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
+                        Albedo.GetRawTextureData<byte>().CopyFrom(data);
+                        Albedo.Apply();
+
+                        // Set albedo texture to both the enabled and disabled materials.
+                        EnabledMaterial.SetTexture("_MainTex", Albedo);
+                        DisabledMaterial.SetTexture("_MainTex", Albedo);
 
                         Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
                     });
@@ -231,14 +259,19 @@ namespace TrekVRApplication {
 
             }
 
-            return material;
         }
 
         protected abstract TerrainModelMetadata GenerateMetadata();
 
-        protected virtual void OnMaterialApplied(Material material) { }
+        public void UseEnabledMaterial() {
+            Debug.Log("SWITCHING TO ENABLED MATERIAL");
+            CurrentMaterial = EnabledMaterial;
+        }
 
-        protected virtual void OnTextureApplied(Texture2D texture) { }
+        public void UseDisabledMaterial() {
+            Debug.Log("SWITCHING TO DISABLED MATERIAL");
+            CurrentMaterial = DisabledMaterial;
+        }
 
     }
 

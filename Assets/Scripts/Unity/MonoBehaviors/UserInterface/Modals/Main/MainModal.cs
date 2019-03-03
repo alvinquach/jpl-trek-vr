@@ -21,6 +21,10 @@ namespace TrekVRApplication {
             set {
                 if (value) {
                     OpenModal();
+                    TerrainModelManager.Instance.CurrentVisibleModel?.UseDisabledMaterial();
+                }
+                else {
+                    TerrainModelManager.Instance.CurrentVisibleModel?.UseEnabledMaterial();
                 }
                 base.Visible = value;
             }

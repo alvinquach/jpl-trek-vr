@@ -70,18 +70,20 @@ namespace TrekVRApplication {
             ZFBrowserUtils.NavigateTo(Browser, activity.GetModalUrl());
 
             // Switch away from current activity.
+            // TODO Convert this to switch case.
             if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
                 TerrainModelManager terrainModelController = TerrainModelManager.Instance;
                 XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                planet.InteractionMode = XRInteractablePlanetMode.Navigate;
+                planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
             }
 
             // Switch to new acivity.
+            // TODO Convert this to switch case.
             if (activity == ControllerModalActivity.BBoxSelection) {
                 TerrainModelManager terrainModelController = TerrainModelManager.Instance;
                 if (terrainModelController.GlobalPlanetModelIsVisible()) {
                     XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                    planet.InteractionMode = XRInteractablePlanetMode.Select;
+                    planet.SwitchToMode(XRInteractablePlanetMode.Select);
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                 } else {
                     terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code

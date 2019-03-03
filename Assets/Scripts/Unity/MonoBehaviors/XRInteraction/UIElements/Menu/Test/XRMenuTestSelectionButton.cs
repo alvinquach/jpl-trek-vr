@@ -14,10 +14,10 @@ namespace TrekVRApplication {
             if (terrainModelController.GlobalPlanetModelIsVisible()) {
                 XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                 if (planet.InteractionMode == XRInteractablePlanetMode.Navigate) {
-                    planet.InteractionMode = XRInteractablePlanetMode.Select;
+                    planet.SwitchToMode(XRInteractablePlanetMode.Select);
                 }
                 else {
-                    planet.InteractionMode = XRInteractablePlanetMode.Navigate;
+                    planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
                 }
             }
             else {

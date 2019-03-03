@@ -20,6 +20,14 @@ namespace TrekVRApplication {
             set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value * GlobalModelScale; }
         }
 
+        public override Texture2D Albedo {
+            get { return base.Albedo; }
+            protected set {
+                TerrainModelManager.Instance.GlobalPlanetTexture = value;
+                base.Albedo = value;
+            }
+        }
+
         protected override void ProcessMeshData(MeshData[] meshData) {
             base.ProcessMeshData(meshData);
 
@@ -42,14 +50,6 @@ namespace TrekVRApplication {
                 lodLevels = _lodLevels,
                 baseDownsample = _baseDownsampleLevel
             };
-        }
-
-        protected override void OnMaterialApplied(Material material) {
-            TerrainModelManager.Instance.GlobalPlanetMaterial = material;
-        }
-
-        protected override void OnTextureApplied(Texture2D texture) {
-            TerrainModelManager.Instance.GlobalPlanetTexture = texture;
         }
 
     }

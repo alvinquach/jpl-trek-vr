@@ -108,7 +108,7 @@ namespace TrekVRApplication {
                         Texture2D texture = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
                         texture.GetRawTextureData<byte>().CopyFrom(data);
                         texture.Apply();
-                        _material.SetTexture("_MainTex", texture); // Assume Material is not null or default.
+                        CurrentMaterial.SetTexture("_MainTex", texture); // Assume Material is not null or default.
                     });
 
                 });
