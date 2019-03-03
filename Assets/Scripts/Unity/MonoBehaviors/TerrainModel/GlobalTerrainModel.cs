@@ -5,12 +5,19 @@ namespace TrekVRApplication {
     [RequireComponent(typeof(XRInteractablePlanet))]
     public class GlobalTerrainModel : TerrainModel {
 
+        public const float GlobalModelScale = 2.5e-7f;
+
+        public override float HeightScale {
+            get { return GlobalModelScale; }
+            set { }
+        }
+
         [SerializeField]
         private float _radius;
 
         public float Radius {
             get { return _radius; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
+            set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value * GlobalModelScale; }
         }
 
         protected override void ProcessMeshData(MeshData[] meshData) {
@@ -31,7 +38,7 @@ namespace TrekVRApplication {
                 demFilePath = _demFilePath,
                 albedoFilePath = _albedoFilePath,
                 radius = _radius,
-                heightScale = _heightScale,
+                heightScale = HeightScale,
                 lodLevels = _lodLevels,
                 baseDownsample = _baseDownsampleLevel
             };

@@ -9,8 +9,14 @@ namespace TrekVRApplication {
         private IMosaicWebService _mosaicWebService = TrekMosaicWebService.Instance;
 
         [SerializeField]
-        private float _radius;
+        protected float _heightScale = 1.0f;
+        public override float HeightScale {
+            get { return _heightScale; }
+            set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
+        }
 
+        [SerializeField]
+        private float _radius;
         public float Radius {
             get { return _radius; }
             set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }

@@ -9,8 +9,6 @@ namespace TrekVRApplication {
     [DisallowMultipleComponent]
     public class TerrainModelManager : MonoBehaviour {
 
-        private const float ModelScale = 2.5e-7f;
-
         /// <summary>
         ///     The maximum number of models that this controller can manage,
         ///     excluding the default planet model. Once the number of models
@@ -97,8 +95,7 @@ namespace TrekVRApplication {
                 _globalPlanetAlbedoFilepath
             );
 
-            _globalPlanetModel.HeightScale = ModelScale;
-            _globalPlanetModel.Radius = Mars.Radius * ModelScale;
+            _globalPlanetModel.Radius = Mars.Radius;
             _globalPlanetModel.BaseDownSampleLevel = _globalPlanetBaseDownsampleLevel;
             _globalPlanetModel.LodLevels = _globalPlanetLODLevels;
             _globalPlanetModel.Visible = true;

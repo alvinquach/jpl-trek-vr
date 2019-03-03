@@ -8,7 +8,6 @@ namespace TrekVRApplication {
 
         [SerializeField]
         protected string _demFilePath;
-
         public string DemFilePath {
             get { return _demFilePath; }
             set { if (_initTaskStatus == TaskStatus.NotStarted) _demFilePath = value; }
@@ -16,20 +15,12 @@ namespace TrekVRApplication {
 
         [SerializeField]
         protected string _albedoFilePath;
-
         public string AlbedoFilePath {
             get { return _albedoFilePath; }
             set { if (_initTaskStatus == TaskStatus.NotStarted) _albedoFilePath = value; }
         }
 
-        [SerializeField]
-        protected float _heightScale = 1.0f;
-
-        public float HeightScale {
-            get { return _heightScale; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
-        }
-
+        public abstract float HeightScale { get; set; }
         [SerializeField]
         protected int _baseDownsampleLevel = 2;
 
@@ -42,7 +33,6 @@ namespace TrekVRApplication {
 
         [SerializeField]
         protected int _lodLevels = 2;
-
         public int LodLevels {
             get { return _lodLevels; }
             set { if (_initTaskStatus == TaskStatus.NotStarted) _lodLevels = value; }

@@ -10,9 +10,9 @@ namespace TrekVRApplication {
 
         // TODO Move these somewhere else?
         private const int CoordinateIndicatorSegmentCount = 72;
-        private const float CoordinateIndicatorThickness = 0.001337f;
-        private const float CoordinateIndicatorActiveThickness = 0.0069f;
-        private const float CoordinateIndicatorRadiusOffset = 0.01337f;
+        private const float CoordinateIndicatorThickness = 1.337e-3f;
+        private const float CoordinateIndicatorActiveThickness = 6.9e-3f;
+        private const float CoordinateIndicatorRadiusOffset = 3.33e-3f;
         private const int ControllerModalBoundingBoxUpdateInterval = 10;
 
         private XRInteractablePlanetMode _interactionMode = XRInteractablePlanetMode.Navigate;
@@ -204,10 +204,10 @@ namespace TrekVRApplication {
                         angle = -angle;
                     }
                     Vector2 offsetAndScale = CalculateLatitudeIndicatorOffsetAndScale(angle);
+                    float modelRadius = Mars.Radius * GlobalTerrainModel.GlobalModelScale;
 
-                    // TODO Un-hardcode the radius
-                    currentCoordinateIndicator.transform.localPosition = new Vector3(0, 3.39f * offsetAndScale.y, 0);
-                    currentCoordinateIndicator.transform.localScale = (offsetAndScale.x * 3.39f + CoordinateIndicatorRadiusOffset) * Vector3.one;
+                    currentCoordinateIndicator.transform.localPosition = new Vector3(0, modelRadius * offsetAndScale.y, 0);
+                    currentCoordinateIndicator.transform.localScale = (offsetAndScale.x * modelRadius + CoordinateIndicatorRadiusOffset) * Vector3.one;
 
                     _coordSelectionLabel.Text = $"Lat: {angle.ToString("0.00")}°";
                 }
@@ -228,6 +228,8 @@ namespace TrekVRApplication {
 
         private void Awake() {
 
+            float indicatorRadius = Mars.Radius * GlobalTerrainModel.GlobalModelScale + CoordinateIndicatorRadiusOffset;
+
             // Create material for coordinate indicators
             _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));
             _coordinateIndicatorMaterial.SetColor("_Color", new Color32(0, 224, 255, 255));
@@ -240,7 +242,7 @@ namespace TrekVRApplication {
             GameObject lonSelectionStartIndicator = new GameObject();
             lonSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             lonSelectionStartIndicator.name = "Lon" + GameObjectName.PlanetSelectionIndicator + "1";
-            lonSelectionStartIndicator.transform.localScale = (3.39f + CoordinateIndicatorRadiusOffset) * Vector3.one; // TODO Un-hardcode the radius.
+            lonSelectionStartIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
             _lonSelectionStartIndicator = InitCoordinateIndicator(lonSelectionStartIndicator);
             _lonSelectionStartIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionStartIndicator);
@@ -255,7 +257,7 @@ namespace TrekVRApplication {
             GameObject lonSelectionEndIndicator = new GameObject();
             lonSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             lonSelectionEndIndicator.name = "Lon" + GameObjectName.PlanetSelectionIndicator + "2";
-            lonSelectionEndIndicator.transform.localScale = (3.39f + CoordinateIndicatorRadiusOffset) * Vector3.one; // TODO Un-hardcode the radius.
+            lonSelectionEndIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
             _lonSelectionEndIndicator = InitCoordinateIndicator(lonSelectionEndIndicator);
             _lonSelectionEndIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionEndIndicator);

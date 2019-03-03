@@ -5,8 +5,14 @@ namespace TrekVRApplication {
     public class PlanarTerrainModel : TerrainModel {
 
         [SerializeField]
-        private float _size;
+        protected float _heightScale = 1.0f;
+        public override float HeightScale {
+            get { return _heightScale; }
+            set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
+        }
 
+        [SerializeField]
+        private float _size;
         public float Size {
             get { return _size; }
             set { if (_initTaskStatus == TaskStatus.NotStarted) _size = value; }
