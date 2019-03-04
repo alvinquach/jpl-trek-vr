@@ -79,7 +79,7 @@ namespace TrekVRApplication {
 
         #region Event handlers
 
-        public override void OnGripDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+        public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance) {
                 return;
             }
@@ -87,16 +87,16 @@ namespace TrekVRApplication {
             _grabPoint = hit.point;
             _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
             _grabbed = true;
-            Debug.Log("Grabbed something at " + hit.point);
+            //Debug.Log("Grabbed something at " + hit.point);
 
             _grabber.cursor.transform.localScale *= 2;
         }
 
-        public override void OnGripUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+        public override void OnTriggerUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             Ungrab();
         }
 
-        public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+        public override void OnTriggerDoubleClick(XRController sender, RaycastHit hit, ClickedEventArgs e) {
 
             if (InteractionMode == XRInteractablePlanetMode.Navigate) {
                 Camera eye = UserInterfaceManager.Instance.XRCamera;

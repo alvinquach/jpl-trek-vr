@@ -7,6 +7,8 @@ namespace TrekVRApplication {
 
         private bool _padTouched = false;
 
+        private DoubleKeyPressDetector _doubleClickDetector;
+
         [SerializeField]
         public GameObject cursor;
 
@@ -16,6 +18,7 @@ namespace TrekVRApplication {
 
         public event Action<object, ClickedEventArgs> OnTriggerClicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnTriggerUnclicked = (sender, e) => {};
+        public event Action<object, ClickedEventArgs> OnTriggerDoubleClicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnPadClicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnPadUnclicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnMenuButtonClicked = (sender, e) => {};
@@ -26,6 +29,11 @@ namespace TrekVRApplication {
         public event Action<object, ClickedEventArgs> OnPadSwipe = (sender, e) => {};
 
         #endregion
+
+        private void Awake() {
+            _doubleClickDetector = new DoubleKeyPressDetector();
+            _doubleClickDetector.OnDoubleKeyPress += TriggerDoubleClickedInternal;
+        }
 
         private void OnEnable() {
             Controller = GetComponent<SteamVR_TrackedController>();
@@ -55,38 +63,52 @@ namespace TrekVRApplication {
             Controller.PadUntouched -= PadUntouchedInternal;
         }
 
+        private void OnDestroy() {
+
+            // Does this need to be unsubscribed, since the
+            // DoubleKeyPressDetector instance is only referenced
+            // in this object, so it will be destroyed anyways?
+            _doubleClickDetector.OnDoubleKeyPress -= TriggerDoubleClickedInternal;
+        }
+
         // Implementing classes should make a super call to this method if
         // it is overwritten.
         protected virtual void Update() {
             if (_padTouched) {
-                ClickedEventArgs e = new ClickedEventArgs() {
-                    controllerIndex = Controller.controllerIndex,
-                    flags = (uint)Controller.controllerState.ulButtonPressed,
-                    padX = Controller.controllerState.rAxis0.x,
-                    padY = Controller.controllerState.rAxis0.y
-                };
-                PadSwipeHandler(Controller, e);
+                PadSwipeHandler(Controller, GenerateClickedEventArgs());
             }
         }
 
-        // Used internally by this class.
+        #region Internally used event handlers
+
         private void PadTouchedInternal(object sender, ClickedEventArgs e) {
             _padTouched = true;
             PadTouchedHandler(sender, e);
         }
 
-        // Used internally by this class.
         private void PadUntouchedInternal(object sender, ClickedEventArgs e) {
             _padTouched = false;
             PadUntouchedHandler(sender, e);
         }
 
+        private void TriggerDoubleClickedInternal() {
+            TriggerDoubleClickedHandler(Controller, GenerateClickedEventArgs());
+        }
+
+        #endregion
+
         protected virtual void TriggerClickedHandler(object sender, ClickedEventArgs e) {
+            _doubleClickDetector.RegisterKeyDown();
             OnTriggerClicked(sender, e);
         }
 
         protected virtual void TriggerUnclickedHandler(object sender, ClickedEventArgs e) {
+            _doubleClickDetector.RegisterKeyUp();
             OnTriggerUnclicked(sender, e);
+        }
+
+        protected virtual void TriggerDoubleClickedHandler(object sender, ClickedEventArgs e) {
+            OnTriggerDoubleClicked(sender, e);
         }
 
         protected virtual void PadClickedHandler(object sender, ClickedEventArgs e) {
@@ -122,6 +144,15 @@ namespace TrekVRApplication {
 
         protected virtual void PadSwipeHandler(object sender, ClickedEventArgs e) {
             OnPadSwipe(sender, e);
+        }
+
+        private ClickedEventArgs GenerateClickedEventArgs() {
+            return new ClickedEventArgs() {
+                controllerIndex = Controller.controllerIndex,
+                flags = (uint)Controller.controllerState.ulButtonPressed,
+                padX = Controller.controllerState.rAxis0.x,
+                padY = Controller.controllerState.rAxis0.y
+            };
         }
 
     }

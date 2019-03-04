@@ -49,6 +49,14 @@ namespace TrekVRApplication {
             base.TriggerUnclickedHandler(sender, e);
         }
 
+        protected override void TriggerDoubleClickedHandler(object sender, ClickedEventArgs e) {
+            XRInteractableObject obj = GetInteractableObjectIfHit();
+            if (obj && obj.triggerDoubleClick) {
+                obj.OnTriggerDoubleClick(this, _hitInfo, e);
+            }
+            base.TriggerDoubleClickedHandler(sender, e);
+        }
+
         protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
             Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = true;
