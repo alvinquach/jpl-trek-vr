@@ -31,6 +31,7 @@ namespace TrekVRApplication {
         #endregion
 
         private void Awake() {
+            Debug.Log("WTF??");
             _doubleClickDetector = new DoubleKeyPressDetector();
             _doubleClickDetector.OnDoubleKeyPress += TriggerDoubleClickedInternal;
         }

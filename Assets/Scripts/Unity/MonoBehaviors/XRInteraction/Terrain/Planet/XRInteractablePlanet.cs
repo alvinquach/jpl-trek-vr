@@ -33,10 +33,14 @@ namespace TrekVRApplication {
         [SerializeField]
         private int _decelerationSmoothing = 10;
 
-        private bool _grabbed = false;
+        private XRController _grabber;
+
+        private bool _triggerGrabbed = false;
         private Vector3 _grabPoint;
         private float _grabRadius;
-        private XRController _grabber;
+
+        private bool _gripGrabbed = false;
+        private Quaternion _grabberRotation;
 
         #endregion
 
@@ -80,20 +84,18 @@ namespace TrekVRApplication {
         #region Event handlers
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance) {
+            if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _gripGrabbed) {
                 return;
             }
             _grabber = sender;
             _grabPoint = hit.point;
             _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
-            _grabbed = true;
-            //Debug.Log("Grabbed something at " + hit.point);
-
+            _triggerGrabbed = true;
             _grabber.cursor.transform.localScale *= 2;
         }
 
         public override void OnTriggerUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            Ungrab();
+            TriggerUngrab();
         }
 
         public override void OnTriggerDoubleClick(XRController sender, RaycastHit hit, ClickedEventArgs e) {
@@ -148,6 +150,20 @@ namespace TrekVRApplication {
 
                 SendBoundingBoxUpdateToControllerModal(new BoundingBox(_selectionBoundingBox));
             }
+        }
+
+        public override void OnGripDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+            if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _triggerGrabbed) {
+                return;
+            }
+            _grabber = sender;
+            _grabberRotation = _grabber.transform.rotation;
+            _gripGrabbed = true;
+            _grabber.cursor.SetActive(false);
+        }
+
+        public override void OnGripUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+            GripUngrab();
         }
 
         public override void OnCursorOver(XRController sender, RaycastHit hit) {
@@ -276,12 +292,13 @@ namespace TrekVRApplication {
 
         // Update is called once per frame
         void Update() {
+
             if (_navToProgress < 1) {
                 _navToProgress += Time.deltaTime / _navToDuration;
                 transform.rotation = Quaternion.Lerp(_initRotation, _destRotation, _navToProgress);
             }
 
-            if (_grabbed && _grabber != null) {
+            if (_triggerGrabbed && _grabber) {
 
                 // Ray representing the forward direction of the controller.
                 Ray forward = new Ray(_grabber.transform.position, _grabber.transform.forward);
@@ -291,7 +308,7 @@ namespace TrekVRApplication {
                 float forwardDistFromObject = HandleUtility.DistancePointLine(transform.position, _grabber.transform.position, forward.GetPoint(_maxGrabDistance));
                 if (forwardDistFromObject > _grabRadius) {
                     Debug.Log("Lost grip on grabbed object (distance too large, " + forwardDistFromObject + ">" + _grabRadius + ")");
-                    Ungrab();
+                    TriggerUngrab();
                 }
 
                 // If the controller is pointing within the planet's bounds, then rotate the planet.
@@ -314,6 +331,17 @@ namespace TrekVRApplication {
 
                 }
             }
+
+            if (_gripGrabbed && _grabber) {
+                Quaternion controllerRotation = _grabber.transform.rotation;
+
+                // https://forum.unity.com/threads/get-the-difference-between-two-quaternions-and-add-it-to-another-quaternion.513187/
+                Quaternion rotation = controllerRotation * Quaternion.Inverse(_grabberRotation);
+                transform.rotation = rotation * transform.rotation;
+                _grabberRotation = controllerRotation;
+                // TODO Hide laser pointer
+            }
+
         }
 
         #endregion
@@ -577,10 +605,19 @@ namespace TrekVRApplication {
 
         }
 
-        private void Ungrab() {
+        private void TriggerUngrab() {
             if (_grabber != null) {
-                _grabbed = false;
+                _triggerGrabbed = false;
                 _grabber.cursor.transform.localScale /= 2;
+                _grabber = null;
+            }
+        }
+
+        private void GripUngrab() {
+            if (_grabber != null) {
+                _gripGrabbed = false;
+                // TODO Show laser pointer
+                _grabber.cursor.SetActive(true);
                 _grabber = null;
             }
         }
