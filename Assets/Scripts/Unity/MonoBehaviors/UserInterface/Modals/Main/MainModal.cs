@@ -18,13 +18,32 @@ namespace TrekVRApplication {
             get {
                 return _visible;
             }
+
+            // FIXME
             set {
                 if (value) {
                     OpenModal();
-                    TerrainModelManager.Instance.CurrentVisibleModel?.UseDisabledMaterial();
+                    TerrainModel model = TerrainModelManager.Instance.CurrentVisibleModel;
+                    if (!model) {
+                        return;
+                    }
+                    if (model.GetType() == typeof(GlobalTerrainModel)) {
+                        model.GetComponent<XRInteractablePlanet>()?.SwitchToMode(XRInteractablePlanetMode.Disabled);
+                    } else {
+                        model.UseDisabledMaterial();
+                    }
                 }
                 else {
-                    TerrainModelManager.Instance.CurrentVisibleModel?.UseEnabledMaterial();
+                    TerrainModel model = TerrainModelManager.Instance.CurrentVisibleModel;
+                    if (!model) {
+                        return;
+                    }
+                    if (model.GetType() == typeof(GlobalTerrainModel)) {
+                        model.GetComponent<XRInteractablePlanet>()?.SwitchToMode(XRInteractablePlanetMode.Navigate);
+                    }
+                    else {
+                        model.UseEnabledMaterial();
+                    }
                 }
                 base.Visible = value;
             }

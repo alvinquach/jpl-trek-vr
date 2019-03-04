@@ -91,7 +91,7 @@ namespace TrekVRApplication {
             _grabPoint = hit.point;
             _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
             _triggerGrabbed = true;
-            _grabber.cursor.transform.localScale *= 2;
+            _grabber.LaserPointer.Active = true;
         }
 
         public override void OnTriggerUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
@@ -159,11 +159,8 @@ namespace TrekVRApplication {
             _grabber = sender;
             _grabberRotation = _grabber.transform.rotation;
             _gripGrabbed = true;
-            _grabber.cursor.SetActive(false);
-        }
-
-        public override void OnGripUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            GripUngrab();
+            _grabber.LaserPointer.Visible = false;
+            _grabber.OnUngripped += GripUngrab;
         }
 
         public override void OnCursorOver(XRController sender, RaycastHit hit) {
@@ -339,7 +336,6 @@ namespace TrekVRApplication {
                 Quaternion rotation = controllerRotation * Quaternion.Inverse(_grabberRotation);
                 transform.rotation = rotation * transform.rotation;
                 _grabberRotation = controllerRotation;
-                // TODO Hide laser pointer
             }
 
         }
@@ -357,6 +353,7 @@ namespace TrekVRApplication {
                     CancelSelection(true);
                     break;
                 case XRInteractablePlanetMode.Disabled:
+                    GetComponent<SphereCollider>().enabled = true;
                     GlobalTerrainModel globe = GetComponent<GlobalTerrainModel>();
                     globe.UseEnabledMaterial();
                     break;
@@ -370,6 +367,7 @@ namespace TrekVRApplication {
                     _coordSelectionLabel.gameObject.SetActive(true);
                     break;
                 case XRInteractablePlanetMode.Disabled:
+                    GetComponent<SphereCollider>().enabled = false;
                     GlobalTerrainModel globe = GetComponent<GlobalTerrainModel>();
                     globe.UseDisabledMaterial();
                     break;
@@ -608,16 +606,15 @@ namespace TrekVRApplication {
         private void TriggerUngrab() {
             if (_grabber != null) {
                 _triggerGrabbed = false;
-                _grabber.cursor.transform.localScale /= 2;
+                _grabber.LaserPointer.Active = false;
                 _grabber = null;
             }
         }
 
-        private void GripUngrab() {
+        private void GripUngrab(object sender, ClickedEventArgs e) {
             if (_grabber != null) {
                 _gripGrabbed = false;
-                // TODO Show laser pointer
-                _grabber.cursor.SetActive(true);
+                _grabber.LaserPointer.Visible = true;
                 _grabber = null;
             }
         }

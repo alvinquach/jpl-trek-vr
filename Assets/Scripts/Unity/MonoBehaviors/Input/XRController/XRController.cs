@@ -9,8 +9,7 @@ namespace TrekVRApplication {
 
         private DoubleKeyPressDetector _doubleClickDetector;
 
-        [SerializeField]
-        public GameObject cursor;
+        public XRControllerLaserPointer LaserPointer { get; protected set; }
 
         public SteamVR_TrackedController Controller { get; private set; }
 
@@ -31,9 +30,10 @@ namespace TrekVRApplication {
         #endregion
 
         private void Awake() {
-            Debug.Log("WTF??");
             _doubleClickDetector = new DoubleKeyPressDetector();
             _doubleClickDetector.OnDoubleKeyPress += TriggerDoubleClickedInternal;
+
+            LaserPointer = GetComponent<XRControllerLaserPointer>();
         }
 
         private void OnEnable() {

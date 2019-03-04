@@ -14,6 +14,8 @@
 
         public const string LODGroupContainer = "LodGroupContainer";
 
+        public const string LaserPointer = "LaserPointer";
+
         public const string CameraRig = "[CameraRig]";
 
         #region Template names

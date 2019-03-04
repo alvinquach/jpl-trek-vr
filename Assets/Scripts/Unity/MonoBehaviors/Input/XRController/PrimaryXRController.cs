@@ -167,17 +167,16 @@ namespace TrekVRApplication {
 
                 if (_activeObject) {
                     _activeObject.OnCursorOver(this, _hitInfo);
-                    cursor.transform.position = _hitInfo.point;
-                    cursor.SetActive(true);
+                    LaserPointer.Distance = _hitInfo.distance;
                 }
                 else {
-                    cursor.SetActive(false);
+                    LaserPointer.Distance = float.PositiveInfinity;
                 }
             }
             else {
                 // TODO Send a cursor leave event
                 _activeObject = null;
-                cursor.SetActive(false);
+                LaserPointer.Distance = float.PositiveInfinity;
             }
 
         }
