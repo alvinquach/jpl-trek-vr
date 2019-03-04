@@ -58,13 +58,20 @@ namespace TrekVRApplication {
             }
         }
 
-        private byte _selectionIndex = 0;
+        private POILabel _coordSelectionLabel;
 
         private LineRenderer _lonSelectionStartIndicator;
         private LineRenderer _latSelectionStartIndicator;
         private LineRenderer _lonSelectionEndIndicator;
         private LineRenderer _latSelectionEndIndicator;
-        private POILabel _coordSelectionLabel;
+
+        private byte _selectionIndex = 0;
+
+        private LineRenderer CurrentSelectionIndicator {
+            get {
+                return GetSelectionIndicatorByIndex(_selectionIndex);
+            }
+        }
 
         private int _framesSinceLastControllerModalUpdate = 0;
 
@@ -122,7 +129,7 @@ namespace TrekVRApplication {
 
                 _selectionBoundingBox[_selectionIndex] = angle;
 
-                GetCurrentSelectionIndicator().startWidth = CoordinateIndicatorThickness;
+                CurrentSelectionIndicator.startWidth = CoordinateIndicatorThickness;
                 _selectionIndex++;
 
                 // Check if selection is finished.
@@ -134,7 +141,7 @@ namespace TrekVRApplication {
                     ExitSelectionMode();
                 }
                 else {
-                    LineRenderer nextCoordinateIndicator = GetCurrentSelectionIndicator();
+                    LineRenderer nextCoordinateIndicator = CurrentSelectionIndicator;
                     nextCoordinateIndicator.startWidth = CoordinateIndicatorActiveThickness;
                     nextCoordinateIndicator.enabled = true;
                 }
@@ -162,7 +169,7 @@ namespace TrekVRApplication {
                 _coordSelectionLabel.transform.forward = -hit.normal;
 
                 // Get the current coordinate indicator to set its angles.
-                LineRenderer currentCoordinateIndicator = GetCurrentSelectionIndicator();
+                LineRenderer currentCoordinateIndicator = CurrentSelectionIndicator;
 
                 Vector3 direction = transform.InverseTransformPoint(hit.point);
                 Vector3 flattened = new Vector3(direction.x, 0, direction.z);
@@ -427,7 +434,16 @@ namespace TrekVRApplication {
             }
             else {
                 if (_selectionIndex > 0) {
+
+                    // Hide the previous indicator
+                    CurrentSelectionIndicator.enabled = false;
+
+                    // Reset selection value
                     _selectionBoundingBox[_selectionIndex--] = float.NaN;
+
+                    // Show current indicator
+                    CurrentSelectionIndicator.startWidth = CoordinateIndicatorActiveThickness;
+                    CurrentSelectionIndicator.enabled = true;
                 }
                 else {
                     InteractionMode = XRInteractablePlanetMode.Navigate;
@@ -455,11 +471,11 @@ namespace TrekVRApplication {
             }
         }
 
-        private LineRenderer GetCurrentSelectionIndicator() {
+        private LineRenderer GetSelectionIndicatorByIndex(int index) {
             if (InteractionMode != XRInteractablePlanetMode.Select) {
                 return null;
             }
-            switch (_selectionIndex) {
+            switch (index) {
                 case 0:
                     return _lonSelectionStartIndicator;
                 case 1:
