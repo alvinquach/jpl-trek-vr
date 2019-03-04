@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -16,10 +15,6 @@ namespace TrekVRApplication {
         public bool gripUp = true;
         public bool cursorOver = true;
 
-        // TODO Not currently used. Either implement or remove this.
-        public virtual void OnTriggerClick(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
-
-        // TODO Not currently used. Either implement or remove this.
         public virtual void OnTriggerDoubleClick(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
 
         public virtual void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
@@ -45,16 +40,6 @@ namespace TrekVRApplication {
         public virtual void OnPadUntouch(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
 
         public virtual void OnPadSwipe(XRController sender, RaycastHit hit, ClickedEventArgs e) { }
-
-        // Use this for initialization
-        void Start() {
-
-        }
-
-        // Update is called once per frame
-        void Update() {
-
-        }
 
     }
 }
