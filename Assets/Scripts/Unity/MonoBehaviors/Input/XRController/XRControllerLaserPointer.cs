@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace TrekVRApplication {
@@ -25,12 +25,7 @@ namespace TrekVRApplication {
 
         private LineRenderer _lineRenderer;
 
-        [SerializeField]
-        private float _maxDistance = 10;
-        public float MaxDistance {
-            get { return _maxDistance; }
-            set { _maxDistance = value; }
-        }
+        public float MaxDistance { get; set; }
 
         private float _distance = float.PositiveInfinity;
         public float Distance {
@@ -46,7 +41,7 @@ namespace TrekVRApplication {
             }
         }
 
-        private bool _active= false;
+        private bool _active = false;
         public bool Active {
             get {
                 return _active;

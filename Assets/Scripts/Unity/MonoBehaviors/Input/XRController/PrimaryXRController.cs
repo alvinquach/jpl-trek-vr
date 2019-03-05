@@ -124,6 +124,11 @@ namespace TrekVRApplication {
 
         #endregion
 
+        protected override void Awake() {
+            base.Awake();
+            LaserPointer.MaxDistance = _maxInteractionDistance;
+        }
+
         protected override void Update() {
 
             base.Update();
