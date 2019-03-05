@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
 
@@ -14,6 +14,7 @@ namespace TrekVRApplication {
         private UnityBrowserWebFunctions _webFunctions;
         private UnityBrowserSearchFunctions _searchFunctions;
         private UnityBrowserControllerFunctions _controllerFunctions;
+        private UnityBrowserTerrainModelFunctions _terrainModelFunctions;
 
         /// <summary>
         ///     <para>
@@ -75,12 +76,14 @@ namespace TrekVRApplication {
             _webFunctions = new UnityBrowserWebFunctions(_browser);
             _searchFunctions = new UnityBrowserSearchFunctions(_browser);
             _controllerFunctions = new UnityBrowserControllerFunctions(_browser);
+            _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(_browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {
             _webFunctions.RegisterFunctions();
             _searchFunctions.RegisterFunctions();
             _controllerFunctions.RegisterFunctions();
+            _terrainModelFunctions.RegisterFunctions();
         }
 
         public void NavigateToRootMenu() {

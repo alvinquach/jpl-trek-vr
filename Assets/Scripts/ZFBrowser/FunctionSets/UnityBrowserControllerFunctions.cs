@@ -22,19 +22,6 @@ namespace TrekVRApplication {
             StartControllerActivity(activityName, false);
         }
 
-        // TODO Move this
-        [RegisterToBrowser]
-        public void NavigateTo(string bbox) {
-            Transform planetTransform = TerrainModelManager.Instance.GetGlobalPlanetModelTransform();
-            XRInteractablePlanet planet = planetTransform.GetComponent<XRInteractablePlanet>();
-            if (planet != null) {
-                BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(bbox);
-                Vector2 latLon = BoundingBoxUtils.MedianLatLon(boundingBox);
-                Camera eye = UserInterfaceManager.Instance.XRCamera;
-                planet.NavigateTo(latLon, eye.transform.position);
-            }
-        }
-
         private void StartControllerActivity(string activityName, bool primary) {
             ControllerModal controllerModal = primary ?
                 UserInterfaceManager.Instance.PrimaryControllerModal :
