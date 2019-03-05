@@ -84,25 +84,16 @@ namespace TrekVRApplication {
         #region Event handlers
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _gripGrabbed) {
-                return;
-            }
-            _grabber = sender;
-            _grabPoint = hit.point;
-            _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
-            _triggerGrabbed = true;
-            _grabber.LaserPointer.Active = true;
-        }
-
-        public override void OnTriggerUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            TriggerUngrab();
-        }
-
-        public override void OnTriggerDoubleClick(XRController sender, RaycastHit hit, ClickedEventArgs e) {
 
             if (InteractionMode == XRInteractablePlanetMode.Navigate) {
-                Camera eye = UserInterfaceManager.Instance.XRCamera;
-                NavigateTo(hit.point - transform.position, eye.transform.position);
+                if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _gripGrabbed) {
+                    return;
+                }
+                _grabber = sender;
+                _grabPoint = hit.point;
+                _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
+                _triggerGrabbed = true;
+                _grabber.LaserPointer.Active = true;
             }
 
             else if (InteractionMode == XRInteractablePlanetMode.Select) {
@@ -149,6 +140,18 @@ namespace TrekVRApplication {
                 }
 
                 SendBoundingBoxUpdateToControllerModal(new BoundingBox(_selectionBoundingBox));
+            }
+
+        }
+
+        public override void OnTriggerUp(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+            TriggerUngrab();
+        }
+
+        public override void OnTriggerDoubleClick(XRController sender, RaycastHit hit, ClickedEventArgs e) {
+            if (InteractionMode == XRInteractablePlanetMode.Navigate) {
+                Camera eye = UserInterfaceManager.Instance.XRCamera;
+                NavigateTo(hit.point - transform.position, eye.transform.position);
             }
         }
 
