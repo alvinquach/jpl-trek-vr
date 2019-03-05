@@ -615,6 +615,7 @@ namespace TrekVRApplication {
             if (_grabber != null) {
                 _gripGrabbed = false;
                 _grabber.LaserPointer.Visible = true;
+                _grabber.OnUngripped -= GripUngrab;
                 _grabber = null;
             }
         }
