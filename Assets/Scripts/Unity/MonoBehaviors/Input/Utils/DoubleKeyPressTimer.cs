@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace TrekVRApplication {
 
-namespace TrekVRApplication {
-
-    public class DoubleKeyPressTimer {
+    public class DoubleKeyPressTimer : KeyPressTimer {
 
         private long _timeAtLastKeyDown = -1;
 
@@ -20,13 +18,11 @@ namespace TrekVRApplication {
         /// </summary>
         public long MaxKeyPressDuration { get; set; } = 300;
 
-        public event Action OnDoubleKeyPress = () => { };
-
-        public void RegisterKeyDown() {
+        public override void RegisterKeyDown() {
             _timeAtLastKeyDown = Now();
         }
 
-        public void RegisterKeyUp() {
+        public override void RegisterKeyUp() {
             if (_timeAtLastKeyDown < 0) {
                 return;
             }
@@ -44,15 +40,11 @@ namespace TrekVRApplication {
                 // If the key was press in time, then call the double keypress action.
                 else if (now - _timeAtLastKeyPress <= MaxKeyPressInterval) {
                     _timeAtLastKeyPress = -1;
-                    OnDoubleKeyPress();
+                    InvokeActionSuccess();
                 }
             }
 
             _timeAtLastKeyDown = -1;
-        }
-
-        private long Now() {
-            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         }
 
     }

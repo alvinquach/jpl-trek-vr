@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace TrekVRApplication {
@@ -7,7 +7,9 @@ namespace TrekVRApplication {
 
         private bool _padTouched = false;
 
-        private DoubleKeyPressTimer _doubleClickTimer;
+        private DoubleKeyPressTimer _triggerDoubleClickTimer;
+
+        private LongKeyPressTimer _menuButtonLongPressTimer;
 
         public XRControllerLaserPointer LaserPointer { get; protected set; }
 
@@ -21,6 +23,8 @@ namespace TrekVRApplication {
         public event Action<object, ClickedEventArgs> OnPadClicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnPadUnclicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnMenuButtonClicked = (sender, e) => {};
+        public event Action<object, ClickedEventArgs> OnMenuButtonUnclicked = (sender, e) => {};
+        public event Action<object, ClickedEventArgs> OnMenuButtonLongPress = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnGripped = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnUngripped = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnPadTouched = (sender, e) => {};
@@ -30,8 +34,11 @@ namespace TrekVRApplication {
         #endregion
 
         protected virtual void Awake() {
-            _doubleClickTimer = new DoubleKeyPressTimer();
-            _doubleClickTimer.OnDoubleKeyPress += TriggerDoubleClickedInternal;
+            _triggerDoubleClickTimer = new DoubleKeyPressTimer();
+            _triggerDoubleClickTimer.OnActionSuccess += TriggerDoubleClickedInternal;
+
+            _menuButtonLongPressTimer = new LongKeyPressTimer();
+            _menuButtonLongPressTimer.OnActionSuccess += MenuButtonLongPressInternal;
 
             LaserPointer = GetComponent<XRControllerLaserPointer>();
         }
@@ -44,6 +51,7 @@ namespace TrekVRApplication {
             Controller.PadClicked += PadClickedHandler;
             Controller.PadUnclicked += PadUnclickedHandler;
             Controller.MenuButtonClicked += MenuButtonClickedHandler;
+            Controller.MenuButtonUnclicked += MenuButtonUnlickedHandler;
             Controller.Gripped += GrippedHandler;
             Controller.Ungripped += UngrippedHandler;
 
@@ -58,6 +66,7 @@ namespace TrekVRApplication {
             Controller.PadClicked -= PadClickedHandler;
             Controller.PadUnclicked -= PadUnclickedHandler;
             Controller.MenuButtonClicked -= MenuButtonClickedHandler;
+            Controller.MenuButtonUnclicked -= MenuButtonUnlickedHandler;
             Controller.Gripped -= GrippedHandler;
             Controller.Ungripped -= UngrippedHandler;
             Controller.PadTouched -= PadTouchedInternal;
@@ -66,10 +75,11 @@ namespace TrekVRApplication {
 
         private void OnDestroy() {
 
-            // Does this need to be unsubscribed, since the
-            // DoubleKeyPressDetector instance is only referenced
-            // in this object, so it will be destroyed anyways?
-            _doubleClickTimer.OnDoubleKeyPress -= TriggerDoubleClickedInternal;
+            // Does this need to be unsubscribed, since the timer
+            // instances are only referenced in this object, so it
+            // will be destroyed anyways?
+            _triggerDoubleClickTimer.OnActionSuccess -= TriggerDoubleClickedInternal;
+            _menuButtonLongPressTimer.OnActionSuccess -= MenuButtonLongPressInternal;
         }
 
         // Implementing classes should make a super call to this method if
@@ -96,15 +106,19 @@ namespace TrekVRApplication {
             TriggerDoubleClickedHandler(Controller, GenerateClickedEventArgs());
         }
 
+        private void MenuButtonLongPressInternal() {
+            MenuButtonLongPressHandler(Controller, GenerateClickedEventArgs());
+        }
+
         #endregion
 
         protected virtual void TriggerClickedHandler(object sender, ClickedEventArgs e) {
-            _doubleClickTimer.RegisterKeyDown();
+            _triggerDoubleClickTimer.RegisterKeyDown();
             OnTriggerClicked(sender, e);
         }
 
         protected virtual void TriggerUnclickedHandler(object sender, ClickedEventArgs e) {
-            _doubleClickTimer.RegisterKeyUp();
+            _triggerDoubleClickTimer.RegisterKeyUp();
             OnTriggerUnclicked(sender, e);
         }
 
@@ -122,6 +136,14 @@ namespace TrekVRApplication {
 
         protected virtual void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
             OnMenuButtonClicked(sender, e);
+        }
+
+        protected virtual void MenuButtonUnlickedHandler(object sender, ClickedEventArgs e) {
+            OnMenuButtonUnclicked(sender, e);
+        }
+
+        protected virtual void MenuButtonLongPressHandler(object sender, ClickedEventArgs e) {
+            OnMenuButtonLongPress(sender, e);
         }
 
         protected virtual void GrippedHandler(object sender, ClickedEventArgs e) {

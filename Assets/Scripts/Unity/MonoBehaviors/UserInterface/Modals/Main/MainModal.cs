@@ -24,25 +24,18 @@ namespace TrekVRApplication {
                 if (value) {
                     OpenModal();
                     TerrainModel model = TerrainModelManager.Instance.CurrentVisibleModel;
-                    if (!model) {
-                        return;
-                    }
-                    if (model.GetType() == typeof(GlobalTerrainModel)) {
+                    if (model && model.GetType() == typeof(GlobalTerrainModel)) {
                         model.GetComponent<XRInteractablePlanet>()?.SwitchToMode(XRInteractablePlanetMode.Disabled);
                     } else {
-                        model.UseDisabledMaterial();
+                        model?.UseDisabledMaterial();
                     }
                 }
                 else {
                     TerrainModel model = TerrainModelManager.Instance.CurrentVisibleModel;
-                    if (!model) {
-                        return;
-                    }
-                    if (model.GetType() == typeof(GlobalTerrainModel)) {
+                    if (model && model.GetType() == typeof(GlobalTerrainModel)) {
                         model.GetComponent<XRInteractablePlanet>()?.SwitchToMode(XRInteractablePlanetMode.Navigate);
-                    }
-                    else {
-                        model.UseEnabledMaterial();
+                    } else {
+                        model?.UseEnabledMaterial();
                     }
                 }
                 base.Visible = value;
