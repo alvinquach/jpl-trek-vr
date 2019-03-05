@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace TrekVRApplication {
@@ -32,7 +32,7 @@ namespace TrekVRApplication {
             set { _maxDistance = value; }
         }
 
-        private float _distance;
+        private float _distance = float.PositiveInfinity;
         public float Distance {
             get {
                 return _distance;
@@ -46,7 +46,7 @@ namespace TrekVRApplication {
             }
         }
 
-        private bool _active;
+        private bool _active= false;
         public bool Active {
             get {
                 return _active;
@@ -58,7 +58,7 @@ namespace TrekVRApplication {
             }
         }
 
-        private bool _visible;
+        private bool _visible = true;
         public bool Visible {
             get {
                 return _visible;
