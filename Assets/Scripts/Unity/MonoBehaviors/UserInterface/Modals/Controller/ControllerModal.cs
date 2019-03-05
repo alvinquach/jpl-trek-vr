@@ -35,7 +35,8 @@ namespace TrekVRApplication {
             }
 
             // Register event handlers
-            _controller.OnMenuButtonClicked += MenuButtonClickedHandler;
+            _controller.OnMenuButtonPressed += MenuButtonPressedHandler;
+            _controller.OnMenuButtonLongPressed += MenuButtonLongPressedHandler;
 
             // Position the modal relative to the controller
             transform.localPosition = new Vector3((IsPrimary ? -1 : 1) * XOffset, YOffset, ZOffset);
@@ -48,7 +49,8 @@ namespace TrekVRApplication {
         }
 
         private void OnDestroy() {
-            _controller.OnMenuButtonClicked -= MenuButtonClickedHandler;
+            _controller.OnMenuButtonPressed -= MenuButtonPressedHandler;
+            _controller.OnMenuButtonPressed -= MenuButtonLongPressedHandler;
         }
 
         protected override int GetHeight() {
@@ -61,7 +63,9 @@ namespace TrekVRApplication {
 
         #region Controller event handlers
 
-        protected abstract void MenuButtonClickedHandler(object sender, ClickedEventArgs e);
+        protected abstract void MenuButtonPressedHandler(object sender, ClickedEventArgs e);
+
+        protected abstract void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e);
 
         #endregion
 
@@ -82,12 +86,15 @@ namespace TrekVRApplication {
             if (activity == ControllerModalActivity.BBoxSelection) {
                 TerrainModelManager terrainModelController = TerrainModelManager.Instance;
                 if (terrainModelController.GlobalPlanetModelIsVisible()) {
+
+                    // FIXME Need to set the mode for all the terrain models, not just the planet.
                     XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                     planet.SwitchToMode(XRInteractablePlanetMode.Select);
+
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                 } else {
                     terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code
-                    Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
+                    //Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
                     return;
                 }
             }

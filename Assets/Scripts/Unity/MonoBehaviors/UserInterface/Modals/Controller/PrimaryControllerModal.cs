@@ -10,14 +10,32 @@ namespace TrekVRApplication {
 
         #region Controller event handlers
 
-        protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
+        protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             UserInterfaceManager userInterfaceManager = UserInterfaceManager.Instance;
             if (userInterfaceManager.MainModal.Visible) {
-                userInterfaceManager.MainModal.Visible = false;
+                // TODO Navigate backwards in modal menu.
             }
             else {
                 userInterfaceManager.SecondaryControllerModal.StartActivity(ControllerModalActivity.Default);
                 userInterfaceManager.MainModal.Visible = true;
+            }
+        }
+
+        protected override void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e) {
+            UserInterfaceManager userInterfaceManager = UserInterfaceManager.Instance;
+            MainModal mainModal = userInterfaceManager.MainModal;
+            if (mainModal.Visible) {
+
+                // FIXME Need to set the mode for all the terrain models, not just the planet.
+                XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
+
+                mainModal.Visible = false;
+                mainModal.NavigateToRootMenu();
+            }
+            else {
+                userInterfaceManager.SecondaryControllerModal.StartActivity(ControllerModalActivity.Default);
+                mainModal.Visible = true;
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
+using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
@@ -14,28 +15,34 @@ namespace TrekVRApplication {
         private UnityBrowserSearchFunctions _searchFunctions;
         private UnityBrowserControllerFunctions _controllerFunctions;
 
+        /// <summary>
+        ///     <para>
+        ///         Whether the main model is visible.
+        ///     </para>
+        ///     <para>
+        ///         When the main modal's visiblity is set to true, then the mode of the
+        ///         current visible model will automatically be set to Disabled.
+        ///     </para>
+        ///     <para>
+        ///         However, when setting the main modal's visiblity to false, the mode of
+        ///         the currently visible model must be set manaully.
+        ///     </para>
+        /// </summary>
         public override bool Visible {
             get {
                 return _visible;
             }
-
-            // FIXME
             set {
                 if (value) {
                     OpenModal();
+                        
+                    // FIXME Need to set the mode for all the terrain models, not just the current model.
+                    // Or need to implement a way to inherit modes when switching to different models.
                     TerrainModel model = TerrainModelManager.Instance.CurrentVisibleModel;
                     if (model && model.GetType() == typeof(GlobalTerrainModel)) {
                         model.GetComponent<XRInteractablePlanet>()?.SwitchToMode(XRInteractablePlanetMode.Disabled);
                     } else {
                         model?.UseDisabledMaterial();
-                    }
-                }
-                else {
-                    TerrainModel model = TerrainModelManager.Instance.CurrentVisibleModel;
-                    if (model && model.GetType() == typeof(GlobalTerrainModel)) {
-                        model.GetComponent<XRInteractablePlanet>()?.SwitchToMode(XRInteractablePlanetMode.Navigate);
-                    } else {
-                        model?.UseEnabledMaterial();
                     }
                 }
                 base.Visible = value;
@@ -74,6 +81,10 @@ namespace TrekVRApplication {
             _webFunctions.RegisterFunctions();
             _searchFunctions.RegisterFunctions();
             _controllerFunctions.RegisterFunctions();
+        }
+
+        public void NavigateToRootMenu() {
+            ZFBrowserUtils.NavigateTo(Browser, $"{MainModalUrl}");
         }
 
         private void OpenModal() {

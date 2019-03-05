@@ -10,11 +10,11 @@ namespace TrekVRApplication {
 
         #region Controller event handlers
 
-        protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
+        protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             MainModal mainModal = UserInterfaceManager.Instance.MainModal;
             switch (CurrentActivity) {
                 case ControllerModalActivity.Default:
-                    mainModal.Visible = !mainModal.Visible;
+                    // TODO Turn on secondary controller menu.
                     break;
                 case ControllerModalActivity.BBoxSelection:
                     XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
@@ -26,6 +26,10 @@ namespace TrekVRApplication {
                     StartActivity(ControllerModalActivity.Default);
                     break;
             }
+        }
+
+        protected override void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e) {
+            StartActivity(ControllerModalActivity.Default);
         }
 
         #endregion

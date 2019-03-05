@@ -27,9 +27,9 @@ namespace TrekVRApplication {
             base.PadClickedHandler(sender, e);
         }
 
-        protected override void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
+        protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             _flashlight?.CycleNextColor();
-            base.MenuButtonClickedHandler(sender, e);
+            base.MenuButtonPressedHandler(sender, e);
         }
 
     }

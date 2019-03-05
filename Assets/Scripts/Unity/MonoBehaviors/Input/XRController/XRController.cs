@@ -11,6 +11,8 @@ namespace TrekVRApplication {
 
         private LongKeyPressTimer _menuButtonLongPressTimer;
 
+        private bool _menuButtonClicked = false;
+
         public XRControllerLaserPointer LaserPointer { get; protected set; }
 
         public SteamVR_TrackedController Controller { get; private set; }
@@ -22,9 +24,8 @@ namespace TrekVRApplication {
         public event Action<object, ClickedEventArgs> OnTriggerDoubleClicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnPadClicked = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnPadUnclicked = (sender, e) => {};
-        public event Action<object, ClickedEventArgs> OnMenuButtonClicked = (sender, e) => {};
-        public event Action<object, ClickedEventArgs> OnMenuButtonUnclicked = (sender, e) => {};
-        public event Action<object, ClickedEventArgs> OnMenuButtonLongPress = (sender, e) => {};
+        public event Action<object, ClickedEventArgs> OnMenuButtonPressed = (sender, e) => {};
+        public event Action<object, ClickedEventArgs> OnMenuButtonLongPressed = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnGripped = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnUngripped = (sender, e) => {};
         public event Action<object, ClickedEventArgs> OnPadTouched = (sender, e) => {};
@@ -50,8 +51,8 @@ namespace TrekVRApplication {
             Controller.TriggerUnclicked += TriggerUnclickedHandler;
             Controller.PadClicked += PadClickedHandler;
             Controller.PadUnclicked += PadUnclickedHandler;
-            Controller.MenuButtonClicked += MenuButtonClickedHandler;
-            Controller.MenuButtonUnclicked += MenuButtonUnlickedHandler;
+            Controller.MenuButtonClicked += MenuButtonClickedInternal;
+            Controller.MenuButtonUnclicked += MenuButtonUnclickedInternal;
             Controller.Gripped += GrippedHandler;
             Controller.Ungripped += UngrippedHandler;
 
@@ -65,8 +66,8 @@ namespace TrekVRApplication {
             Controller.TriggerUnclicked -= TriggerUnclickedHandler;
             Controller.PadClicked -= PadClickedHandler;
             Controller.PadUnclicked -= PadUnclickedHandler;
-            Controller.MenuButtonClicked -= MenuButtonClickedHandler;
-            Controller.MenuButtonUnclicked -= MenuButtonUnlickedHandler;
+            Controller.MenuButtonClicked -= MenuButtonClickedInternal;
+            Controller.MenuButtonUnclicked -= MenuButtonUnclickedInternal;
             Controller.Gripped -= GrippedHandler;
             Controller.Ungripped -= UngrippedHandler;
             Controller.PadTouched -= PadTouchedInternal;
@@ -88,6 +89,7 @@ namespace TrekVRApplication {
             if (_padTouched) {
                 PadSwipeHandler(Controller, GenerateClickedEventArgs());
             }
+            _menuButtonLongPressTimer.Update();
         }
 
         #region Internally used event handlers
@@ -102,12 +104,26 @@ namespace TrekVRApplication {
             PadUntouchedHandler(sender, e);
         }
 
-        private void TriggerDoubleClickedInternal() {
-            TriggerDoubleClickedHandler(Controller, GenerateClickedEventArgs());
+        private void MenuButtonClickedInternal(object sender, ClickedEventArgs e) {
+            _menuButtonClicked = true;
+            _menuButtonLongPressTimer.RegisterKeyDown();
+        }
+
+        private void MenuButtonUnclickedInternal(object sender, ClickedEventArgs e) {
+            if (_menuButtonClicked) {
+                _menuButtonClicked = false;
+                MenuButtonPressedHandler(sender, e);
+            }
+            _menuButtonLongPressTimer.RegisterKeyUp();
         }
 
         private void MenuButtonLongPressInternal() {
-            MenuButtonLongPressHandler(Controller, GenerateClickedEventArgs());
+            _menuButtonClicked = false;
+            MenuButtonLongPressedHandler(Controller, GenerateClickedEventArgs());
+        }
+
+        private void TriggerDoubleClickedInternal() {
+            TriggerDoubleClickedHandler(Controller, GenerateClickedEventArgs());
         }
 
         #endregion
@@ -134,16 +150,12 @@ namespace TrekVRApplication {
             OnPadUnclicked(sender, e);
         }
 
-        protected virtual void MenuButtonClickedHandler(object sender, ClickedEventArgs e) {
-            OnMenuButtonClicked(sender, e);
+        protected virtual void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
+            OnMenuButtonPressed(sender, e);
         }
 
-        protected virtual void MenuButtonUnlickedHandler(object sender, ClickedEventArgs e) {
-            OnMenuButtonUnclicked(sender, e);
-        }
-
-        protected virtual void MenuButtonLongPressHandler(object sender, ClickedEventArgs e) {
-            OnMenuButtonLongPress(sender, e);
+        protected virtual void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e) {
+            OnMenuButtonLongPressed(sender, e);
         }
 
         protected virtual void GrippedHandler(object sender, ClickedEventArgs e) {
