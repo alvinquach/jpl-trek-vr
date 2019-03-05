@@ -122,6 +122,36 @@ namespace TrekVRApplication {
             base.UngrippedHandler(sender, e);
         }
 
+        protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
+            UserInterfaceManager userInterfaceManager = UserInterfaceManager.Instance;
+            MainModal mainModal = userInterfaceManager.MainModal;
+            if (userInterfaceManager.MainModal.Visible) {
+                mainModal.XRBrowser.RegisterKeyPress(KeyCode.M);
+            }
+            else {
+                userInterfaceManager.SecondaryControllerModal.StartActivity(ControllerModalActivity.Default);
+                mainModal.Visible = true;
+            }
+        }
+
+        protected override void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e) {
+            UserInterfaceManager userInterfaceManager = UserInterfaceManager.Instance;
+            MainModal mainModal = userInterfaceManager.MainModal;
+            if (mainModal.Visible) {
+
+                // FIXME Need to set the mode for all the terrain models, not just the planet.
+                XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
+
+                mainModal.Visible = false;
+                mainModal.NavigateToRootMenu();
+            }
+            else {
+                userInterfaceManager.SecondaryControllerModal.StartActivity(ControllerModalActivity.Default);
+                mainModal.Visible = true;
+            }
+        }
+
         #endregion
 
         protected override void Awake() {

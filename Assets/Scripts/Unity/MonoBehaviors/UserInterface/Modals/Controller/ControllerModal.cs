@@ -28,15 +28,7 @@ namespace TrekVRApplication {
         public ControllerModalActivity CurrentActivity { get; private set; }
 
         protected override void Awake() {
-
             _controller = GetComponentInParent<XRController>();
-            if (!_controller) {
-                // TODO Throw exception
-            }
-
-            // Register event handlers
-            _controller.OnMenuButtonPressed += MenuButtonPressedHandler;
-            _controller.OnMenuButtonLongPressed += MenuButtonLongPressedHandler;
 
             // Position the modal relative to the controller
             transform.localPosition = new Vector3((IsPrimary ? -1 : 1) * XOffset, YOffset, ZOffset);
@@ -48,10 +40,7 @@ namespace TrekVRApplication {
             base.Awake();
         }
 
-        private void OnDestroy() {
-            _controller.OnMenuButtonPressed -= MenuButtonPressedHandler;
-            _controller.OnMenuButtonPressed -= MenuButtonLongPressedHandler;
-        }
+
 
         protected override int GetHeight() {
             return Resolution;
@@ -60,14 +49,6 @@ namespace TrekVRApplication {
         protected override int GetWidth() {
             return Mathf.RoundToInt(Width / Height * Resolution);
         }
-
-        #region Controller event handlers
-
-        protected abstract void MenuButtonPressedHandler(object sender, ClickedEventArgs e);
-
-        protected abstract void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e);
-
-        #endregion
 
         public virtual void StartActivity(ControllerModalActivity activity) {
 

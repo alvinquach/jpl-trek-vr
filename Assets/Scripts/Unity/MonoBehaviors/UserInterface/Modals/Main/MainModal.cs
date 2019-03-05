@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
 
@@ -13,7 +13,7 @@ namespace TrekVRApplication {
 
         private UnityBrowserWebFunctions _webFunctions;
         private UnityBrowserSearchFunctions _searchFunctions;
-        private UnityBrowserControllerFunctions _controllerFunctions;
+        private UnityBrowserUserInterfaceFunctions _userInterfaceFunctions;
         private UnityBrowserTerrainModelFunctions _terrainModelFunctions;
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace TrekVRApplication {
             }
         }
 
-        protected override string DefaultUrl { get; } = ZFBrowserConstants.BaseUrl;
+        protected override string DefaultUrl { get; } = BaseUrl;
 
         private GenerateCylindricalMenuMeshTask _generateMenuMeshTask;
         protected override GenerateMenuMeshTask GenerateMenuMeshTask {
@@ -75,14 +75,14 @@ namespace TrekVRApplication {
             base.Init(mesh);
             _webFunctions = new UnityBrowserWebFunctions(_browser);
             _searchFunctions = new UnityBrowserSearchFunctions(_browser);
-            _controllerFunctions = new UnityBrowserControllerFunctions(_browser);
+            _userInterfaceFunctions = new UnityBrowserUserInterfaceFunctions(_browser);
             _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(_browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {
             _webFunctions.RegisterFunctions();
             _searchFunctions.RegisterFunctions();
-            _controllerFunctions.RegisterFunctions();
+            _userInterfaceFunctions.RegisterFunctions();
             _terrainModelFunctions.RegisterFunctions();
         }
 

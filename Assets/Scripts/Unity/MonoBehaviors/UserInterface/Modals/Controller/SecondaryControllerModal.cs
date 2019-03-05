@@ -8,9 +8,23 @@ namespace TrekVRApplication {
             get { return false; }
         }
 
+        protected override void Awake() {
+            base.Awake();
+            if (!_controller) {
+                // TODO Throw exception
+            }
+            _controller.OnMenuButtonPressed += MenuButtonPressedHandler;
+            _controller.OnMenuButtonLongPressed += MenuButtonLongPressedHandler;
+        }
+
+        private void OnDestroy() {
+            _controller.OnMenuButtonPressed -= MenuButtonPressedHandler;
+            _controller.OnMenuButtonPressed -= MenuButtonLongPressedHandler;
+        }
+
         #region Controller event handlers
 
-        protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
+        private void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             MainModal mainModal = UserInterfaceManager.Instance.MainModal;
             switch (CurrentActivity) {
                 case ControllerModalActivity.Default:
@@ -28,7 +42,7 @@ namespace TrekVRApplication {
             }
         }
 
-        protected override void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e) {
+        private void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e) {
             StartActivity(ControllerModalActivity.Default);
         }
 

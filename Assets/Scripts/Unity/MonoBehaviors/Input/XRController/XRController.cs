@@ -7,9 +7,9 @@ namespace TrekVRApplication {
 
         private bool _padTouched = false;
 
-        private DoubleKeyPressTimer _triggerDoubleClickTimer;
+        private readonly DoubleKeyPressTimer _triggerDoubleClickTimer = new DoubleKeyPressTimer();
 
-        private LongKeyPressTimer _menuButtonLongPressTimer;
+        private readonly LongKeyPressTimer _menuButtonLongPressTimer = new LongKeyPressTimer();
 
         private bool _menuButtonClicked = false;
 
@@ -35,10 +35,7 @@ namespace TrekVRApplication {
         #endregion
 
         protected virtual void Awake() {
-            _triggerDoubleClickTimer = new DoubleKeyPressTimer();
             _triggerDoubleClickTimer.OnActionSuccess += TriggerDoubleClickedInternal;
-
-            _menuButtonLongPressTimer = new LongKeyPressTimer();
             _menuButtonLongPressTimer.OnActionSuccess += MenuButtonLongPressInternal;
 
             LaserPointer = GetComponent<XRControllerLaserPointer>();

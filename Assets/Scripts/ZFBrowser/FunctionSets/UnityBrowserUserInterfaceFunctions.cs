@@ -4,11 +4,11 @@ using ZenFulcrum.EmbeddedBrowser;
 
 namespace TrekVRApplication {
 
-    public class UnityBrowserControllerFunctions : UnityBrowserFunctionSet {
+    public class UnityBrowserUserInterfaceFunctions : UnityBrowserFunctionSet {
 
         protected override string FunctionsReadyVariable { get; } = "controllerFunctionsReady";
 
-        public UnityBrowserControllerFunctions(Browser browser) : base(browser) {
+        public UnityBrowserUserInterfaceFunctions(Browser browser) : base(browser) {
 
         }
 
@@ -20,6 +20,17 @@ namespace TrekVRApplication {
         [RegisterToBrowser]
         public void StartSecondaryControllerActivity(string activityName) {
             StartControllerActivity(activityName, false);
+        }
+
+        [RegisterToBrowser]
+        public void SetMainModalVisiblity(bool visible) {
+            UserInterfaceManager.Instance.MainModal.Visible = visible;
+            
+            // FIXME Need to set the mode for all the terrain models, not just the planet.
+            if (!visible) {
+                XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
+            }
         }
 
         private void StartControllerActivity(string activityName, bool primary) {

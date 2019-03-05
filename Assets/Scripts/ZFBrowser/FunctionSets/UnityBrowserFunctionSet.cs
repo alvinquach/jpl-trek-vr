@@ -14,7 +14,9 @@ namespace TrekVRApplication {
             typeof(JSONNode),
             typeof(int),
             typeof(float),
-            typeof(double)
+            typeof(double),
+            typeof(bool),
+            // TODO Add array type
         };
 
         [AttributeUsage(AttributeTargets.Method, Inherited = true)]

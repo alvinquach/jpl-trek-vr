@@ -20,9 +20,15 @@ namespace TrekVRApplication {
 
         [SerializeField]
         private PrimaryXRController _primaryController;
+        public PrimaryXRController PrimaryController {
+            get { return _primaryController; }
+        }
 
         [SerializeField]
         private SecondaryXRController _secondaryController;
+        public SecondaryXRController SecondaryController {
+            get { return _secondaryController; }
+        }
 
         [SerializeField]
         protected GameObject _cameraRig;
