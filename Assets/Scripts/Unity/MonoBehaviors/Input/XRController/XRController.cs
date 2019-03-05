@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace TrekVRApplication {
@@ -7,7 +7,7 @@ namespace TrekVRApplication {
 
         private bool _padTouched = false;
 
-        private DoubleKeyPressDetector _doubleClickDetector;
+        private DoubleKeyPressTimer _doubleClickTimer;
 
         public XRControllerLaserPointer LaserPointer { get; protected set; }
 
@@ -29,9 +29,9 @@ namespace TrekVRApplication {
 
         #endregion
 
-        private void Awake() {
-            _doubleClickDetector = new DoubleKeyPressDetector();
-            _doubleClickDetector.OnDoubleKeyPress += TriggerDoubleClickedInternal;
+        protected virtual void Awake() {
+            _doubleClickTimer = new DoubleKeyPressTimer();
+            _doubleClickTimer.OnDoubleKeyPress += TriggerDoubleClickedInternal;
 
             LaserPointer = GetComponent<XRControllerLaserPointer>();
         }
@@ -69,7 +69,7 @@ namespace TrekVRApplication {
             // Does this need to be unsubscribed, since the
             // DoubleKeyPressDetector instance is only referenced
             // in this object, so it will be destroyed anyways?
-            _doubleClickDetector.OnDoubleKeyPress -= TriggerDoubleClickedInternal;
+            _doubleClickTimer.OnDoubleKeyPress -= TriggerDoubleClickedInternal;
         }
 
         // Implementing classes should make a super call to this method if
@@ -99,12 +99,12 @@ namespace TrekVRApplication {
         #endregion
 
         protected virtual void TriggerClickedHandler(object sender, ClickedEventArgs e) {
-            _doubleClickDetector.RegisterKeyDown();
+            _doubleClickTimer.RegisterKeyDown();
             OnTriggerClicked(sender, e);
         }
 
         protected virtual void TriggerUnclickedHandler(object sender, ClickedEventArgs e) {
-            _doubleClickDetector.RegisterKeyUp();
+            _doubleClickTimer.RegisterKeyUp();
             OnTriggerUnclicked(sender, e);
         }
 

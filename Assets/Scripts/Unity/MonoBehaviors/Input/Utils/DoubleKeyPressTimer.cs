@@ -2,7 +2,7 @@
 
 namespace TrekVRApplication {
 
-    public class DoubleKeyPressDetector {
+    public class DoubleKeyPressTimer {
 
         private long _timeAtLastKeyDown = -1;
 
