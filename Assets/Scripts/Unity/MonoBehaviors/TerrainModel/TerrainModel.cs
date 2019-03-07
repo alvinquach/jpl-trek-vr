@@ -234,7 +234,7 @@ namespace TrekVRApplication {
                 float start = Time.realtimeSinceStartup;
 
                 // Task for loading texture data on a separate thread.
-                LoadColorImageFromFileTask<BGRAImage> loadImageTask = new LoadColorImageFromFileTask<BGRAImage>(_albedoFilePath);
+                LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(_albedoFilePath);
 
                 // Execute the task.
                 loadImageTask.Execute(image => {
@@ -244,7 +244,7 @@ namespace TrekVRApplication {
                     // Queue a task to apply texture on the main thread during the next update.
                     QueueTask(() => {
 
-                        TextureCompressionFormat format = TextureCompressionFormat.UncompressedWithAlpha;
+                        TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
 
                         //byte[] data = TextureUtils.GenerateMipmaps(image);
                         byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
