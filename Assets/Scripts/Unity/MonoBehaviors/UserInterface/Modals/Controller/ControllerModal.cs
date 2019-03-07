@@ -25,6 +25,8 @@ namespace TrekVRApplication {
 
         protected override string DefaultUrl { get; } = $"{BaseUrl}#{ControllerModalUrl}";
 
+        public ControllerModalInput Input { get; private set; }
+
         public ControllerModalActivity CurrentActivity { get; private set; }
 
         protected override void Awake() {
@@ -40,7 +42,10 @@ namespace TrekVRApplication {
             base.Awake();
         }
 
-
+        protected override void Init(Mesh mesh) {
+            base.Init(mesh);
+            Input = Browser.gameObject.AddComponent<ControllerModalInput>();
+        }
 
         protected override int GetHeight() {
             return Resolution;

@@ -122,6 +122,7 @@ namespace TrekVRApplication {
             base.UngrippedHandler(sender, e);
         }
 
+        // TODO Move this event handler to MainModal.cs
         protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             UserInterfaceManager userInterfaceManager = UserInterfaceManager.Instance;
             MainModal mainModal = userInterfaceManager.MainModal;

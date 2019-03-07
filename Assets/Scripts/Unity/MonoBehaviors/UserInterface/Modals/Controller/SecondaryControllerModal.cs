@@ -15,11 +15,15 @@ namespace TrekVRApplication {
             }
             _controller.OnMenuButtonPressed += MenuButtonPressedHandler;
             _controller.OnMenuButtonLongPressed += MenuButtonLongPressedHandler;
+            _controller.OnPadClicked += PadClickedHandler;
+            _controller.OnPadUnclicked += PadUnclickedHandler;
         }
 
         private void OnDestroy() {
             _controller.OnMenuButtonPressed -= MenuButtonPressedHandler;
             _controller.OnMenuButtonPressed -= MenuButtonLongPressedHandler;
+            _controller.OnPadClicked -= PadClickedHandler;
+            _controller.OnPadUnclicked -= PadUnclickedHandler;
         }
 
         #region Controller event handlers
@@ -44,6 +48,14 @@ namespace TrekVRApplication {
 
         private void MenuButtonLongPressedHandler(object sender, ClickedEventArgs e) {
             StartActivity(ControllerModalActivity.Default);
+        }
+
+        private void PadClickedHandler(object sender, ClickedEventArgs e) {
+
+        }
+
+        private void PadUnclickedHandler(object sender, ClickedEventArgs e) {
+
         }
 
         #endregion

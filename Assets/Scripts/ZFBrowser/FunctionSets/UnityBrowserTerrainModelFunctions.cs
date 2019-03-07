@@ -24,6 +24,7 @@ namespace TrekVRApplication {
             }
         }
 
+        // Temporary
         [RegisterToBrowser]
         public void AdjustLayer(int layer, int value) {
             Material material = TerrainModelManager.Instance.CurrentVisibleModel.CurrentMaterial;

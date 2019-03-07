@@ -6,6 +6,8 @@ namespace TrekVRApplication {
 
         protected MeshCollider _meshCollider;
 
+        public XRBrowser XRBrowser { get; protected set; }
+
         public override bool Visible {
             get {
                 return _visible;
@@ -18,8 +20,6 @@ namespace TrekVRApplication {
                 SetObjectsVisiblity(value, _meshRenderer, _meshCollider);
             }
         }
-
-        public XRBrowser XRBrowser { get; protected set; }
 
         protected override void Init(Mesh mesh) {
             base.Init(mesh);

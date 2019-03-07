@@ -39,11 +39,7 @@ namespace TrekVRApplication {
 
         protected abstract int GetHeight();
 
-
-        protected Browser _browser;
-        public Browser Browser {
-            get { return _browser; }
-        }
+        public Browser Browser { get; private set; }
 
         protected virtual void Awake() {
             Debug.Log(GenerateMenuMeshTask.GetType());
@@ -78,11 +74,10 @@ namespace TrekVRApplication {
             // Some hacky stuff
             ZFBrowserConfig.AddFlags();
 
-            _browser = gameObject.AddComponent<Browser>();
-            _browser.onLoad += OnBrowserLoad;
-            _browser.Url = DefaultUrl;
-            _browser.Resize(GetWidth(), GetHeight());
-            
+            Browser = gameObject.AddComponent<Browser>();
+            Browser.onLoad += OnBrowserLoad;
+            Browser.Url = DefaultUrl;
+            Browser.Resize(GetWidth(), GetHeight());
         }
 
         protected virtual Mesh ProcessMeshData(MeshData meshData) {
