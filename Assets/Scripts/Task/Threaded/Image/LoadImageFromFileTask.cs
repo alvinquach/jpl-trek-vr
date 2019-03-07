@@ -1,11 +1,9 @@
 ﻿
 namespace TrekVRApplication {
 
-    public class ConvertTextureFromFileTask : ThreadedTask<float, byte[]> {
+    public class LoadImageFromFileTask : ThreadedTask<float, BGRAImage> {
 
         private string _filepath;
-
-        private TextureCompressionFormat _textureFormat;
 
         private float _progress = 0.0f;
 
@@ -13,29 +11,32 @@ namespace TrekVRApplication {
 
         public int TextureHeight { get; private set; }
 
-        public ConvertTextureFromFileTask(string filepath, TextureCompressionFormat textureFormat = TextureCompressionFormat.DXT5) {
+        public LoadImageFromFileTask(string filepath) {
             _filepath = filepath;
-            _textureFormat = textureFormat;
         }
 
         public override float GetProgress() {
             return _progress;
         }
 
-        protected sealed override byte[] Task() {
+        protected sealed override BGRAImage Task() {
 
-            RGBAImage srcImage;
+            BGRAImage srcImage;
 
             // TODO Support other file types.
             // TODO Check if path is valid.
             using (TiffWrapper tiff = new TiffWrapper(_filepath)) {
-                srcImage = tiff.ToRGBAImage();
+                srcImage = tiff.ToBGRAImage();
             }
 
             TextureWidth = srcImage.Width;
             TextureHeight = srcImage.Height;
 
-            return TextureToolUtils.ImageToTexture(srcImage, _textureFormat);
+            return srcImage;
+
+            //return TextureUtils.GenerateMipmaps(srcImage);
+
+            //return TextureToolUtils.ImageToTexture(srcImage, _textureFormat);
         }
 
     }

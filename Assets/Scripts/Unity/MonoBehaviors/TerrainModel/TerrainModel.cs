@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -63,6 +65,8 @@ namespace TrekVRApplication {
                 _currentMaterial = value;
             }
         }
+
+
 
         protected TaskStatus _initTaskStatus = TaskStatus.NotStarted;
 
@@ -229,24 +233,26 @@ namespace TrekVRApplication {
 
                 float start = Time.realtimeSinceStartup;
 
-                TextureCompressionFormat textureFormat = TextureCompressionFormat.DXT1;
-
                 // Task for loading texture data on a separate thread.
-                ConvertTextureFromFileTask textureTask = new ConvertTextureFromFileTask(_albedoFilePath, textureFormat);
+                LoadImageFromFileTask loadImageTask = new LoadImageFromFileTask(_albedoFilePath);
 
                 // Execute the task.
-                textureTask.Execute((data) => {
+                loadImageTask.Execute((image) => {
 
-                    int width = textureTask.TextureWidth, height = textureTask.TextureHeight;
+                    int width = loadImageTask.TextureWidth, height = loadImageTask.TextureHeight;
 
                     // Queue a task to apply texture on the main thread during the next update.
                     QueueTask(() => {
                         Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to generate texture.");
                         start = Time.realtimeSinceStartup;
 
-                        Albedo = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
+                        TextureCompressionFormat format = TextureCompressionFormat.UncompressedWithAlpha;
+                        byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
+                        image.CopyRawBytes(data);
+
+                        Albedo = new Texture2D(width, height, format.GetUnityFormat(), true);
                         Albedo.GetRawTextureData<byte>().CopyFrom(data);
-                        Albedo.Apply();
+                        Albedo.Apply(true);
 
                         // Set albedo texture to both the enabled and disabled materials.
                         EnabledMaterial.SetTexture("_MainTex", Albedo);

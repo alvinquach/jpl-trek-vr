@@ -99,15 +99,19 @@ namespace TrekVRApplication {
             _mosaicWebService.GetMosaic(_squareBoundingBox, 1024, (textureFilePath) => {
                 _albedoFilePath = textureFilePath; // Should this be allowed?
 
-                // TODO Restructure base class to remove this duplicate logic.
-                TextureCompressionFormat textureFormat = TextureCompressionFormat.DXT1;
-                ConvertTextureFromFileTask textureTask = new ConvertTextureFromFileTask(textureFilePath, textureFormat);
-                textureTask.Execute((data) => {
-                    int width = textureTask.TextureWidth, height = textureTask.TextureHeight;
+                LoadImageFromFileTask loadImageTask = new LoadImageFromFileTask(textureFilePath);
+                loadImageTask.Execute((image) => {
+                    int width = loadImageTask.TextureWidth, height = loadImageTask.TextureHeight;
                     QueueTask(() => {
-                        Texture2D texture = new Texture2D(width, height, textureFormat.GetUnityFormat(), true);
+
+                        TextureCompressionFormat format = TextureCompressionFormat.UncompressedWithAlpha;
+                        byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
+                        image.CopyRawBytes(data);
+
+                        Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
                         texture.GetRawTextureData<byte>().CopyFrom(data);
-                        texture.Apply();
+                        texture.Apply(true);
+
                         CurrentMaterial.SetTexture("_MainTex", texture); // Assume Material is not null or default.
                     });
 

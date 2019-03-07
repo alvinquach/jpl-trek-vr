@@ -7,6 +7,7 @@ namespace TrekVRApplication {
     /// <summary>
     ///     Helper class for working with Nvidia Texture Tools (NVTT).
     /// </summary>
+    [Obsolete("nVidia Texture Tools is no longer used.")]
     public static class TextureToolUtils {
 
         private class BytesWrapper {

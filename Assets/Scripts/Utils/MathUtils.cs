@@ -12,7 +12,7 @@ namespace TrekVRApplication {
             1, 10, 100, 1000, 10000, 100000, 1000000, 10000000
         };
 
-        public static int Clamp(int value, int min, int max) {
+        public static int Clamp(int value, int min, int max = int.MaxValue) {
             return value < min ? min : value > max ? max : value;
         }
 
