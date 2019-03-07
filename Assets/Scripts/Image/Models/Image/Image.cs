@@ -1,48 +1,34 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public abstract class Image<T> {
+    public abstract class Image<T, DATA> : Image {
 
-        protected readonly T[,] _pixels;
+        protected abstract int DataPerPixel { get; }
 
-        public int Width { get; private set; }
+        protected DATA[] _rawData;
 
-        public int Height { get; private set; }
+        public int Size {
+            get {
+                return Marshal.SizeOf(_rawData[0]) * _rawData.Length;
+            }
+        }
 
-        public Image(int width, int height) {
-            Width = width;
-            Height = height;
-            _pixels = new T[width, height];
+        public Image(int width, int height) : base(width, height) {
+            _rawData = new DATA[width * height * DataPerPixel];
         }
 
         /// <summary>
         ///     Sets the value of a pixel. Out of bounds handled; if the coordinates 
         ///     are not within valid range, then this method won't do anything.
         /// </summary>
-        public virtual void SetPixel(int x, int y, T value) {
-            if (IsOutOfBounds(x, y)) {
-                return;
-            }
-            _pixels[x, y] = value;
-        }
+        public abstract void SetPixel(int x, int y, T value);
 
-        public virtual T GetPixel(int x, int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.Repeat) {
-            if (IsOutOfBounds(x, y)) {
-                if (boundaryMode == ImageBoundaryMode.Wrap) {
-                    x %= Width;
-                    y %= Height;
-                }
-                else if (boundaryMode == ImageBoundaryMode.Repeat) {
-                    x = MathUtils.Clamp(x, 0, Width - 1);
-                    y = MathUtils.Clamp(y, 0, Height - 1);
-                }
-                else {
-                    return DefaultValue();
-                }
-            }
-            return _pixels[x, y];
-        }
+        public abstract T GetPixel(int x, int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.Repeat);
+
+        public abstract DATA[] GetRawPixel(int x, int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None);
 
         public virtual T GetAverage(int x, int y, int size, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
             return GetAverage(x, y, size, size, boundaryMode);
@@ -59,23 +45,57 @@ namespace TrekVRApplication {
             return GetAverage(offset.x, offset.y, width, height, boundaryMode);
         }
 
-        public abstract byte[] ToByteArray();
+        public void CopyRawData(DATA[] destinationArray, long destinationIndex = 0) {
+            Array.Copy(_rawData, 0, destinationArray, destinationIndex, _rawData.Length);
+        }
 
-        protected abstract T DefaultValue();
+        protected long GetPixelOffet(int x, int y) {
+            return (x + Width * y) * DataPerPixel;
+        }
+
+    }
+
+    public abstract class Image {
+
+        public int Width { get; private set; }
+
+        public int Height { get; private set; }
+
+        public Image(int width, int height) {
+            Width = width;
+            Height = height;
+        }
 
         protected bool IsOutOfBounds(int x, int y) {
             return x < 0 || y < 0 || x > Width - 1 || y > Height - 1;
         }
 
-        public static bool operator true(Image<T> o) {
+        protected bool AdjustCoordinates(ref int x, ref int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
+            if (IsOutOfBounds(x, y)) {
+                if (boundaryMode == ImageBoundaryMode.Wrap) {
+                    x %= Width;
+                    y %= Height;
+                }
+                else if (boundaryMode == ImageBoundaryMode.Repeat) {
+                    x = MathUtils.Clamp(x, 0, Width - 1);
+                    y = MathUtils.Clamp(y, 0, Height - 1);
+                }
+                else {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool operator true(Image o) {
             return o != null;
         }
 
-        public static bool operator false(Image<T> o) {
+        public static bool operator false(Image o) {
             return o == null;
         }
 
-        public static bool operator !(Image<T> o) {
+        public static bool operator !(Image o) {
             return o ? false : true;
         }
 

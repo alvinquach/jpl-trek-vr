@@ -99,14 +99,14 @@ namespace TrekVRApplication {
             _mosaicWebService.GetMosaic(_squareBoundingBox, 1024, (textureFilePath) => {
                 _albedoFilePath = textureFilePath; // Should this be allowed?
 
-                LoadImageFromFileTask loadImageTask = new LoadImageFromFileTask(textureFilePath);
+                LoadBGRAImageFromFileTask loadImageTask = new LoadBGRAImageFromFileTask(textureFilePath);
                 loadImageTask.Execute((image) => {
                     int width = loadImageTask.TextureWidth, height = loadImageTask.TextureHeight;
                     QueueTask(() => {
 
                         TextureCompressionFormat format = TextureCompressionFormat.UncompressedWithAlpha;
                         byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                        image.CopyRawBytes(data);
+                        image.CopyRawData(data);
 
                         Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
                         texture.GetRawTextureData<byte>().CopyFrom(data);

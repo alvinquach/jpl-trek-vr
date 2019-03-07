@@ -1,8 +1,36 @@
-﻿namespace TrekVRApplication {
+﻿using System;
 
-    public class IntensityImage : Image<float> {
+namespace TrekVRApplication {
 
-        public IntensityImage(int width, int height) : base(width, height) { }
+    public class IntensityImage : Image<float, float> {
+
+        protected override int DataPerPixel {
+            get { return 1; }
+        }
+
+        public IntensityImage(int width, int height) : base(width, height) {
+
+        }
+
+        public override void SetPixel(int x, int y, float value) {
+            if (IsOutOfBounds(x, y)) {
+                return;
+            }
+            long offset = GetPixelOffet(x, y);
+            _rawData[offset] = value;
+        }
+
+        public override float GetPixel(int x, int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
+            if (!AdjustCoordinates(ref x, ref y, boundaryMode)) {
+                return default;
+            }
+            long offset = GetPixelOffet(x, y);
+            return _rawData[offset];
+        }
+
+        public override float[] GetRawPixel(int x, int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
+            return new float[] { GetPixel(x, y, boundaryMode) };
+        }
 
         public override float GetAverage(int x, int y, int width, int height, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
 
@@ -30,15 +58,6 @@
             }
 
             return sum / count;
-        }
-
-        public override byte[] ToByteArray() {
-            // TODO Implement this
-            throw new System.NotImplementedException();
-        }
-
-        protected override float DefaultValue() {
-            return 0.0f;
         }
 
     }

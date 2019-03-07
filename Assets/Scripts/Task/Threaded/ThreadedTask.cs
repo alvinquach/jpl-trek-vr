@@ -9,6 +9,9 @@ namespace TrekVRApplication {
 
         public TaskStatus Status { get; private set; } = TaskStatus.NotStarted;
 
+        /// <summary>
+        ///     Execute the task asynchronously in a new thread.
+        /// </summary>
         public void Execute(Action<Result> callback = null) {
             if (Status >= TaskStatus.Started) {
                 // TODO Throw exception.
@@ -22,6 +25,13 @@ namespace TrekVRApplication {
                 callback?.Invoke(result);
                 Status = TaskStatus.Completed;
             });
+        }
+
+        /// <summary>
+        ///     Execute the task synchronously in the current thread.
+        /// </summary>
+        public Result ExecuteInSameThread() {
+            return Task();
         }
 
         public abstract Progress GetProgress();

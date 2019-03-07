@@ -20,7 +20,7 @@ namespace TrekVRApplication {
             _uvBounds = uvBounds;
         }
 
-        protected override MeshData GenerateForLod(Image<float> image, int downsample) {
+        protected override MeshData GenerateForLod(IntensityImage image, int downsample) {
 
             // Downsampling rate must be a power of 2.
             if (!MathUtils.IsPowerOfTwo(downsample)) {

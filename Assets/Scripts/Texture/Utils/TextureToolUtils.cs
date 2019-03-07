@@ -26,7 +26,8 @@ namespace TrekVRApplication {
         public static byte[] ImageToTexture(RGBAImage image, TextureCompressionFormat format = TextureCompressionFormat.DXT5, bool mipmaps = true) {
 
             // Retrieve the raw pixel data from the image.
-            byte[] srcBytes = image.ToByteArray();
+            byte[] srcBytes = new byte[image.Size];
+            image.CopyRawData(srcBytes);
 
             /* 
              * Allocate a handle for the pixel data so that it doesn't get garbage collected.

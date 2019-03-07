@@ -1,7 +1,9 @@
 ﻿
+using System;
+
 namespace TrekVRApplication {
 
-    public class LoadImageFromFileTask : ThreadedTask<float, BGRAImage> {
+    public abstract class LoadImageFromFileTask<T> : ThreadedTask<float, T> where T : Image {
 
         private string _filepath;
 
@@ -19,14 +21,15 @@ namespace TrekVRApplication {
             return _progress;
         }
 
-        protected sealed override BGRAImage Task() {
+        protected sealed override T Task() {
 
-            BGRAImage srcImage;
+            T srcImage;
 
             // TODO Support other file types.
             // TODO Check if path is valid.
             using (TiffWrapper tiff = new TiffWrapper(_filepath)) {
-                srcImage = tiff.ToBGRAImage();
+                VerifyImageFormat(tiff);
+                srcImage = GetImage(tiff);
             }
 
             TextureWidth = srcImage.Width;
@@ -38,6 +41,14 @@ namespace TrekVRApplication {
 
             //return TextureToolUtils.ImageToTexture(srcImage, _textureFormat);
         }
+
+        protected virtual void VerifyImageFormat(TiffWrapper tiff) {
+            if (!tiff || !tiff.Metadata) {
+                throw new Exception("TIFF file cannot be null.");
+            }
+        }
+
+        protected abstract T GetImage(TiffWrapper tiff);
 
     }
 
