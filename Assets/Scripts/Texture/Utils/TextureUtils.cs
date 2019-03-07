@@ -72,47 +72,35 @@ namespace TrekVRApplication {
             return mipWidth * mipHeight * format.BitsPerPixel();
         }
 
-        public static byte[] GenerateMipmaps(RGBAImage image) {
+        public static byte[] GenerateMipmaps(BGRAImage image) {
             int width = image.Width;
             int height = image.Height;
             if (!MathUtils.IsPowerOfTwo(width) || !MathUtils.IsPowerOfTwo(height)) {
                 throw new Exception("Image dimensions must by power of 2");
             }
             long size = ComputeTextureSize(width, height, TextureCompressionFormat.UncompressedWithAlpha);
-            Debug.Log($"AAAAAAAAAAAAAAAA Size = {size}");
-
             byte[] result = new byte[size];
-            byte[] mipData = image.ToByteArray();
-            Array.Copy(mipData, result, mipData.Length);
-            Debug.Log("BBBBBBBBBBBBBBB Generated level " + 0 + " mipmap, size: " + mipData.Length);
-            GenerateMipmaps(image, result, mipData.Length, 1);
+            image.CopyRawData(result);
+            Debug.Log($"Generated level {0} mipmap ({image.Size} bytes, width: {width}, height: {height})");
+            GenerateMipmaps(image, result, image.Size, 1);
             return result;
         }
 
-        private static void GenerateMipmaps(RGBAImage image, byte[] result, long resultIndex, int count) {
+        private static void GenerateMipmaps(BGRAImage image, byte[] result, long resultIndex, int level) {
             int mipWidth = MathUtils.Clamp(image.Width >> 1, 1);
             int mipHeight = MathUtils.Clamp(image.Height >> 1, 1);
-            RGBAImage mipImage = new RGBAImage(mipWidth, mipHeight);
-            Debug.Log("CCCCCCCCCCCCCCCCC Starting level " + count + " mipmap " + $"width: {mipWidth}, height: {mipHeight}");
+            BGRAImage mipImage = new BGRAImage(mipWidth, mipHeight);
             for (int x = 0; x < mipWidth; x++) {
                 for (int y = 0; y < mipHeight; y++) {
                     mipImage.SetPixel(x, y, image.GetAverage(x << 1, y << 1, 2, ImageBoundaryMode.Wrap));
                 }
             }
-            byte[] mipData = mipImage.ToByteArray();
-            Debug.Log("DDDDDDDDDDDDDDDDDDDDDDDDDd");
-            try {
-                Array.Copy(mipData, 0, result, resultIndex, mipData.Length);
-            }
-            catch (Exception e) {
-                Debug.LogError(e.Message);
-            }
-            Debug.Log("BBBBBBBBBBBBBBB Generated level " + count + " mipmap, size: " + mipData.Length);
+            mipImage.CopyRawData(result, resultIndex);
+            Debug.Log($"Generated level {level} mipmap ({mipImage.Size} bytes, width: {mipWidth}, height: {mipHeight})");
             if (mipWidth == 1 && mipHeight == 1) {
-                Debug.Log("EEEEEEEEEEEEEEEEEEEE FINISHED MIPMAPS");
                 return;
             }
-            GenerateMipmaps(mipImage, result, mipData.Length + resultIndex, count++);
+            GenerateMipmaps(mipImage, result, mipImage.Size + resultIndex, level++);
         }
 
     }
