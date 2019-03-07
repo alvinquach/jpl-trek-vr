@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TrekVRApplication {
 
     [Obsolete("Use BGRAImage instead.")]
-    public class RGBAImage : Image<Color32, byte> {
+    public class RGBAImage : ColorImage {
 
         protected override int DataPerPixel {
             get { return 4; }
@@ -36,16 +36,6 @@ namespace TrekVRApplication {
                 _rawData[offset + 1],
                 _rawData[offset + 3]
             );
-        }
-
-        public override byte[] GetRawPixel(int x, int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
-            if (!AdjustCoordinates(ref x, ref y, boundaryMode)) {
-                return default;
-            }
-            long offset = GetPixelOffet(x, y);
-            byte[] pixel = new byte[DataPerPixel];
-            Array.Copy(_rawData, offset, pixel, 0, DataPerPixel);
-            return pixel;
         }
 
         public override Color32 GetAverage(int x, int y, int width, int height, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {

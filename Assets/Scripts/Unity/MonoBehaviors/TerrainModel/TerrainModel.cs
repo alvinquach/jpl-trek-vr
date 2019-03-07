@@ -234,7 +234,7 @@ namespace TrekVRApplication {
                 float start = Time.realtimeSinceStartup;
 
                 // Task for loading texture data on a separate thread.
-                LoadBGRAImageFromFileTask loadImageTask = new LoadBGRAImageFromFileTask(_albedoFilePath);
+                LoadColorImageFromFileTask<BGRAImage> loadImageTask = new LoadColorImageFromFileTask<BGRAImage>(_albedoFilePath);
 
                 // Execute the task.
                 loadImageTask.Execute(image => {

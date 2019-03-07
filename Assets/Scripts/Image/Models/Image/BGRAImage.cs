@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public class BGRAImage : Image<Color32, byte> {
+    public class BGRAImage : ColorImage {
 
         protected override int DataPerPixel {
             get { return 4; }
@@ -37,18 +36,8 @@ namespace TrekVRApplication {
             );
         }
 
-        public override byte[] GetRawPixel(int x, int y, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
-            if (!AdjustCoordinates(ref x, ref y, boundaryMode)) {
-                return default;
-            }
-            long offset = GetPixelOffet(x, y);
-            byte[] pixel = new byte[DataPerPixel];
-            Array.Copy(_rawData, offset, pixel, 0, DataPerPixel);
-            return pixel;
-        }
-
         public override Color32 GetAverage(int x, int y, int width, int height, ImageBoundaryMode boundaryMode = ImageBoundaryMode.None) {
-            int[] sum = new int[] { 0, 0, 0, 0 };
+            int[] sum = new int[DataPerPixel];
             int count = 0;
 
             for (int j = y; j < y + height; j++) {
@@ -67,7 +56,7 @@ namespace TrekVRApplication {
 
                     // Call GetPixel() instead of accessing the pixel array directly to handle boundaries.
                     byte[] pixel = GetRawPixel(i, j, boundaryMode);
-                    for (int k = 0; k < 4; k++) {
+                    for (int k = 0; k < DataPerPixel; k++) {
                         sum[k] += pixel[k];
                     }
                     count++;
