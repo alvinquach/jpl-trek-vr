@@ -64,23 +64,28 @@ namespace TrekVRApplication {
 
             // Switch to new acivity.
             // TODO Convert this to switch case.
-            if (activity == ControllerModalActivity.BBoxSelection) {
-                TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-                if (terrainModelController.GlobalPlanetModelIsVisible()) {
+            switch (activity) {
+                case ControllerModalActivity.BBoxSelection:
+                    TerrainModelManager terrainModelController = TerrainModelManager.Instance;
+                    if (terrainModelController.GlobalPlanetModelIsVisible()) {
 
-                    // FIXME Need to set the mode for all the terrain models, not just the planet.
-                    XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                    planet.SwitchToMode(XRInteractablePlanetMode.Select);
+                        // FIXME Need to set the mode for all the terrain models, not just the planet.
+                        XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                        planet.SwitchToMode(XRInteractablePlanetMode.Select);
 
+                        UserInterfaceManager.Instance.MainModal.Visible = false;
+                    }
+                    else {
+                        terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code
+                        //Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
+                        return;
+                    }
+                    break;
+                case ControllerModalActivity.BookmarkResults:
+                case ControllerModalActivity.ProductResults:
+                case ControllerModalActivity.LayerManager:
                     UserInterfaceManager.Instance.MainModal.Visible = false;
-                } else {
-                    terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code
-                    //Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
-                    return;
-                }
-            }
-            else if (activity == ControllerModalActivity.BookmarkResults || activity == ControllerModalActivity.ProductResults) {
-                UserInterfaceManager.Instance.MainModal.Visible = false;
+                    break;
             }
 
             Visible = activity != ControllerModalActivity.Default;

@@ -24,6 +24,14 @@ namespace TrekVRApplication {
             }
         }
 
+        [RegisterToBrowser]
+        public void AdjustLayer(int layer, int value) {
+            Material material = TerrainModelManager.Instance.CurrentVisibleModel.CurrentMaterial;
+            if (material) {
+                material.SetFloat($"Diffuse{layer}", value / 100.0f);
+            }
+        }
+
     }
 
 }
