@@ -239,23 +239,23 @@ namespace TrekVRApplication {
                 // Execute the task.
                 loadImageTask.Execute(image => {
 
-                    int width = loadImageTask.TextureWidth, height = loadImageTask.TextureHeight;
+                    int width = loadImageTask.TextureWidth;
+                    int height = loadImageTask.TextureHeight;
+
+                    TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
+
+                    //byte[] data = TextureUtils.GenerateMipmaps(image);
+                    byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
+                    image.CopyRawData(data);
 
                     // Queue a task to apply texture on the main thread during the next update.
                     QueueTask(() => {
-
-                        TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
-
-                        //byte[] data = TextureUtils.GenerateMipmaps(image);
-                        byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                        image.CopyRawData(data);
-
                         Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to generate texture.");
                         start = Time.realtimeSinceStartup;
 
                         Albedo = new Texture2D(width, height, format.GetUnityFormat(), true);
                         Albedo.GetRawTextureData<byte>().CopyFrom(data);
-                        Albedo.Apply(true);
+                        Albedo.Apply(true, true);
 
                         // Set albedo texture to both the enabled and disabled materials.
                         EnabledMaterial.SetTexture("_MainTex", Albedo);

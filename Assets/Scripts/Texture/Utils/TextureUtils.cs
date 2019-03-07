@@ -72,13 +72,13 @@ namespace TrekVRApplication {
             return mipWidth * mipHeight * format.BitsPerPixel();
         }
 
-        public static byte[] GenerateMipmaps(BGRAImage image) {
+        public static byte[] GenerateMipmaps(RGBImage image) {
             int width = image.Width;
             int height = image.Height;
             if (!MathUtils.IsPowerOfTwo(width) || !MathUtils.IsPowerOfTwo(height)) {
                 throw new Exception("Image dimensions must by power of 2");
             }
-            long size = ComputeTextureSize(width, height, TextureCompressionFormat.UncompressedWithAlpha);
+            long size = ComputeTextureSize(width, height, TextureCompressionFormat.Uncompressed);
             byte[] result = new byte[size];
             image.CopyRawData(result);
             Debug.Log($"Generated level {0} mipmap ({image.Size} bytes, width: {width}, height: {height})");
@@ -86,21 +86,21 @@ namespace TrekVRApplication {
             return result;
         }
 
-        private static void GenerateMipmaps(BGRAImage image, byte[] result, long resultIndex, int level) {
+        private static void GenerateMipmaps(RGBImage image, byte[] result, long resultIndex, int level) {
             int mipWidth = MathUtils.Clamp(image.Width >> 1, 1);
             int mipHeight = MathUtils.Clamp(image.Height >> 1, 1);
-            BGRAImage mipImage = new BGRAImage(mipWidth, mipHeight);
+            RGBImage mipImage = new RGBImage(mipWidth, mipHeight);
             for (int x = 0; x < mipWidth; x++) {
                 for (int y = 0; y < mipHeight; y++) {
                     mipImage.SetPixel(x, y, image.GetAverage(x << 1, y << 1, 2, ImageBoundaryMode.Wrap));
                 }
             }
             mipImage.CopyRawData(result, resultIndex);
-            Debug.Log($"Generated level {level} mipmap ({mipImage.Size} bytes, width: {mipWidth}, height: {mipHeight})");
+            Debug.Log($"Generated level {level++} mipmap ({mipImage.Size} bytes, width: {mipWidth}, height: {mipHeight})");
             if (mipWidth == 1 && mipHeight == 1) {
                 return;
             }
-            GenerateMipmaps(mipImage, result, mipImage.Size + resultIndex, level++);
+            GenerateMipmaps(mipImage, result, mipImage.Size + resultIndex, level);
         }
 
     }
