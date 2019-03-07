@@ -45,7 +45,7 @@ namespace TrekVRApplication {
                     Color32 pixel = _pixels[x, y];
 
                     // This is ouput in BGRA format to work with NVTT.
-                    // TODO Add option parametero to output in other formats.
+                    // TODO Add option parameters to output in other formats.
                     bytes[index] = pixel.b;
                     bytes[index + 1] = pixel.g;
                     bytes[index + 2] = pixel.r;

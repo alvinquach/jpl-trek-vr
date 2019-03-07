@@ -90,23 +90,23 @@ namespace TrekVRApplication {
                 // BeginImageHandler. This is called for each mip level.
                 (size, width, height, depth, face, miplevel) => {
                     mipIndex = miplevel; // Set the current mipmap level.
-            },
+                },
 
                 // OutputHandler. This is called for header data and for each mip level.
                 (data, size) => {
                     if (mipIndex == -1) {
-                    // Header data, do nothing.
-                }
+                        // Header data, do nothing.
+                    }
                     else {
 
-                    // Resize the destination array if needed.
-                    int currentSize = destBytes.Bytes.Length;
+                        // Resize the destination array if needed.
+                        int currentSize = destBytes.Bytes.Length;
                         if (currentSize - destIndex < size) {
                             Array.Resize(ref destBytes.Bytes, destIndex + size);
                         }
 
-                    // Copy the generated mip data into the destination array.
-                    Marshal.Copy(data, destBytes.Bytes, destIndex, size);
+                        // Copy the generated mip data into the destination array.
+                        Marshal.Copy(data, destBytes.Bytes, destIndex, size);
 
                         destIndex += size;
                     }
@@ -115,8 +115,8 @@ namespace TrekVRApplication {
 
                 // EndImageHandler
                 () => {
-                // Do nothing.
-            }
+                    // Do nothing.
+                }
             );
             return outputOptions;
         }
