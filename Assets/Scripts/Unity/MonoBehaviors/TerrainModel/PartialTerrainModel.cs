@@ -112,7 +112,7 @@ namespace TrekVRApplication {
                         texture.GetRawTextureData<byte>().CopyFrom(data);
                         texture.Apply(true);
 
-                        CurrentMaterial.SetTexture("_MainTex", texture); // Assume Material is not null or default.
+                        CurrentMaterial.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
                     });
 
                 });
