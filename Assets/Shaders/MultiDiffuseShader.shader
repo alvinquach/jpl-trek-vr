@@ -32,6 +32,7 @@
         sampler2D _Diffuse2;
         sampler2D _Diffuse3;
 
+		// TODO Add UVs from other textures.
         struct Input {
             float2 uv_DiffuseBase;
         };

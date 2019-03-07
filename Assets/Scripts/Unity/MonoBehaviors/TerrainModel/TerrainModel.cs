@@ -258,8 +258,8 @@ namespace TrekVRApplication {
                         Albedo.Apply(true, true);
 
                         // Set albedo texture to both the enabled and disabled materials.
-                        EnabledMaterial.SetTexture("_MainTex", Albedo);
-                        DisabledMaterial.SetTexture("_MainTex", Albedo);
+                        EnabledMaterial.SetTexture("_DiffuseBase", Albedo);
+                        DisabledMaterial.SetTexture("_DiffuseBase", Albedo);
 
                         Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
                     });
