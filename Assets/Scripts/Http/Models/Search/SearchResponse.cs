@@ -27,17 +27,20 @@ namespace TrekVRApplication.SearchResponse {
     }
 
     public class Document {
-        public string productLabel;
+        public string bbox;
+        public string dataProjection;
+        public string description;
+        public bool hasAttach;
+        public string instrument;
         public string item_DBID;
+        public string item_UUID;
         public string itemType;
         public string keyword;
-        public string title;
-        public string item_UUID;
-        public string shape;
-        public string bbox;
+        public string productLabel;
         public string productType;
-        public string dataProjection;
-        public bool hasAttach;
+        public string shape;
+        public string thumbnailURLDir;
+        public string title;
         public long _version_;
     }
 
