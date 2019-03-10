@@ -22,7 +22,7 @@ namespace TrekVRApplication {
         public virtual bool Visible {
             get {
                 return _visible;
-}
+            }
             set {
                 _visible = value;
                 Browser.EnableInput = value;

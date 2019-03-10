@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
+using ZenFulcrum.EmbeddedBrowser;
 
 namespace TrekVRApplication {
 
     public class SecondaryControllerModal : ControllerModal {
+
+        private UnityBrowserTerrainModelFunctions _terrainModelFunctions;
+
+        private KeyCode _padCurrentKey = 0;
 
         public override bool IsPrimary {
             get { return false; }
@@ -24,6 +29,15 @@ namespace TrekVRApplication {
             _controller.OnMenuButtonPressed -= MenuButtonLongPressedHandler;
             _controller.OnPadClicked -= PadClickedHandler;
             _controller.OnPadUnclicked -= PadUnclickedHandler;
+        }
+
+        protected override void Init(Mesh mesh) {
+            base.Init(mesh);
+            _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(Browser);
+        }
+
+        protected override void OnBrowserLoad(JSONNode loadData) {
+            _terrainModelFunctions.RegisterFunctions();
         }
 
         #region Controller event handlers
@@ -51,11 +65,23 @@ namespace TrekVRApplication {
         }
 
         private void PadClickedHandler(object sender, ClickedEventArgs e) {
-
+            if (_padCurrentKey != 0) {
+                return;
+            }
+            if (Mathf.Abs(e.padX) > Mathf.Abs(e.padY)) {
+                _padCurrentKey = e.padX < 0 ? KeyCode.A : KeyCode.D;
+            } else {
+                _padCurrentKey = e.padY < 0 ? KeyCode.S : KeyCode.W;
+            }
+            Input.RegisterKeyDown(_padCurrentKey);
         }
 
         private void PadUnclickedHandler(object sender, ClickedEventArgs e) {
-
+            if (_padCurrentKey == 0) {
+                return;
+            }
+            Input.RegisterKeyUp(_padCurrentKey);
+            _padCurrentKey = 0;
         }
 
         #endregion

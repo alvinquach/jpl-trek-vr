@@ -18,6 +18,18 @@ namespace TrekVRApplication {
 
         public abstract bool IsPrimary { get; }
 
+        public override bool Visible {
+            get {
+                return base.Visible;
+            }
+            set {
+                base.Visible = value;
+                if (Input) {
+                    Input.SetVisiblityState(value);
+                }
+            }
+        }
+
         private GeneratePlanarMenuMeshTask _generateMenuMeshTask;
         protected override GenerateMenuMeshTask GenerateMenuMeshTask {
             get { return _generateMenuMeshTask; }
