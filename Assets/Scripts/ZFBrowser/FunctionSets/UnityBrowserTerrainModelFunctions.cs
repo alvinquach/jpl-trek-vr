@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 
@@ -31,6 +32,27 @@ namespace TrekVRApplication {
             if (material) {
                 material.SetFloat($"Diffuse{layer}", value / 100.0f);
             }
+        }
+
+        // Temporary
+        [RegisterToBrowser]
+        public void GetCurrentLayers(string requestId) {
+            // TODO Un-hardcode this data
+            IList<object> layers = new List<object>() {
+                new Dictionary<string, object>() {
+                    { "name", "Test Texture" },
+                    { "opacity", 0 }
+                },
+                new Dictionary<string, object>() {
+                    { "name", "mola_roughness" },
+                    { "opacity", 0 }
+                },
+                new Dictionary<string, object>() {
+                    { "name", "Mars_MGS_MOLA_ClrShade_merge_global_463m" },
+                    { "opacity", 0 }
+                }
+            };
+            ZFBrowserUtils.SendDataResponse(_browser, requestId, layers);
         }
 
     }
