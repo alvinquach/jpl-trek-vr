@@ -1,4 +1,4 @@
-﻿namespace TrekVRApplication {
+namespace TrekVRApplication {
 
     public class ZFBrowserConstants {
 
@@ -11,6 +11,7 @@
         public const string BoundingBoxSelectionModalName = "ControllerModalBoundingBoxSelectionComponent";
 
         public const string UnityGlobalObjectName = "UnityGlobalVariables";
+        public const string DataServiceName = "UnityDataService";
         public const string HttpServiceName = "UnityHttpService";
         public const string SearchServiceName = "UnitySearchService";
 

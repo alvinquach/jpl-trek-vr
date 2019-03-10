@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using TrekVRApplication.SearchResponse;
-using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
 
@@ -63,7 +60,7 @@ namespace TrekVRApplication {
         public static void SendResponse(Browser browser, string requestId, SearchResult data) {
             string response = JsonConvert.SerializeObject(data, JsonConfig.SerializerSettings);
             response = response.Replace(@"\", @"\\"); // Need to replace single backslash with double when evaluating JS.
-            browser.EvalJS($"{AngularInjectableContainerPath}.{SearchServiceName}.fulfillSearchRequest(`{requestId}`, `{response}`);");
+            browser.EvalJS($"{AngularInjectableContainerPath}.{SearchServiceName}.fulfillRequest(`{requestId}`, `{response}`);");
         }
 
     }

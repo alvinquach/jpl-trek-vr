@@ -43,7 +43,7 @@ namespace TrekVRApplication {
 
         public BrowserCursor BrowserCursor { get; private set; }
 
-        public BrowserInputSettings InputSettings { get; private set; } = new BrowserInputSettings();
+        public BrowserInputSettings InputSettings { get; } = new BrowserInputSettings();
 
         #region Unity lifecycle functions
 

@@ -10,27 +10,27 @@ namespace TrekVRApplication {
         [SerializeField]
         private RoomLightingController _roomLights;
 
-        protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
-            _flashlight?.Toggle();
-            base.TriggerClickedHandler(sender, e);
-        }
+        // TODO Move lighting logic to modal.
 
-        protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
-            Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
+        //protected override void TriggerClickedHandler(object sender, ClickedEventArgs e) {
+        //    _flashlight?.Toggle();
+        //    base.TriggerClickedHandler(sender, e);
+        //}
 
-            if (e.padY > 0) {
-                _roomLights?.Brighten();
-            }
-            else {
-                _roomLights?.Dim();
-            }
-            base.PadClickedHandler(sender, e);
-        }
+        //protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
+        //    if (e.padY > 0) {
+        //        _roomLights?.Brighten();
+        //    }
+        //    else {
+        //        _roomLights?.Dim();
+        //    }
+        //    base.PadClickedHandler(sender, e);
+        //}
 
-        protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
-            _flashlight?.CycleNextColor();
-            base.MenuButtonPressedHandler(sender, e);
-        }
+        //protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
+        //    _flashlight?.CycleNextColor();
+        //    base.MenuButtonPressedHandler(sender, e);
+        //}
 
     }
 

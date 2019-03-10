@@ -6,7 +6,8 @@ namespace TrekVRApplication {
         Default,
         BBoxSelection,
         BookmarkResults,
-        ProductResults
+        ProductResults,
+        LayerManager
     }
 
     public static class ControllerModalActivityEnumExtensions {
@@ -19,6 +20,8 @@ namespace TrekVRApplication {
                     return $"{ControllerModalUrl}/bookmarks";
                 case ControllerModalActivity.ProductResults:
                     return $"{ControllerModalUrl}/products";
+                case ControllerModalActivity.LayerManager:
+                    return $"{ControllerModalUrl}/layer-manager";
                 default:
                     return $"{ControllerModalUrl}";
             }
@@ -26,20 +29,15 @@ namespace TrekVRApplication {
 
         public static bool IsAvailableForPrimary(this ControllerModalActivity activity) {
             switch (activity) {
-                case ControllerModalActivity.BBoxSelection:
-                    return false;
-                default:
+                case ControllerModalActivity.Default:
                     return true;
+                default:
+                    return false;
             }
         }
 
         public static bool IsAvailableForSecondary(this ControllerModalActivity activity) {
-            switch (activity) {
-                case ControllerModalActivity.BBoxSelection:
-                    return true;
-                default:
-                    return true;
-            }
+            return true;
         }
 
     }

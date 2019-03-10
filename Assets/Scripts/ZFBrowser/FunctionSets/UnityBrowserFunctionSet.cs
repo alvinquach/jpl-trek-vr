@@ -12,8 +12,8 @@ namespace TrekVRApplication {
         protected readonly ICollection<Type> SupportedTypes = new HashSet<Type> {
             typeof(string),
             typeof(JSONNode),
-            typeof(int),
-            typeof(float),
+            //typeof(int),
+            //typeof(float),
             typeof(double),
             typeof(bool),
             // TODO Add array type

@@ -73,10 +73,10 @@ namespace TrekVRApplication {
 
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
-            _webFunctions = new UnityBrowserWebFunctions(_browser);
-            _searchFunctions = new UnityBrowserSearchFunctions(_browser);
-            _userInterfaceFunctions = new UnityBrowserUserInterfaceFunctions(_browser);
-            _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(_browser);
+            _webFunctions = new UnityBrowserWebFunctions(Browser);
+            _searchFunctions = new UnityBrowserSearchFunctions(Browser);
+            _userInterfaceFunctions = new UnityBrowserUserInterfaceFunctions(Browser);
+            _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(Browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {

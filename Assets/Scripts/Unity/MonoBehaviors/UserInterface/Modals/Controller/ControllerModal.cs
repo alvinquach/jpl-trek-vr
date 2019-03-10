@@ -18,12 +18,26 @@ namespace TrekVRApplication {
 
         public abstract bool IsPrimary { get; }
 
+        public override bool Visible {
+            get {
+                return base.Visible;
+            }
+            set {
+                base.Visible = value;
+                if (Input) {
+                    Input.SetVisiblityState(value);
+                }
+            }
+        }
+
         private GeneratePlanarMenuMeshTask _generateMenuMeshTask;
         protected override GenerateMenuMeshTask GenerateMenuMeshTask {
             get { return _generateMenuMeshTask; }
         }
 
         protected override string DefaultUrl { get; } = $"{BaseUrl}#{ControllerModalUrl}";
+
+        public ControllerModalInput Input { get; private set; }
 
         public ControllerModalActivity CurrentActivity { get; private set; }
 
@@ -40,7 +54,10 @@ namespace TrekVRApplication {
             base.Awake();
         }
 
-
+        protected override void Init(Mesh mesh) {
+            base.Init(mesh);
+            Input = Browser.gameObject.AddComponent<ControllerModalInput>();
+        }
 
         protected override int GetHeight() {
             return Resolution;
@@ -54,33 +71,46 @@ namespace TrekVRApplication {
 
             ZFBrowserUtils.NavigateTo(Browser, activity.GetModalUrl());
 
+            TerrainModelManager terrainModelController = TerrainModelManager.Instance;
+            XRInteractablePlanet planet;
+
             // Switch away from current activity.
             // TODO Convert this to switch case.
             if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
-                TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-                XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                 planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
             }
 
+
             // Switch to new acivity.
             // TODO Convert this to switch case.
-            if (activity == ControllerModalActivity.BBoxSelection) {
-                TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-                if (terrainModelController.GlobalPlanetModelIsVisible()) {
+            switch (activity) {
+                case ControllerModalActivity.BBoxSelection:
+                    if (terrainModelController.GlobalPlanetModelIsVisible()) {
+
+                        // FIXME Need to set the mode for all the terrain models, not just the planet.
+                        planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                        planet.SwitchToMode(XRInteractablePlanetMode.Select);
+
+                        UserInterfaceManager.Instance.MainModal.Visible = false;
+                    }
+                    else {
+                        terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code
+                        //Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
+                        return;
+                    }
+                    break;
+
+                case ControllerModalActivity.BookmarkResults:
+                case ControllerModalActivity.ProductResults:
+                case ControllerModalActivity.LayerManager:
 
                     // FIXME Need to set the mode for all the terrain models, not just the planet.
-                    XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                    planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                     planet.SwitchToMode(XRInteractablePlanetMode.Select);
 
                     UserInterfaceManager.Instance.MainModal.Visible = false;
-                } else {
-                    terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code
-                    //Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
-                    return;
-                }
-            }
-            else if (activity == ControllerModalActivity.BookmarkResults || activity == ControllerModalActivity.ProductResults) {
-                UserInterfaceManager.Instance.MainModal.Visible = false;
+                    break;
             }
 
             Visible = activity != ControllerModalActivity.Default;
