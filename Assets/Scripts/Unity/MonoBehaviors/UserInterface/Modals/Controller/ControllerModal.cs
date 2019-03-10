@@ -71,23 +71,25 @@ namespace TrekVRApplication {
 
             ZFBrowserUtils.NavigateTo(Browser, activity.GetModalUrl());
 
+            TerrainModelManager terrainModelController = TerrainModelManager.Instance;
+            XRInteractablePlanet planet;
+
             // Switch away from current activity.
             // TODO Convert this to switch case.
             if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
-                TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-                XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                 planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
             }
+
 
             // Switch to new acivity.
             // TODO Convert this to switch case.
             switch (activity) {
                 case ControllerModalActivity.BBoxSelection:
-                    TerrainModelManager terrainModelController = TerrainModelManager.Instance;
                     if (terrainModelController.GlobalPlanetModelIsVisible()) {
 
                         // FIXME Need to set the mode for all the terrain models, not just the planet.
-                        XRInteractablePlanet planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                        planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
                         planet.SwitchToMode(XRInteractablePlanetMode.Select);
 
                         UserInterfaceManager.Instance.MainModal.Visible = false;
@@ -98,9 +100,15 @@ namespace TrekVRApplication {
                         return;
                     }
                     break;
+
                 case ControllerModalActivity.BookmarkResults:
                 case ControllerModalActivity.ProductResults:
                 case ControllerModalActivity.LayerManager:
+
+                    // FIXME Need to set the mode for all the terrain models, not just the planet.
+                    planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
+                    planet.SwitchToMode(XRInteractablePlanetMode.Select);
+
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
             }
