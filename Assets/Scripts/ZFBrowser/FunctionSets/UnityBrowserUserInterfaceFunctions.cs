@@ -6,7 +6,7 @@ namespace TrekVRApplication {
 
     public class UnityBrowserUserInterfaceFunctions : UnityBrowserFunctionSet {
 
-        protected override string FunctionsReadyVariable { get; } = "controllerFunctionsReady";
+        protected override string FunctionsReadyVariable { get; } = "userInterfaceFunctionsReady";
 
         public UnityBrowserUserInterfaceFunctions(Browser browser) : base(browser) {
 

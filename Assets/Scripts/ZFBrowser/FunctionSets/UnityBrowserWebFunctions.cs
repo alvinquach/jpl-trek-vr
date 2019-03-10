@@ -29,7 +29,7 @@ namespace TrekVRApplication {
 
         public static void SendResponse(Browser browser, string requestId, string response) {
             response = response.Replace(@"\", @"\\"); // Need to replace single backslash with double when evaluating JS.
-            browser.EvalJS($"{AngularInjectableContainerPath}.{HttpServiceName}.fulfillWebRequest(`{requestId}`, `{response}`);");
+            browser.EvalJS($"{AngularInjectableContainerPath}.{HttpServiceName}.fulfillRequest(`{requestId}`, `{response}`);");
         }
 
     }
