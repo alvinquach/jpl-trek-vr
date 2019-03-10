@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
@@ -27,10 +27,10 @@ namespace TrekVRApplication {
 
         // Temporary
         [RegisterToBrowser]
-        public void AdjustLayer(int layer, int value) {
+        public void AdjustLayer(double layer, double value) {
             Material material = TerrainModelManager.Instance.CurrentVisibleModel.CurrentMaterial;
             if (material) {
-                material.SetFloat($"Diffuse{layer}", value / 100.0f);
+                material.SetFloat($"_Diffuse{(int)layer}", (float)(value / 100));
             }
         }
 
