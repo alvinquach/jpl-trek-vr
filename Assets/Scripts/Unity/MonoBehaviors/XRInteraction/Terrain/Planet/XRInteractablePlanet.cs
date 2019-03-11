@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
@@ -305,7 +304,7 @@ namespace TrekVRApplication {
 
                 // Check if the controller is pointing outside of the planet's bounds.
                 // If the controller is pointing outside of the planet, then ungrab the planet.
-                float forwardDistFromObject = HandleUtility.DistancePointLine(transform.position, _grabber.transform.position, forward.GetPoint(_maxGrabDistance));
+                float forwardDistFromObject = MathUtils.DistancePointLine(transform.position, _grabber.transform.position, forward.GetPoint(_maxGrabDistance));
                 if (forwardDistFromObject > _grabRadius) {
                     Debug.Log("Lost grip on grabbed object (distance too large, " + forwardDistFromObject + ">" + _grabRadius + ")");
                     TriggerUngrab();

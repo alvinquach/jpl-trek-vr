@@ -75,6 +75,25 @@ namespace TrekVRApplication {
             return Mathf.RoundToInt(a) == Mathf.RoundToInt(b);
         }
 
+        /// <summary>
+        ///     Calculate distance between a point and a line. 
+        ///     Copied over from Unity's HandleUtility.cs.
+        /// </summary>
+        public static float DistancePointLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd) {
+            Vector3 relativePoint = point - lineStart;
+            Vector3 lineDirection = lineEnd - lineStart;
+            float length = lineDirection.magnitude;
+            Vector3 normalizedLineDirection = lineDirection;
+            if (length > .000001f)
+                normalizedLineDirection /= length;
+
+            float dot = Vector3.Dot(normalizedLineDirection, relativePoint);
+            dot = Mathf.Clamp(dot, 0.0F, length);
+
+            Vector3 projected = lineStart + normalizedLineDirection * dot;
+            return Vector3.Magnitude(projected - point);
+        }
+
     }
 
 }
