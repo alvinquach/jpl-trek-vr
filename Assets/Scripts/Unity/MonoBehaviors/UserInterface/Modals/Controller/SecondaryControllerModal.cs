@@ -18,6 +18,7 @@ namespace TrekVRApplication {
             if (!_controller) {
                 // TODO Throw exception
             }
+            _controller.OnTriggerClicked += TriggerClickedHandler;
             _controller.OnMenuButtonPressed += MenuButtonPressedHandler;
             _controller.OnMenuButtonLongPressed += MenuButtonLongPressedHandler;
             _controller.OnPadClicked += PadClickedHandler;
@@ -25,6 +26,7 @@ namespace TrekVRApplication {
         }
 
         private void OnDestroy() {
+            _controller.OnTriggerClicked -= TriggerClickedHandler;
             _controller.OnMenuButtonPressed -= MenuButtonPressedHandler;
             _controller.OnMenuButtonPressed -= MenuButtonLongPressedHandler;
             _controller.OnPadClicked -= PadClickedHandler;
@@ -42,11 +44,18 @@ namespace TrekVRApplication {
 
         #region Controller event handlers
 
+        private void TriggerClickedHandler(object sender, ClickedEventArgs e) {
+            SecondaryXRController controller = (SecondaryXRController)_controller;
+            controller.Flashlight?.Toggle();
+        }
+
         private void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             MainModal mainModal = UserInterfaceManager.Instance.MainModal;
             switch (CurrentActivity) {
                 case ControllerModalActivity.Default:
-                    // TODO Turn on secondary controller menu.
+                    // TODO Turn on secondary controller menu instead.
+                    SecondaryXRController controller = (SecondaryXRController)_controller;
+                    controller.Flashlight?.CycleNextColor();
                     break;
                 case ControllerModalActivity.BBoxSelection:
                     XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
@@ -66,15 +75,25 @@ namespace TrekVRApplication {
         }
 
         private void PadClickedHandler(object sender, ClickedEventArgs e) {
-            if (_padCurrentKey != 0) {
-                return;
+            if (CurrentActivity == ControllerModalActivity.Default) {
+                SecondaryXRController controller = (SecondaryXRController)_controller;
+                if (e.padY > 0) {
+                    controller.RoomLights?.Brighten();
+                } else {
+                    controller.RoomLights?.Dim();
+                }
             }
-            if (Mathf.Abs(e.padX) > Mathf.Abs(e.padY)) {
-                _padCurrentKey = e.padX < 0 ? KeyCode.A : KeyCode.D;
-            } else {
-                _padCurrentKey = e.padY < 0 ? KeyCode.S : KeyCode.W;
+            else {
+                if (_padCurrentKey != 0) {
+                    return;
+                }
+                if (Mathf.Abs(e.padX) > Mathf.Abs(e.padY)) {
+                    _padCurrentKey = e.padX < 0 ? KeyCode.A : KeyCode.D;
+                } else {
+                    _padCurrentKey = e.padY < 0 ? KeyCode.S : KeyCode.W;
+                }
+                Input.RegisterKeyDown(_padCurrentKey);
             }
-            Input.RegisterKeyDown(_padCurrentKey);
         }
 
         private void PadUnclickedHandler(object sender, ClickedEventArgs e) {
