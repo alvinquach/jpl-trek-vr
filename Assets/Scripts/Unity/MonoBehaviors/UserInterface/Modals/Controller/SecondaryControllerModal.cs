@@ -54,6 +54,7 @@ namespace TrekVRApplication {
                     break;
                 case ControllerModalActivity.BookmarkResults:
                 case ControllerModalActivity.ProductResults:
+                case ControllerModalActivity.LayerManager:
                     mainModal.Visible = true;
                     StartActivity(ControllerModalActivity.Default);
                     break;
