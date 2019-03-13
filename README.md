@@ -28,7 +28,7 @@ This section contains instructions on how to clone and setup the project for dev
 ### Prerequisites
 The following hardware/software is required:
 * All of the requirments as listed in the [requirements](https://github.com/alvinquach/jpl-trek-vr/blob/master/README.md#requirements) section.
-* [Unity Editor](https://unity3d.com/get-unity/download/archive) (currently being developed on 2018.2.6f1)
+* [Unity Editor](https://unity3d.com/get-unity/download/archive) (currently being developed on 2018.3.5f1)
 * Git and [Git LFS](https://git-lfs.github.com/)
 ### Repository Setup
 1. Clone this repository.
@@ -67,13 +67,15 @@ Controls specific to the HTC Vive headset.
 
 * The grip button(s) allow you to grab the planet and spin it around.
 
-* The menu button opens up a VR menu containing a list of bookmarks. Click on the menu button again to close the menu.
+* ~~The menu button opens up a VR menu containing a list of bookmarks. Click on the menu button again to close the menu.~~
 
-  Clicking on a bookmark using the trigger button will rotate the planet such that the bookmarked area is facing you.
+  ~~Clicking on a bookmark using the trigger button will rotate the planet such that the bookmarked area is facing you.~~
   
-  When the menu is open, the bookedmarked areas will also appear on the planet with a pin and label.
-  
-* Clicking the trigger button when the controller is pointed to the planet will rotate the planet such that the area that is being pointed at is facing you.
+  ~~When the menu is open, the bookedmarked areas will also appear on the planet with a pin and label.~~
+
+* Holding down the trigger button allows you to drag the planet around.
+
+* Double clicking the trigger button when the controller is pointed to the planet will rotate the planet such that the area that is being pointed at is facing you.
 
 ## Thrid-Party Credits
 This projects uses assets libraries from third party sources.
