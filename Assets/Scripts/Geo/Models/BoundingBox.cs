@@ -4,9 +4,11 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public struct BoundingBox {
+    public struct BoundingBox : IEquatable<BoundingBox> {
 
         public static BoundingBox Zero { get { return new BoundingBox(0f, 0f, 0f, 0f); } }
+
+        public static BoundingBox Global { get { return new BoundingBox(-180f, -90f, 180f, 90f); } }
 
         private float _lonStart;
         public float LonStart {
@@ -108,6 +110,10 @@ namespace TrekVRApplication {
                 this[1] = this[3];
                 this[3] = lat;
             }
+        }
+
+        public bool Equals(BoundingBox other) {
+            return Equals((object)other);
         }
 
         public override bool Equals(object obj) {

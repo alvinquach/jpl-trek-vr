@@ -11,7 +11,7 @@
         public long MinKeyPressInterval { get; set; } = 750;
 
         public override void RegisterKeyDown() {
-            _timeAtPressStart = Now();
+            _timeAtPressStart = DateTimeUtils.Now();
         }
 
         public override void RegisterKeyUp() {
@@ -22,7 +22,7 @@
             if (_timeAtPressStart < 0) {
                 return;
             }
-            if (Now() - _timeAtPressStart >= MinKeyPressInterval) {
+            if (DateTimeUtils.Now() - _timeAtPressStart >= MinKeyPressInterval) {
                 _timeAtPressStart = -1;
                 InvokeActionSuccess();
             }

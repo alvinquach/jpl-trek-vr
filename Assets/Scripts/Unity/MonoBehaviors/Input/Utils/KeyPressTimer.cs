@@ -16,10 +16,6 @@ namespace TrekVRApplication {
             OnActionSuccess.Invoke();
         }
 
-        protected long Now() {
-            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        }
-
     }
 
 }

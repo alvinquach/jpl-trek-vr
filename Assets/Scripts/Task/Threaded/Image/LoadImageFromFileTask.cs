@@ -1,5 +1,6 @@
 ﻿
 using System;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -27,7 +28,7 @@ namespace TrekVRApplication {
 
             // TODO Support other file types.
             // TODO Check if path is valid.
-            using (TiffWrapper tiff = new TiffWrapper(_filepath)) {
+            using (TiffImage tiff = new TiffImage(_filepath)) {
                 VerifyImageFormat(tiff);
                 srcImage = GetImage(tiff);
             }
@@ -42,13 +43,13 @@ namespace TrekVRApplication {
             //return TextureToolUtils.ImageToTexture(srcImage, _textureFormat);
         }
 
-        protected virtual void VerifyImageFormat(TiffWrapper tiff) {
-            if (!tiff || !tiff.Metadata) {
+        protected virtual void VerifyImageFormat(TiffImage tiff) {
+            if (!tiff) {
                 throw new Exception("TIFF file cannot be null.");
             }
         }
 
-        protected abstract T GetImage(TiffWrapper tiff);
+        protected abstract T GetImage(TiffImage tiff);
 
     }
 

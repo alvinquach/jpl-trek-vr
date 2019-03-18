@@ -198,47 +198,6 @@ namespace TrekVRApplication {
 
         #endregion
 
-        #region Metadata Methods
-
-        [Obsolete]
-        public static void PrintInfo(Tiff tiff, string header = "TIFF Info:") {
-
-            TiffMetadata info = GetMetadata(tiff);
-
-            Debug.Log(
-                $"{header}\n" +
-                $"Resolution: {info.Width}x{info.Height}@{info.BPP}{info.SampleFormat}, " +
-                $"Compression: {info.Compression}, " +
-                $"Tiled: {(info.Tiled ? $"{tiff.TileRowSize()}x{tiff.TileSize() / tiff.TileRowSize()}" : "NO")}"
-            );
-
-        }
-
-        [Obsolete]
-        public static TiffMetadata GetMetadata(Tiff tiff) {
-
-            if (tiff == null) {
-                return null;
-            }
-
-            bool tiled = tiff.IsTiled();
-
-            return new TiffMetadata() {
-                Width = tiff.GetField(TiffTag.IMAGEWIDTH)[0].ToInt(),
-                Height = tiff.GetField(TiffTag.IMAGELENGTH)[0].ToInt(),
-                BPP = tiff.GetField(TiffTag.BITSPERSAMPLE)[0].ToShort(),
-                SPP = tiff.GetField(TiffTag.SAMPLESPERPIXEL)[0].ToShort(),
-                SampleFormat = tiff.GetField(TiffTag.SAMPLEFORMAT)[0].ToString(),
-                Compression = (Compression)tiff.GetField(TiffTag.COMPRESSION)[0].ToInt(),
-                Tiled = tiled,
-                TileSize = tiled ? tiff.TileSize() : 0,
-                TileWidth = tiled ? tiff.GetField(TiffTag.TILEWIDTH)[0].ToInt() : 0,
-                TileHeight = tiled ? tiff.GetField(TiffTag.TILELENGTH)[0].ToInt() : 0
-            };
-        }
-
-        #endregion
-
     }
 
 }

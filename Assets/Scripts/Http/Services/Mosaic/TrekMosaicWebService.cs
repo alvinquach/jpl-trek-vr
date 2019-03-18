@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
+    [Obsolete("Digital elevation model and mosaic services have been merged into product service.")]
     public class TrekMosaicWebService : IMosaicWebService {
-
-        private const string Format = "tiff";
 
         private const string BaseUrl = "https://trek.nasa.gov/mars/arcgis/rest/services/Mars_Viking_MDIM21_ClrMosaic_global_232m/ImageServer";
 
@@ -17,10 +17,10 @@ namespace TrekVRApplication {
 
         public void GetMosaic(BoundingBox bbox, int size, Action<string> callback) {
 
-            TerrainModelFileMetadata metadata = new TerrainModelFileMetadata(0, bbox, size, "tiff");
+            TerrainModelProductMetadata metadata = new TerrainModelProductMetadata(GlobalMosaicUUID, bbox, size, ImageFileFormat.Tiff);
             string filename = metadata.EncodeBase64() + ".hi"; // TODO Un-hardcode file extension.
 
-            string directory = Path.Combine(FilePath.PersistentRoot, FilePath.Texture);
+            string directory = Path.Combine(FilePath.PersistentRoot, FilePath.Product);
             IList<string> availableFiles = FileUtils.ListFiles(directory, "*.hi", true); // TODO Un-hardcode file extension.
 
             string filepath = Path.Combine(directory, filename);
@@ -34,7 +34,7 @@ namespace TrekVRApplication {
                 { "size", $"{size},{size}" },
                 { "noDataInterpretation", "esriNoDataMatchAny" },
                 { "interpolation", "RSP_BilinearInterpolation" },
-                { "format", Format },
+                { "format", "tiff" },
                 { "f", "image" }
             };
 

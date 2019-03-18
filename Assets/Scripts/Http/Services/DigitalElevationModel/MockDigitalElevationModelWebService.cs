@@ -7,6 +7,7 @@ namespace TrekVRApplication {
     ///     For testing purposes only.
     ///     Remove this implementation when it is no longer needed.
     /// </summary>
+    [Obsolete("Digital elevation model and mosaic services have been merged into product service.")]
     public class MockDigitalElevationModelWebService : IDigitalElevationModelWebService {
 
         public void GetDEM(BoundingBox bbox, int size, Action<string> callback) {

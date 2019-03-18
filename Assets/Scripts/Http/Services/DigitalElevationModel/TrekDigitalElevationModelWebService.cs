@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
+    [Obsolete("Digital elevation model and mosaic services have been merged into product service.")]
     public class TrekDigitalElevationModelWebService : IDigitalElevationModelWebService {
-
-        private const string Format = "tiff";
 
         private const string BaseUrl = "https://trek.nasa.gov/mars/arcgis/rest/services/mola128_mola64_merge_90Nto90S_SimpleC_clon0/ImageServer";
 
@@ -17,7 +17,7 @@ namespace TrekVRApplication {
 
         public void GetDEM(BoundingBox bbox, int size, Action<string> callback) {
 
-            TerrainModelFileMetadata metadata = new TerrainModelFileMetadata(0, bbox, size, "tiff");
+            TerrainModelProductMetadata metadata = new TerrainModelProductMetadata(GlobalDigitalElevationModelUUID, bbox, size, ImageFileFormat.Tiff);
             string filename = metadata.EncodeBase64() + ".hi"; // TODO Un-hardcode file extension.
 
             string directory = Path.Combine(FilePath.PersistentRoot, FilePath.DigitalElevationModel);
@@ -34,7 +34,7 @@ namespace TrekVRApplication {
                 { "size", $"{size},{size}" },
                 { "noDataInterpretation", "esriNoDataMatchAny" },
                 { "interpolation", "RSP_BilinearInterpolation" },
-                { "format", Format },
+                { "format", "tiff" },
                 { "f", "image" }
             };
 

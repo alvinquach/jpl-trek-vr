@@ -1,6 +1,4 @@
 using System;
-using System.Threading;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 

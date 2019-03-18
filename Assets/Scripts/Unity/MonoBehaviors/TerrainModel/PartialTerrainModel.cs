@@ -101,13 +101,14 @@ namespace TrekVRApplication {
 
                 LoadColorImageFromFileTask<BGRAImage> loadImageTask = new LoadColorImageFromFileTask<BGRAImage>(textureFilePath);
                 loadImageTask.Execute(image => {
+
                     int width = loadImageTask.TextureWidth, height = loadImageTask.TextureHeight;
+                    TextureCompressionFormat format = TextureCompressionFormat.UncompressedWithAlpha;
+
+                    byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
+                    image.CopyRawData(data);
+
                     QueueTask(() => {
-
-                        TextureCompressionFormat format = TextureCompressionFormat.UncompressedWithAlpha;
-                        byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                        image.CopyRawData(data);
-
                         Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
                         texture.GetRawTextureData<byte>().CopyFrom(data);
                         texture.Apply(true);

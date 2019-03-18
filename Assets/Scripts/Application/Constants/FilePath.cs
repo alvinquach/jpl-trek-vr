@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -30,9 +31,12 @@ namespace TrekVRApplication {
 
         #region File Type Specific
 
+        [Obsolete("DEM should go under products.")]
         public const string DigitalElevationModel = "dem";
 
-        public const string Texture = "textures";
+        public const string Product = "product";
+
+        public const string ProductFileExtension = "prd";
 
         public const string Test = "test";
 

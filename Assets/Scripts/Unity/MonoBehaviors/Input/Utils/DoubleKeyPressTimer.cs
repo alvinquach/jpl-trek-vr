@@ -19,14 +19,14 @@
         public long MaxKeyPressDuration { get; set; } = 300;
 
         public override void RegisterKeyDown() {
-            _timeAtLastKeyDown = Now();
+            _timeAtLastKeyDown = DateTimeUtils.Now();
         }
 
         public override void RegisterKeyUp() {
             if (_timeAtLastKeyDown < 0) {
                 return;
             }
-            long now = Now();
+            long now = DateTimeUtils.Now();
 
             // New key press registered.
             if (now - _timeAtLastKeyDown <= MaxKeyPressDuration) {

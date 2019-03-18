@@ -5,51 +5,60 @@ namespace TrekVRApplication {
     /// <summary>
     ///     A data transfer object containing the information about a TIFF image.
     /// </summary>
-    public class TiffMetadata {
+    public struct TiffMetadata {
 
         /// <summary> Width of the TIFF image in pixels. </summary>
-        public int Width;
+        public int Width { get; }
 
         /// <summary> height of the TIFF image in pixels. </summary>
-        public int Height;
+        public int Height { get; }
 
         /// <summary> Number of bits per pixel. </summary>
-        public short BPP;
+        public short BPP { get; }
 
         /// <summary> Number of samples (color channels) per pixel. </summary>
-        public short SPP;
+        public short SPP { get; }
 
-        /// <summary> Sample data type (ie. float, int, etc.). </summary>
-        public string SampleFormat;
+        /// <summary> Sample data type (ie. float; int; etc.). </summary>
+        public string SampleFormat { get; }
 
         /// <summary> Compression method used by the TIFF image. </summary>
-        public Compression Compression;
+        public Compression Compression { get; }
 
         /// <summary> Whether the TIFF is encoded with tiles rather than scanlines. </summary>
-        public bool Tiled;
+        public bool Tiled { get; }
 
         /// <summary> Tile size in bytes. </summary>
-        public int TileSize;
+        public int TileSize { get; }
 
         /// <summary> Tile width in pixels. </summary>
-        public int TileWidth;
+        public int TileWidth { get; }
 
         /// <summary> Tile height in pixels. </summary>
-        public int TileHeight;
+        public int TileHeight { get; }
 
         /// <summary> Scanline size in bytes. </summary>
-        public int ScanlineSize;
+        public int ScanlineSize { get; }
 
-        public static bool operator true(TiffMetadata o) {
-            return o != null;
-        }
+        public TiffMetadata(Tiff tiff) {
+            if (tiff == null) {
+                // TODO Throw exception
+            }
 
-        public static bool operator false(TiffMetadata o) {
-            return o == null;
-        }
+            Width = tiff.GetField(TiffTag.IMAGEWIDTH)[0].ToInt();
+            Height = tiff.GetField(TiffTag.IMAGELENGTH)[0].ToInt();
+            BPP = tiff.GetField(TiffTag.BITSPERSAMPLE)[0].ToShort();
+            SPP = tiff.GetField(TiffTag.SAMPLESPERPIXEL)[0].ToShort();
+            
+            // FIXME Handle null field properly (field can be null when TIFF is saved from Photoshop).
+            SampleFormat = tiff.GetField(TiffTag.SAMPLEFORMAT)?[0].ToString();
 
-        public static bool operator !(TiffMetadata o) {
-            return o ? false : true;
+            Compression = (Compression)tiff.GetField(TiffTag.COMPRESSION)[0].ToInt();
+            Tiled = tiff.IsTiled();
+            TileSize = Tiled ? tiff.TileSize() : 0;
+            TileWidth = Tiled ? tiff.GetField(TiffTag.TILEWIDTH)[0].ToInt() : 0;
+            TileHeight = Tiled ? tiff.GetField(TiffTag.TILELENGTH)[0].ToInt() : 0;
+            ScanlineSize = Tiled ? 0 : tiff.ScanlineSize();
         }
 
     }

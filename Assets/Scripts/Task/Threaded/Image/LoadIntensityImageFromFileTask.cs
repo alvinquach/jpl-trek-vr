@@ -7,7 +7,7 @@ namespace TrekVRApplication {
 
         }
 
-        protected override void VerifyImageFormat(TiffWrapper tiff) {
+        protected override void VerifyImageFormat(TiffImage tiff) {
             base.VerifyImageFormat(tiff);
 
             // For use as a height map, the image must be in 16-bit or 32-bit grayscale.
@@ -17,8 +17,8 @@ namespace TrekVRApplication {
             }
         }
 
-        protected override IntensityImage GetImage(TiffWrapper tiff) {
-            return tiff.ToIntensityImage();
+        protected override IntensityImage GetImage(TiffImage tiff) {
+            return TiffImageConverter.ToIntensityImage(tiff);
         }
 
     }

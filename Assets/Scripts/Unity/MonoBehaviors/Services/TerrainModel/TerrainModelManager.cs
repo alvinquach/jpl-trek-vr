@@ -79,7 +79,7 @@ namespace TrekVRApplication {
             }
         }
 
-        void Awake() {
+        private void Awake() {
 
             if (Instance == null) {
                 Instance = this;
@@ -107,7 +107,7 @@ namespace TrekVRApplication {
             GlobalPlanetModel.AlbedoFilePath = Path.Combine(
                 FilePath.StreamingAssetsRoot,
                 FilePath.JetPropulsionLaboratory,
-                FilePath.Texture,
+                FilePath.Product,
                 _globalPlanetAlbedoFilepath
             );
 

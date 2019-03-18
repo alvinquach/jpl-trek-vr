@@ -7,8 +7,8 @@ namespace TrekVRApplication {
 
         }
 
-        protected override T GetImage(TiffWrapper tiff) {
-            return tiff.ToColorImage<T>();
+        protected override T GetImage(TiffImage tiff) {
+            return TiffImageConverter.ToColorImage<T>(tiff);
         }
 
     }
