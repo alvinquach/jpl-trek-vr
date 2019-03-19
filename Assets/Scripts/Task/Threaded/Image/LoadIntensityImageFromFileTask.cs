@@ -17,8 +17,8 @@ namespace TrekVRApplication {
             }
         }
 
-        protected override IntensityImage GetImage(TiffImage tiff) {
-            return TiffImageConverter.ToIntensityImage(tiff);
+        protected override IntensityImage FromTiffImage(TiffImage tiff) {
+            return TiffImageLoader.ToIntensityImage(tiff);
         }
 
     }

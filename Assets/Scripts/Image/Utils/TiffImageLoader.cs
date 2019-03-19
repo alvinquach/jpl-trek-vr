@@ -2,10 +2,9 @@
 using System;
 using UnityEngine;
 
-namespace TrekVRApplication
-{
+namespace TrekVRApplication {
 
-    public static class TiffImageConverter {
+    public static class TiffImageLoader {
 
         public static IntensityImage ToIntensityImage(TiffImage tiff) {
             TiffMetadata metadata = tiff.Metadata;

@@ -30,7 +30,7 @@ namespace TrekVRApplication {
             // TODO Check if path is valid.
             using (TiffImage tiff = new TiffImage(_filepath)) {
                 VerifyImageFormat(tiff);
-                srcImage = GetImage(tiff);
+                srcImage = FromTiffImage(tiff);
             }
 
             TextureWidth = srcImage.Width;
@@ -49,7 +49,7 @@ namespace TrekVRApplication {
             }
         }
 
-        protected abstract T GetImage(TiffImage tiff);
+        protected abstract T FromTiffImage(TiffImage tiff);
 
     }
 
