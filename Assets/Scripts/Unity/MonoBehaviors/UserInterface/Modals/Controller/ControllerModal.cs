@@ -74,14 +74,6 @@ namespace TrekVRApplication {
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
             XRInteractablePlanet planet;
 
-            // Switch away from current activity.
-            // TODO Convert this to switch case.
-            if (CurrentActivity == ControllerModalActivity.BBoxSelection) {
-                planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
-            }
-
-
             // Switch to new acivity.
             // TODO Convert this to switch case.
             switch (activity) {

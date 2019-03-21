@@ -45,6 +45,7 @@ namespace TrekVRApplication {
         #region Controller event handlers
 
         private void TriggerClickedHandler(object sender, ClickedEventArgs e) {
+            // TODO Only toggle flashlight when default activity is active.
             SecondaryXRController controller = (SecondaryXRController)_controller;
             controller.Flashlight?.Toggle();
         }

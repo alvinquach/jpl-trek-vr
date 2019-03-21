@@ -370,8 +370,8 @@ namespace TrekVRApplication {
                     break;
             }
 
+            Debug.Log($"SWITCHING MODES: {InteractionMode} --> {mode}");
             InteractionMode = mode;
-            Debug.Log($"Interaction mode changed to {mode}.");
         }
 
         #region Naviation methods
