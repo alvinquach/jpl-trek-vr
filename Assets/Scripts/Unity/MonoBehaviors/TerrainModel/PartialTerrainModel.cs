@@ -116,7 +116,7 @@ namespace TrekVRApplication {
                 int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
                 Material.SetTexture(diffuseBaseId, texture);
 
-                UVScaleOffset uvScaleOffset = BoundingBoxUtils.CalculateUVScaleOffset(UnrestrictedBoundingBox.Global, _boundingBox);
+                UVScaleOffset uvScaleOffset = BoundingBoxUtils.CalculateUVScaleOffset(UnrestrictedBoundingBox.Global, _squareBoundingBox);
                 Material.SetTextureScale(diffuseBaseId, uvScaleOffset.Scale);
                 Material.SetTextureOffset(diffuseBaseId, uvScaleOffset.Offset);
             });
