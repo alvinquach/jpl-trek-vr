@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -17,6 +18,8 @@ namespace TrekVRApplication {
             }
         }
 
+        public event Action OnInitComplete = () => { };
+
         protected override void GenerateMaterial() {
             base.GenerateMaterial();
 
@@ -33,6 +36,7 @@ namespace TrekVRApplication {
                 QueueTask(() => {
                     ProcessMeshData(meshData);
                     _initTaskStatus = TaskStatus.Completed;
+                    OnInitComplete.Invoke();
                 });
             });
         }

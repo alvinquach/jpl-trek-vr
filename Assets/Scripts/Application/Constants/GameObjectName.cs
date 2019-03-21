@@ -12,6 +12,8 @@
 
         public const string PlanetSelectionIndicatorContainer = "SelectionIndicatorContainer";
 
+        public const string PlanetCoordinateLines = "CoordniateLines";
+
         public const string LODGroupContainer = "LodGroupContainer";
 
         public const string LaserPointer = "LaserPointer";
