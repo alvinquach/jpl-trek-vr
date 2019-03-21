@@ -19,7 +19,7 @@ namespace TrekVRApplication {
 
             // Create material for coordinate indicators
             _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));
-            _coordinateIndicatorMaterial.SetColor("_Color", new Color32(255, 127, 32, 255));
+            _coordinateIndicatorMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
 
             // Generate latitude and longitude lines
             float angleIncrement = 90.0f / (HemisphereLongLatCoordinateIndicatorCount + 1);
@@ -29,7 +29,11 @@ namespace TrekVRApplication {
 
                 GameObject gameObject = new GameObject($"Lat{GameObjectName.PlanetCoordinateLines}{latitudeLines.Count + 1}");
                 gameObject.transform.SetParent(transform, false);
-                LineRenderer lineRenderer = InitCoordinateIndicator(gameObject, _coordinateIndicatorMaterial);
+                LineRenderer lineRenderer = InitCoordinateIndicator(
+                    gameObject,
+                    _coordinateIndicatorMaterial,
+                    CoordinateIndicatorStaticThickness
+                );
                 GeneratePointsForLatitudeIndicator(lineRenderer, latitude);
                 latitudeLines.Add(lineRenderer);
 
@@ -40,7 +44,11 @@ namespace TrekVRApplication {
 
                 gameObject = new GameObject($"Lat{GameObjectName.PlanetCoordinateLines}{latitudeLines.Count + 1}");
                 gameObject.transform.SetParent(transform, false);
-                lineRenderer = InitCoordinateIndicator(gameObject, _coordinateIndicatorMaterial);
+                lineRenderer = InitCoordinateIndicator(
+                    gameObject,
+                    _coordinateIndicatorMaterial,
+                    CoordinateIndicatorStaticThickness
+                );
                 GeneratePointsForLatitudeIndicator(lineRenderer, -latitude);
                 latitudeLines.Add(lineRenderer);
             }
@@ -49,7 +57,11 @@ namespace TrekVRApplication {
                 float longitude = i * angleIncrement;
                 GameObject gameObject = new GameObject($"Lon{GameObjectName.PlanetCoordinateLines}{i + 1}");
                 gameObject.transform.SetParent(transform, false);
-                LineRenderer lineRenderer = InitCoordinateIndicator(gameObject, _coordinateIndicatorMaterial);
+                LineRenderer lineRenderer = InitCoordinateIndicator(
+                    gameObject,
+                    _coordinateIndicatorMaterial,
+                    CoordinateIndicatorStaticThickness
+                );
                 GeneratePointsForLongitudeIndicator(lineRenderer, longitude);
                 longitudeLines.Add(lineRenderer);
             }

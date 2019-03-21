@@ -48,12 +48,12 @@ namespace TrekVRApplication {
             );
         }
 
-        public static LineRenderer InitCoordinateIndicator(GameObject gameObject, Material material, bool loop = true) {
+        public static LineRenderer InitCoordinateIndicator(GameObject gameObject, Material material, float thickness, bool loop = true) {
             LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
             lineRenderer.useWorldSpace = false;
             lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
             lineRenderer.receiveShadows = false;
-            lineRenderer.startWidth = CoordinateIndicatorThickness;
+            lineRenderer.startWidth = thickness;
             lineRenderer.loop = loop;
             lineRenderer.material = material;
             return lineRenderer;

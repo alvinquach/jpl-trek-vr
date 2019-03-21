@@ -237,7 +237,7 @@ namespace TrekVRApplication {
 
             // Create material for coordinate indicators
             _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));
-            _coordinateIndicatorMaterial.SetColor("_Color", new Color32(0, 224, 255, 255));
+            _coordinateIndicatorMaterial.SetColor("_Color", CoordinateIndicatorColor);
 
             // Create the latitude and longitude selection indicators.
             GameObject selectionIndicatorsContainer = new GameObject();
@@ -247,26 +247,42 @@ namespace TrekVRApplication {
             GameObject lonSelectionStartIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}1");
             lonSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             lonSelectionStartIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
-            _lonSelectionStartIndicator = InitCoordinateIndicator(lonSelectionStartIndicator, _coordinateIndicatorMaterial);
+            _lonSelectionStartIndicator = InitCoordinateIndicator(
+                lonSelectionStartIndicator,
+                _coordinateIndicatorMaterial,
+                CoordinateIndicatorThickness
+            );
             _lonSelectionStartIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionStartIndicator);
 
             GameObject latSelectionStartIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}1");
             latSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
-            _latSelectionStartIndicator = InitCoordinateIndicator(latSelectionStartIndicator, _coordinateIndicatorMaterial);
+            _latSelectionStartIndicator = InitCoordinateIndicator(
+                latSelectionStartIndicator,
+                _coordinateIndicatorMaterial,
+                CoordinateIndicatorThickness
+            );
             _latSelectionStartIndicator.enabled = false;
             GeneratePointsForLatitudeIndicator(_latSelectionStartIndicator);
 
             GameObject lonSelectionEndIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}2");
             lonSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             lonSelectionEndIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
-            _lonSelectionEndIndicator = InitCoordinateIndicator(lonSelectionEndIndicator, _coordinateIndicatorMaterial);
+            _lonSelectionEndIndicator = InitCoordinateIndicator(
+                lonSelectionEndIndicator,
+                _coordinateIndicatorMaterial,
+                CoordinateIndicatorThickness
+            );
             _lonSelectionEndIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionEndIndicator);
 
             GameObject latSelectionEndIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}2");
             latSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
-            _latSelectionEndIndicator = InitCoordinateIndicator(latSelectionEndIndicator, _coordinateIndicatorMaterial);
+            _latSelectionEndIndicator = InitCoordinateIndicator(
+                latSelectionEndIndicator,
+                _coordinateIndicatorMaterial,
+                CoordinateIndicatorThickness
+            );
             _latSelectionEndIndicator.enabled = false;
             GeneratePointsForLatitudeIndicator(_latSelectionEndIndicator);
 
