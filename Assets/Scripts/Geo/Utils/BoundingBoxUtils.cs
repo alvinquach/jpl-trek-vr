@@ -28,13 +28,13 @@ namespace TrekVRApplication {
         /// </summary>
         /// <param name="boundingBox"></param>
         /// <returns>A Vector2 where x is the latitude and y is the longitude.</returns>
-        public static Vector2 MedianLatLon(BoundingBox boundingBox) {
+        public static Vector2 MedianLatLon(IBoundingBox boundingBox) {
             float lon = (boundingBox[0] + boundingBox[2]) / 2;
 
             // Handle case where the start and end longitudes have opposite signs.
-            if (ReverseLonOrder(boundingBox)) {
-                lon += (lon > 0 ? -180 : 180);
-            }
+            //if (ReverseLonOrder(boundingBox)) {
+            //    lon += (lon > 0 ? -180 : 180);
+            //}
 
             return new Vector2((boundingBox[1] + boundingBox[3]) / 2, lon);
         }
@@ -129,7 +129,7 @@ namespace TrekVRApplication {
 
         }
 
-        public static UVBounds CalculateUVBounds(BoundingBox boundingBox, BoundingBox selectedArea) {
+        public static UVBounds CalculateUVBounds(IBoundingBox boundingBox, IBoundingBox selectedArea) {
             if (boundingBox == selectedArea) {
                 return UVBounds.Default;
             }
@@ -140,12 +140,34 @@ namespace TrekVRApplication {
             return new UVBounds(uStart, vStart, uEnd, vEnd);
         }
 
+        public static UVScaleOffset CalculateUVScaleOffset(IBoundingBox boundingBox, IBoundingBox selectedArea) {
+            UVBounds asdf = CalculateUVBounds(boundingBox, selectedArea);
+            return CalculateUVScaleOffset(asdf);
+        }
+
+        public static UVScaleOffset CalculateUVScaleOffset(UVBounds relativeUV) {
+            if (relativeUV == UVBounds.Default) {
+                return UVScaleOffset.Default;
+            }
+
+            return new UVScaleOffset() {
+                Scale = new Vector2(
+                    relativeUV.U2 - relativeUV.U1,
+                    relativeUV.V2 - relativeUV.V1
+                ),
+                Offset = new Vector2(
+                    relativeUV.U1,
+                    relativeUV.V1
+                )
+            };
+        }
+
         /// <summary>
         ///     Calculates the largest dimension (width or height) of the terrain slice
         ///     enclosed by the bounding box if the terrain slice is rotated such that
-        ///     the median direction is pointing upwards in world space.
+        ///     the median direction is pointing upwards in world space. Currently only
+        ///     works with restricted (total longitude <= 180°) bounding boxes.
         /// </summary>
-        /// <param name="boundingBox"></param>
         public static float LargestDimension(BoundingBox boundingBox, float radius = 1.0f) {
 
             float width, height, lat;
@@ -179,22 +201,9 @@ namespace TrekVRApplication {
             return Mathf.Max(width, height);
         }
 
+        [Obsolete("No longer required since bounding boxes are now self-sorting.")]
         public static bool ReverseLonOrder(BoundingBox boundingBox) {
             return boundingBox[0] * boundingBox[2] < 0 && Mathf.Abs(boundingBox[0] - boundingBox[2]) > 180.0f;
-        }
-
-        [Obsolete]
-        public static Vector4 SortBoundingBox(Vector4 boundingBox) {
-            Vector4 result = boundingBox;
-            if (result[3] < result[1]) {
-                result[1] = boundingBox[3];
-                result[3] = boundingBox[1];
-            }
-            if (result[2] < result[0]) {
-                result[0] = boundingBox[2];
-                result[2] = boundingBox[0];
-            }
-            return result;
         }
 
     }

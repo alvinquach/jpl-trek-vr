@@ -226,7 +226,7 @@ namespace TrekVRApplication {
         }
 
         private bool IsGlobalMosaic(TerrainModelProductMetadata texInfo) {
-            return texInfo.ProductId == GlobalMosaicUUID && texInfo.BoundingBox == BoundingBox.Global;
+            return texInfo.ProductId == GlobalMosaicUUID && texInfo.BoundingBox == UnrestrictedBoundingBox.Global;
         }
 
         private int ClearExcessTextures() {

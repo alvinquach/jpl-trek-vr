@@ -4,9 +4,11 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public struct BoundingBox : IEquatable<IBoundingBox>, IBoundingBox {
+    public struct UnrestrictedBoundingBox : IEquatable<IBoundingBox>, IBoundingBox {
 
-        public static BoundingBox Zero { get { return new BoundingBox(0f, 0f, 0f, 0f); } }
+        public static UnrestrictedBoundingBox Zero { get { return new UnrestrictedBoundingBox(0f, 0f, 0f, 0f); } }
+
+        public static UnrestrictedBoundingBox Global { get { return new UnrestrictedBoundingBox(-180f, -90f, 180f, 90f); } }
 
         private float _lonStart;
         public float LonStart {
@@ -84,7 +86,7 @@ namespace TrekVRApplication {
             }
         }
 
-        public BoundingBox(float lonStart, float latStart, float lonEnd, float latEnd) {
+        public UnrestrictedBoundingBox(float lonStart, float latStart, float lonEnd, float latEnd) {
             _lonStart = WrapLongitude(lonStart);
             _latStart = WrapLatitude(latStart);
             _lonEnd = WrapLongitude(lonEnd);
@@ -92,17 +94,16 @@ namespace TrekVRApplication {
             SortBoundingBox();
         }
 
-        public BoundingBox(Vector4 v) : this(v[0], v[1], v[2], v[3]) {
+        public UnrestrictedBoundingBox(Vector4 v) : this(v[0], v[1], v[2], v[3]) {
 
         }
 
-        public BoundingBox(IBoundingBox bbox) : this(bbox[0], bbox[1], bbox[2], bbox[3]) {
+        public UnrestrictedBoundingBox(IBoundingBox bbox) : this(bbox[0], bbox[1], bbox[2], bbox[3]) {
 
         }
 
         private void SortBoundingBox() {
-            if ((this[2] < this[0] && this[0] - this[2] < 180f)
-                || (this[0] < this[2] && this[2] - this[0] > 180f)) {
+            if (this[2] < this[0]) {
                 float lon = this[0];
                 this[0] = this[2];
                 this[2] = lon;
@@ -161,42 +162,42 @@ namespace TrekVRApplication {
             return Mathf.Clamp(MathUtils.WrapAngle180(lat), -90f, 90f);
         }
 
-        public static bool operator ==(BoundingBox bbox1, IBoundingBox bbox2) {
+        public static bool operator ==(UnrestrictedBoundingBox bbox1, IBoundingBox bbox2) {
             Debug.Log("== OPERATOR USED");
             return bbox1.Equals(bbox2);
         }
 
-        public static bool operator !=(BoundingBox bbox1, IBoundingBox bbox2) {
+        public static bool operator !=(UnrestrictedBoundingBox bbox1, IBoundingBox bbox2) {
             return !bbox1.Equals(bbox2);
         }
 
-        public static bool operator ==(IBoundingBox bbox1, BoundingBox bbox2) {
+        public static bool operator ==(IBoundingBox bbox1, UnrestrictedBoundingBox bbox2) {
             Debug.Log("== OPERATOR USED");
             return bbox1.Equals(bbox2);
         }
 
-        public static bool operator !=(IBoundingBox bbox1, BoundingBox bbox2) {
+        public static bool operator !=(IBoundingBox bbox1, UnrestrictedBoundingBox bbox2) {
             return !bbox1.Equals(bbox2);
         }
 
-        // Converts a  to a BoundingBox.
-        public static implicit operator BoundingBox(Vector4 v) {
-            return new BoundingBox(v);
-        }
-
-        // Converts a UnrestrictedBoundingBox to a BoundingBox.
-        public static implicit operator BoundingBox(UnrestrictedBoundingBox bbox) {
-            return new BoundingBox((IBoundingBox)bbox);
-        }
-
-        // Converts a BoundingBox to a Vector4.
-        public static implicit operator Vector4(BoundingBox bbox) {
-            return new Vector4(bbox[0], bbox[1], bbox[2], bbox[3]);
+        // Converts a Vector4 to a UnrestrictedBoundingBox.
+        public static implicit operator UnrestrictedBoundingBox(Vector4 v) {
+            return new UnrestrictedBoundingBox(v);
         }
 
         // Converts a BoundingBox to a UnrestrictedBoundingBox.
         public static implicit operator UnrestrictedBoundingBox(BoundingBox bbox) {
             return new UnrestrictedBoundingBox((IBoundingBox)bbox);
+        }
+
+        // Converts a UnrestrictedBoundingBox to a Vector4.
+        public static implicit operator Vector4(UnrestrictedBoundingBox bbox) {
+            return new Vector4(bbox[0], bbox[1], bbox[2], bbox[3]);
+        }
+
+        // Converts a UnrestrictedBoundingBox to a BoundingBox.
+        public static implicit operator BoundingBox(UnrestrictedBoundingBox bbox) {
+            return new BoundingBox((IBoundingBox)bbox);
         }
 
     }

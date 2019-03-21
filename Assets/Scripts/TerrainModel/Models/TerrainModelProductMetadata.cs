@@ -7,7 +7,7 @@ namespace TrekVRApplication {
 
         public string ProductId { get; }
 
-        public BoundingBox BoundingBox { get; }
+        public IBoundingBox BoundingBox { get; }
 
         public int Width { get; }
 
@@ -15,12 +15,12 @@ namespace TrekVRApplication {
 
         public ImageFileFormat Format { get; set; }
 
-        public TerrainModelProductMetadata(string productId, BoundingBox boundingBox, int size, ImageFileFormat format = 0) :
+        public TerrainModelProductMetadata(string productId, IBoundingBox boundingBox, int size, ImageFileFormat format = 0) :
             this(productId, boundingBox, size, size, format) {
 
         }
 
-        public TerrainModelProductMetadata(string productId, BoundingBox boundingBox, int width, int height, ImageFileFormat format = 0) {
+        public TerrainModelProductMetadata(string productId, IBoundingBox boundingBox, int width, int height, ImageFileFormat format = 0) {
             ProductId = productId;
             BoundingBox = boundingBox;
             Width = width;

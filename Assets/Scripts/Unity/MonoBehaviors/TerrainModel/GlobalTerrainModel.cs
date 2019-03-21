@@ -69,7 +69,7 @@ namespace TrekVRApplication {
         }
 
         private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int width, int height) {
-            return new TerrainModelProductMetadata(productId, BoundingBox.Global, width, height);
+            return new TerrainModelProductMetadata(productId, UnrestrictedBoundingBox.Global, width, height);
         }
 
     }

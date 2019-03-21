@@ -66,6 +66,7 @@ namespace TrekVRApplication {
 
         protected override void GenerateMaterial() {
             base.GenerateMaterial();
+            ApplyTemporaryTextures();
             LoadDetailedTextures();
         }
 
@@ -105,8 +106,26 @@ namespace TrekVRApplication {
 
         }
 
-        private void LoadDetailedTextures() {
+        /// <summary>
+        ///     Applies the global textures to the mesh as a placeholder until
+        ///     the more detailed local textures can be loaded.
+        /// </summary>
+        private void ApplyTemporaryTextures() {
+            // TODO Inherit layers from global terrain model.
+            TerrainModelTextureManager.Instance.GetGlobalMosaicTexture(texture => {
+                int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
+                Material.SetTexture(diffuseBaseId, texture);
 
+                UVScaleOffset uvScaleOffset = BoundingBoxUtils.CalculateUVScaleOffset(UnrestrictedBoundingBox.Global, _boundingBox);
+                Material.SetTextureScale(diffuseBaseId, uvScaleOffset.Scale);
+                Material.SetTextureOffset(diffuseBaseId, uvScaleOffset.Offset);
+            });
+        }
+
+        /// <summary>
+        ///     Loads the local textures and replaces the placeholder textures.
+        /// </summary>
+        private void LoadDetailedTextures() {
             // TODO Inherit layers from global terrain model.
 
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
@@ -114,8 +133,8 @@ namespace TrekVRApplication {
             textureManager.GetTexture(texInfo, texture => {
                 int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
                 Material.SetTexture(diffuseBaseId, texture);
-                Material.SetTextureOffset(diffuseBaseId, Vector2.zero);
                 Material.SetTextureScale(diffuseBaseId, Vector2.one);
+                Material.SetTextureOffset(diffuseBaseId, Vector2.zero);
                 textureManager.RegisterUsage(texInfo, true);
             });
 
