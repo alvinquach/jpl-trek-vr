@@ -56,7 +56,7 @@ namespace TrekVRApplication {
             }
         }
 
-        private void OnDestroy() {
+        protected override void OnDestroy() {
             // TODO Unregister all layers
             TerrainModelProductMetadata texInfo = GenerateTerrainModelProductMetadata(GlobalMosaicUUID);
             TerrainModelTextureManager.Instance.RegisterUsage(texInfo, false);
@@ -87,6 +87,7 @@ namespace TrekVRApplication {
             // Load the DEM data, and then generate another mesh after using the data.
             _dataElevationModelWebService.GetDEM(_squareBoundingBox, 1024, (demFilePath) => {
                 //_demFilePath = demFilePath; // Should this be allowed?
+                metadata.demFilePath = demFilePath; // Temporary fix
                 GenerateTerrainMeshTask generateMeshTask = 
                     new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
 

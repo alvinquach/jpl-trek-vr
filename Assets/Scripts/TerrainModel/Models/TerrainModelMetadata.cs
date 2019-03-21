@@ -2,6 +2,8 @@
 
     public struct TerrainModelMetadata {
 
+        // TODO Refactor this to be properties instead of fields.
+
         public string demFilePath;
 
         //public string albedoFilePath;
