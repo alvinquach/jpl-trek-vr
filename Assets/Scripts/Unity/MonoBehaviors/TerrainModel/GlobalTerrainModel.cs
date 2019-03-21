@@ -7,49 +7,54 @@ namespace TrekVRApplication {
 
         public const float GlobalModelScale = 2.5e-7f;
 
-        public override float HeightScale {
-            get { return GlobalModelScale; }
-            set { }
-        }
-
-        [SerializeField]
         private float _radius;
-
         public float Radius {
-            get { return _radius; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value * GlobalModelScale; }
+            get { return _radius * GlobalModelScale; }
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    _radius = value;
+                }
+            }
         }
 
-        public override Texture2D Albedo {
-            get { return base.Albedo; }
-            protected set {
-                TerrainModelManager.Instance.GlobalPlanetTexture = value;
-                base.Albedo = value;
-            }
+        protected override void GenerateMaterials() {
+            base.GenerateMaterials();
+
+            TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
+            textureManager.GetGlobalMosaicTexture(texture => {
+                CurrentMaterial.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
+            });
+        }
+
+        protected override void GenerateMesh() {
+            TerrainModelMetadata metadata = GenerateTerrainModelMetadata();
+            GenerateTerrainMeshTask generateMeshTask = new GenerateDigitalElevationModelSphericalTerrainMeshTask(metadata);
+            generateMeshTask.Execute((meshData) => {
+                QueueTask(() => ProcessMeshData(meshData));
+                _initTaskStatus = TaskStatus.Completed;
+            });
         }
 
         protected override void ProcessMeshData(MeshData[] meshData) {
             base.ProcessMeshData(meshData);
 
-            // Add a sphere collider to the mesh, so that it can be manipulated using the controller.
+            // Adds a sphere collider to the mesh, so that it can be manipulated using the controller.
             SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-            collider.radius = _radius;
+            collider.radius = Radius;
         }
 
-        protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
-            TerrainModelMetadata metadata = GenerateMetadata();
-            return new GenerateDigitalElevationModelSphericalTerrainMeshTask(metadata);
-        }
-
-        protected override TerrainModelMetadata GenerateMetadata() {
+        protected override TerrainModelMetadata GenerateTerrainModelMetadata() {
             return new TerrainModelMetadata() {
                 demFilePath = _demFilePath,
-                albedoFilePath = _albedoFilePath,
-                radius = _radius,
-                heightScale = HeightScale,
+                radius = Radius,
+                heightScale = HeightScale * GlobalModelScale,
                 lodLevels = _lodLevels,
                 baseDownsample = _baseDownsampleLevel
             };
+        }
+
+        private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int width, int height) {
+            return new TerrainModelProductMetadata(productId, BoundingBox.Global, width, height);
         }
 
     }

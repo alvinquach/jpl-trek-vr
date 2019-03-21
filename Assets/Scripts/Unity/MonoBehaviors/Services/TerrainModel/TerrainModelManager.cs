@@ -103,14 +103,6 @@ namespace TrekVRApplication {
                 _globalPlanetDEMFilepath
             );
 
-            // ALSO TEMPORARY
-            GlobalPlanetModel.AlbedoFilePath = Path.Combine(
-                FilePath.StreamingAssetsRoot,
-                FilePath.JetPropulsionLaboratory,
-                FilePath.Product,
-                _globalPlanetAlbedoFilepath
-            );
-
             GlobalPlanetModel.Radius = Mars.Radius;
             GlobalPlanetModel.BaseDownSampleLevel = _globalPlanetBaseDownsampleLevel;
             GlobalPlanetModel.LodLevels = _globalPlanetLODLevels;
@@ -123,32 +115,6 @@ namespace TrekVRApplication {
 
         // TEMPORARY
         private int _counter = 0;
-
-        [Obsolete("Planar terrains should no longer be created. Use CreatePartial() to create partial terrain instead.")]
-        public TerrainModel Create(string demPath, string albedoPath = null) {
-            GameObject terrainModelContainer = new GameObject();
-            terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform);
-            terrainModelContainer.name = $"Model {++_counter}";
-            terrainModelContainer.SetActive(false);
-
-            PlanarTerrainModel terrainModel = terrainModelContainer.AddComponent<PlanarTerrainModel>();
-            try {
-                terrainModel.Size = 1.5f;
-                terrainModel.HeightScale = 0.000002f;
-                terrainModel.LodLevels = 0;
-                terrainModel.BaseDownSampleLevel = 4;
-                terrainModel.DemFilePath = demPath;
-                terrainModel.AlbedoFilePath = albedoPath;
-                terrainModel.InitModel();
-            }
-            catch (Exception e) {
-                Debug.LogError(e.Message);
-                Destroy(terrainModelContainer);
-                return null;
-            }
-
-            return AddTerrainModel(terrainModel);
-        }
 
         public TerrainModel CreatePartial(BoundingBox boundingBox, string demPath, string albedoPath = null) {
             GameObject terrainModelContainer = new GameObject();

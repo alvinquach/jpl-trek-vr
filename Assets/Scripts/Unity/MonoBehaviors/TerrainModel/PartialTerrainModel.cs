@@ -1,19 +1,11 @@
 using UnityEngine;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
     public class PartialTerrainModel : TerrainModel {
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
-
-        private IMosaicWebService _mosaicWebService = TrekMosaicWebService.Instance;
-
-        [SerializeField]
-        protected float _heightScale = 1.0f;
-        public override float HeightScale {
-            get { return _heightScale; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
-        }
 
         [SerializeField]
         private float _radius;
@@ -50,6 +42,8 @@ namespace TrekVRApplication {
         /// </summary>
         private GenerateBasePartialTerrainMeshTask _baseMeshGenerator;
 
+        #region Unity lifecycle methods
+
         protected override void Start() {
             base.Start();
             // TODO Call method to download DEM and textures here.
@@ -62,28 +56,40 @@ namespace TrekVRApplication {
             }
         }
 
-        public override void InitModel() {
-            if (_initTaskStatus > TaskStatus.NotStarted) {
-                return;
-            }
+        private void OnDestroy() {
+            // TODO Unregister all layers
+            TerrainModelProductMetadata texInfo = GenerateTerrainModelProductMetadata(GlobalMosaicUUID);
+            TerrainModelTextureManager.Instance.RegisterUsage(texInfo, false);
+        }
 
-            _initTaskStatus = TaskStatus.Started;
+        #endregion
 
-            TerrainModelMetadata metadata = GenerateMetadata();
+        protected override void GenerateMaterials() {
+            base.GenerateMaterials();
+            LoadDetailedTextures();
+        }
+
+        protected override void GenerateMesh() {
+            TerrainModelMetadata metadata = GenerateTerrainModelMetadata();
             UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(_squareBoundingBox, _boundingBox);
             GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
 
             // Generate a base mesh first to be displayed temporarily
             // while the DEM data is being loaded.
             generateBaseMeshTask.Execute((meshData) => {
-                QueueTask(() => ProcessMeshData(meshData));
+                QueueTask(() => {
+                    ProcessMeshData(meshData);
+                    PostProcessMeshData();
+                });
                 _initTaskStatus = TaskStatus.Completed;
             });
 
             // Load the DEM data, and then generate another mesh after using the data.
             _dataElevationModelWebService.GetDEM(_squareBoundingBox, 1024, (demFilePath) => {
-                _demFilePath = demFilePath; // Should this be allowed?
-                GenerateTerrainMeshTask generateMeshTask = InstantiateGenerateMeshTask();
+                //_demFilePath = demFilePath; // Should this be allowed?
+                GenerateTerrainMeshTask generateMeshTask = 
+                    new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
+
                 generateMeshTask.Execute((meshData) => {
                     QueueTask(() => {
                         // TODO Rework the logic in the base class to do this instead.
@@ -91,38 +97,30 @@ namespace TrekVRApplication {
                         if (lodGroupContainer) {
                             Destroy(lodGroupContainer);
                         }
-                        base.ProcessMeshData(meshData);
+                        ProcessMeshData(meshData);
                     });
-                });
-            });
-
-            _mosaicWebService.GetMosaic(_squareBoundingBox, 1024, (textureFilePath) => {
-                _albedoFilePath = textureFilePath; // Should this be allowed?
-
-                LoadColorImageFromFileTask<BGRAImage> loadImageTask = new LoadColorImageFromFileTask<BGRAImage>(textureFilePath);
-                loadImageTask.Execute(image => {
-
-                    int width = loadImageTask.TextureWidth, height = loadImageTask.TextureHeight;
-                    TextureCompressionFormat format = TextureCompressionFormat.UncompressedWithAlpha;
-
-                    byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                    image.CopyRawData(data);
-
-                    QueueTask(() => {
-                        Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
-                        texture.GetRawTextureData<byte>().CopyFrom(data);
-                        texture.Apply(true);
-
-                        CurrentMaterial.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
-                    });
-
                 });
             });
 
         }
 
-        protected override void ProcessMeshData(MeshData[] meshData) {
-            base.ProcessMeshData(meshData);
+        private void LoadDetailedTextures() {
+
+            // TODO Inherit layers from global terrain model.
+
+            TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
+            TerrainModelProductMetadata texInfo = GenerateTerrainModelProductMetadata(GlobalMosaicUUID);
+            textureManager.GetTexture(texInfo, texture => {
+                CurrentMaterial.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
+                textureManager.RegisterUsage(texInfo, true);
+            });
+
+        }
+
+        /// <summary>
+        ///     Positions the model after the mesh is generated, and starts the view transition process.
+        /// </summary>
+        private void PostProcessMeshData() {
             transform.rotation = TerrainModelManager.Instance.GetGlobalPlanetModelTransform().rotation;
             transform.localPosition = transform.rotation * (0.25f * 3.39f * BoundingBoxUtils.MedianDirection(_boundingBox));
 
@@ -145,21 +143,18 @@ namespace TrekVRApplication {
             }
         }
 
-        protected override GenerateTerrainMeshTask InstantiateGenerateMeshTask() {
-            TerrainModelMetadata metadata = GenerateMetadata();
-            UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(_squareBoundingBox, _boundingBox);
-            return new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
-        }
-
-        protected override TerrainModelMetadata GenerateMetadata() {
+        protected override TerrainModelMetadata GenerateTerrainModelMetadata() {
             return new TerrainModelMetadata() {
                 demFilePath = _demFilePath,
-                albedoFilePath = _albedoFilePath,
                 radius = _radius,
                 heightScale = _heightScale,
                 lodLevels = _lodLevels,
                 baseDownsample = _baseDownsampleLevel
             };
+        }
+
+        private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int size = 1024) {
+            return new TerrainModelProductMetadata(productId, _squareBoundingBox, size);
         }
 
     }

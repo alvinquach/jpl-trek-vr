@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using static TrekVRApplication.TerrainModelConstants;
+using System.Linq;
 
 namespace TrekVRApplication {
 
@@ -9,21 +12,26 @@ namespace TrekVRApplication {
 
         private const int MaxGlobalTextures = 8;
 
+        /// <summary>
+        ///     The instance of the TerrainModelTextureManager that is present in the scene.
+        ///     There should only be one TerrainModelTextureManager in the entire scene.
+        /// </summary>
+        public static TerrainModelTextureManager Instance { get; private set; }
+
         private class TextureWrapper {
 
-            public readonly LinkedList<Action<Texture2D>> OnLoadTexture = new LinkedList<Action<Texture2D>>();
+            public readonly LinkedList<Action<Texture2D>> OnTextureLoad = new LinkedList<Action<Texture2D>>();
 
             private Texture2D _texture;
             public Texture2D Texture {
                 get { return _texture; }
                 set {
                     _texture = value;
-                    if (OnLoadTexture.Count > 0) {
-                        foreach (Action<Texture2D> action in OnLoadTexture) {
+                    if (OnTextureLoad.Count > 0) {
+                        foreach (Action<Texture2D> action in OnTextureLoad) {
                             action.Invoke(_texture);
                         }
-                        OnLoadTexture.Clear();
-                        LastUsed = DateTimeUtils.Now();
+                        OnTextureLoad.Clear();
                     }
                 }
             }
@@ -50,17 +58,60 @@ namespace TrekVRApplication {
         private readonly IDictionary<TerrainModelProductMetadata, TextureWrapper> _textureDictionary =
             new Dictionary<TerrainModelProductMetadata, TextureWrapper>();
 
+        [SerializeField]
+        private string _globalMosaicFilepath;
+
+        private Texture2D _globalMosaicTexture;
+
+        private LinkedList<Action<Texture2D>> _onGlobalMosaicLoad = new LinkedList<Action<Texture2D>>();
+
+        #region Unity lifecycle methods
+
+        private void Awake() {
+
+            if (Instance == null) {
+                Instance = this;
+            } else if (Instance != this) {
+                // TODO Throw exception
+            }
+
+            // Load the global mosaic texture.
+            string fullMosaicFilepath = Path.Combine(
+                FilePath.StreamingAssetsRoot,
+                FilePath.JetPropulsionLaboratory,
+                FilePath.Product,
+                _globalMosaicFilepath
+            );
+            LoadTextureFromImage(fullMosaicFilepath, texture => {
+                _globalMosaicTexture = texture;
+                foreach (Action<Texture2D> action in _onGlobalMosaicLoad) {
+                    action.Invoke(_globalMosaicTexture);
+                }
+                _onGlobalMosaicLoad = null; // Set to null since it won't be used anymore after this.
+            });
+
+        }
+
         protected override void Update() {
             base.Update();
         }
 
-        public void RegisterUsage(TerrainModelProductMetadata texInfo, bool inUse) {
-            TextureWrapper textureWrapper = _textureDictionary[texInfo];
-            if (!textureWrapper) {
+        #endregion
 
+        public void RegisterUsage(TerrainModelProductMetadata texInfo, bool inUse) {
+            if (!_textureDictionary.TryGetValue(texInfo, out TextureWrapper wrapper)) {
                 return;
             }
-            textureWrapper.UsageCount += MathUtils.Clamp(textureWrapper.UsageCount + (inUse ? 1 : -1), 0);
+            if (inUse) {
+                wrapper.UsageCount += 1;
+                wrapper.LastUsed = DateTimeUtils.Now();
+            } else {
+                wrapper.UsageCount = MathUtils.Clamp(wrapper.UsageCount - 1, 0);
+                if (wrapper.UsageCount == 0) {
+                    ClearExcessTextures();
+                }
+            }
+            PrintTextureList();
         }
 
         /// <summary>
@@ -72,39 +123,22 @@ namespace TrekVRApplication {
         /// </param>
         public void GetTexture(TerrainModelProductMetadata productInfo, Action<Texture2D> callback = null) {
 
+            if (IsGlobalMosaic(productInfo)) {
+                GetGlobalMosaicTexture(callback);
+                return;
+            }
+
             TerrainModelProductMetadata texInfo = CleanMetadata(productInfo);
 
-            TextureWrapper wrapper = _textureDictionary[texInfo];
-
             // If an entry for the texture doesn't exist yet, then create it.
-            if (!wrapper) {
-
-                _textureDictionary[texInfo] = wrapper = new TextureWrapper();
+            if (!_textureDictionary.TryGetValue(texInfo, out TextureWrapper wrapper)) {
+                _textureDictionary.Add(texInfo, wrapper = new TextureWrapper());
 
                 // Get product either from the file system (if available) or the web service.
                 _productWebService.GetProduct(productInfo, filepath => {
-
-                    // Create a task for loading texture data on a separate thread.
-                    LoadColorImageFromFileTask<BGRAImage> loadImageTask = new LoadColorImageFromFileTask<BGRAImage>(filepath);
-
-                    // Execute the task.
-                    loadImageTask.Execute(image => {
-
-                        int width = loadImageTask.TextureWidth;
-                        int height = loadImageTask.TextureHeight;
-
-                        TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
-
-                        byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                        image.CopyRawData(data);
-
-                        QueueTask(() => {
-                            Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
-                            texture.GetRawTextureData<byte>().CopyFrom(data);
-                            texture.Apply(true);
-                            wrapper.Texture = texture;
-                        });
-
+                    LoadTextureFromImage(filepath, texture => {
+                        wrapper.Texture = texture;
+                        ClearExcessTextures();
                     });
                 });
             }
@@ -112,13 +146,39 @@ namespace TrekVRApplication {
             // Register the callback function if it is not null.
             if (callback != null) {
                 if (!wrapper.Texture) {
-                    wrapper.OnLoadTexture.AddLast(callback);
+                    wrapper.OnTextureLoad.AddLast(callback);
                 } else {
                     QueueTask(() => {
                         callback(wrapper.Texture);
-                        wrapper.LastUsed = DateTimeUtils.Now();
                     });
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callback">
+        ///     A callback function that the requested Texture2D object will be passed through.
+        ///     The callback function is guaranteed to be called on the main thread.
+        /// </param>
+        public void GetGlobalMosaicTexture(Action<Texture2D> callback = null) {
+            if (!_globalMosaicTexture) {
+                _onGlobalMosaicLoad.AddLast(callback);
+            } else {
+                QueueTask(() => {
+                    callback(_globalMosaicTexture);
+                });
+            }
+        }
+
+        /// <summary>
+        ///     Prints debug info to the console.
+        /// </summary>
+        public void PrintTextureList() {
+            foreach (TerrainModelProductMetadata texInfo in _textureDictionary.Keys) {
+                TextureWrapper wrapper = _textureDictionary[texInfo];
+                Debug.Log(texInfo + "\n" + wrapper.UsageCount);
             }
         }
 
@@ -129,6 +189,70 @@ namespace TrekVRApplication {
                 texInfo.Width,
                 texInfo.Height
             );
+        }
+
+        private void LoadTextureFromImage(string filepath, Action<Texture2D> callback) {
+
+            float start = Time.realtimeSinceStartup;
+
+            // Create a task for loading texture data on a separate thread.
+            LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(filepath);
+
+            // Execute the task.
+            loadImageTask.Execute(image => {
+
+                int width = loadImageTask.TextureWidth;
+                int height = loadImageTask.TextureHeight;
+
+                TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
+
+                byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
+                image.CopyRawData(data);
+
+                QueueTask(() => {
+                    Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to generate texture.");
+                    start = Time.realtimeSinceStartup;
+
+                    Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
+                    texture.GetRawTextureData<byte>().CopyFrom(data);
+                    texture.Apply(true, true);
+
+                    Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
+
+                    callback?.Invoke(texture);
+                });
+
+            });
+        }
+
+        private bool IsGlobalMosaic(TerrainModelProductMetadata texInfo) {
+            return texInfo.ProductId == GlobalMosaicUUID && texInfo.BoundingBox == BoundingBox.Global;
+        }
+
+        private int ClearExcessTextures() {
+
+            // TODO Test this
+
+            int targetDeleteCount = _textureDictionary.Count - MaxGlobalTextures;
+            if (targetDeleteCount < 0) {
+                return 0;
+            }
+
+            IEnumerable<KeyValuePair<TerrainModelProductMetadata, TextureWrapper>> entries =
+                _textureDictionary.ToList()
+                .Where(kv => kv.Value.UsageCount == 0)
+                .OrderByDescending(kv => kv.Value.LastUsed);
+
+            int count = 0;
+            foreach (KeyValuePair<TerrainModelProductMetadata, TextureWrapper> entry in entries) {
+                _textureDictionary.Remove(entry.Key);
+                Destroy(entry.Value.Texture);
+                if (++count == targetDeleteCount) {
+                    break;
+                }
+            }
+
+            return count;
         }
 
     }

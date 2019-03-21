@@ -32,7 +32,7 @@ namespace TrekVRApplication {
         ///     Encodes the metadata into a base64 string that can be used as a filename.
         /// </summary>
         public string EncodeBase64() {
-            string rawFilename = $"{ProductId}|{BoundingBox.ToString(",")}|{Width}x{Height}|{Format}";
+            string rawFilename = ToString("|");
             byte[] bytes = Encoding.UTF8.GetBytes(rawFilename);
             return Convert.ToBase64String(bytes);
         }
@@ -40,6 +40,17 @@ namespace TrekVRApplication {
         public static TerrainModelProductMetadata DecodeBase64(string filename) {
             // TODO Implement this
             throw new NotImplementedException();
+        }
+
+        public string ToString(string delimiter) {
+            return ProductId + delimiter +
+                BoundingBox.ToString(",") + delimiter +
+                $"{Width}x{Height}" + delimiter +
+                Format.ToString();
+        }
+
+        public override string ToString() {
+            return ToString("\n");
         }
 
         public bool Equals(TerrainModelProductMetadata other) {

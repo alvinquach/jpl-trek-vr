@@ -1,4 +1,6 @@
-﻿namespace TrekVRApplication {
+﻿using UnityEngine;
+
+namespace TrekVRApplication {
 
     public sealed class TerrainModelConstants {
 

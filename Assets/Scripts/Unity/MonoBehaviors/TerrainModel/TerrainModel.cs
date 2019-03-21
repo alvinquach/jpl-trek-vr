@@ -14,13 +14,13 @@ namespace TrekVRApplication {
         }
 
         [SerializeField]
-        protected string _albedoFilePath;
-        public string AlbedoFilePath {
-            get { return _albedoFilePath; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _albedoFilePath = value; }
+        protected float _heightScale = 1.0f;
+        public float HeightScale {
+            get { return _heightScale; }
+            // TODO Allow height scale to be changed after mesh is already generated.
+            set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
         }
 
-        public abstract float HeightScale { get; set; }
         [SerializeField]
         protected int _baseDownsampleLevel = 2;
 
@@ -39,8 +39,6 @@ namespace TrekVRApplication {
         }
 
         protected LOD[] _lods;
-
-        public virtual Texture2D Albedo { get; protected set; }
 
         protected virtual Material EnabledMaterial { get; set; }
 
@@ -110,24 +108,41 @@ namespace TrekVRApplication {
         #endregion
 
         // Can only be called once.
-        public virtual void InitModel() {
+        public void InitModel() {
             if (_initTaskStatus > TaskStatus.NotStarted) {
                 return;
             }
             _initTaskStatus = TaskStatus.Started;
-            GenerateTerrainMeshTask generateMeshTask = InstantiateGenerateMeshTask();
-            generateMeshTask.Execute((meshData) => {
-                QueueTask(() => ProcessMeshData(meshData));
-                _initTaskStatus = TaskStatus.Completed;
-            });
-        }
-
-        /// <summary>Instantiates the task for generating the terrain model mesh data.</summary>
-        protected abstract GenerateTerrainMeshTask InstantiateGenerateMeshTask();
-
-        protected virtual void ProcessMeshData(MeshData[] meshData) {
 
             GenerateMaterials();
+            GenerateMesh();
+        }
+
+        protected virtual void GenerateMaterials() {
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            if (!terrainModelManager.BaseEnabledMaterial || !terrainModelManager.BaseDisabledMaterial) {
+                // TODO Throw exception.
+            }
+            EnabledMaterial = new Material(terrainModelManager.BaseEnabledMaterial);
+            DisabledMaterial = new Material(terrainModelManager.BaseDisabledMaterial);
+            // Population of the material's texture slots is up to the implementing class.
+        }
+
+        protected abstract void GenerateMesh();
+
+        /// <summary>
+        ///     <para>
+        ///         Processes the generated mesh data. Creates a mesh renderer and mesh
+        ///         filter for each LOD mesh, and assigns material to the mesh. Also creates
+        ///         a LOD group containing the LOD mesh levels.
+        ///     </para>
+        ///     <para>
+        ///         This method is intended to be called from implementations of TerrainModel;
+        ///         it is not called by the TerrainModel abstract class itself.
+        ///     </para>
+        /// </summary>
+        protected virtual void ProcessMeshData(MeshData[] meshData) {
+
             _currentMaterial = UserInterfaceManager.Instance.MainModal.Visible ? DisabledMaterial : EnabledMaterial;
 
             // Minimum base downsampling level should be 1.
@@ -217,58 +232,7 @@ namespace TrekVRApplication {
 
         }
 
-        protected virtual void GenerateMaterials() {
-
-            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            if (!terrainModelManager.BaseEnabledMaterial || !terrainModelManager.BaseDisabledMaterial) {
-                // TODO Throw exception.
-            }
-            EnabledMaterial = new Material(terrainModelManager.BaseEnabledMaterial);
-            DisabledMaterial = new Material(terrainModelManager.BaseDisabledMaterial);
-
-            // TODO Also check if file exists.
-            if (!string.IsNullOrEmpty(_albedoFilePath)) {
-
-                float start = Time.realtimeSinceStartup;
-
-                // Task for loading texture data on a separate thread.
-                LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(_albedoFilePath);
-
-                // Execute the task.
-                loadImageTask.Execute(image => {
-
-                    int width = loadImageTask.TextureWidth;
-                    int height = loadImageTask.TextureHeight;
-
-                    TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
-
-                    //byte[] data = TextureUtils.GenerateMipmaps(image);
-                    byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                    image.CopyRawData(data);
-
-                    // Queue a task to apply texture on the main thread during the next update.
-                    QueueTask(() => {
-                        Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to generate texture.");
-                        start = Time.realtimeSinceStartup;
-
-                        Albedo = new Texture2D(width, height, format.GetUnityFormat(), true);
-                        Albedo.GetRawTextureData<byte>().CopyFrom(data);
-                        Albedo.Apply(true, true);
-
-                        // Set albedo texture to both the enabled and disabled materials.
-                        EnabledMaterial.SetTexture("_DiffuseBase", Albedo);
-                        DisabledMaterial.SetTexture("_DiffuseBase", Albedo);
-
-                        Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
-                    });
-
-                });
-
-            }
-
-        }
-
-        protected abstract TerrainModelMetadata GenerateMetadata();
+        protected abstract TerrainModelMetadata GenerateTerrainModelMetadata();
 
         public void UseEnabledMaterial() {
             Debug.Log("SWITCHING TO ENABLED MATERIAL");

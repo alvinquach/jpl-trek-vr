@@ -4,7 +4,7 @@
 
         public string demFilePath;
 
-        public string albedoFilePath;
+        //public string albedoFilePath;
 
         public float size;
 
