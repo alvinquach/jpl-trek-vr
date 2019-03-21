@@ -201,11 +201,6 @@ namespace TrekVRApplication {
             return Mathf.Max(width, height);
         }
 
-        [Obsolete("No longer required since bounding boxes are now self-sorting.")]
-        public static bool ReverseLonOrder(BoundingBox boundingBox) {
-            return boundingBox[0] * boundingBox[2] < 0 && Mathf.Abs(boundingBox[0] - boundingBox[2]) > 180.0f;
-        }
-
     }
 
 }

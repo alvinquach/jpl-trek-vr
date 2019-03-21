@@ -37,19 +37,8 @@ namespace TrekVRApplication {
             int lonVertCount = imageEndX - imageStartX + 1;
             int latVertCount = imageEndY - imageStartY + 1;
 
-            float latStart = _boundingBox[1] * Mathf.Deg2Rad;
-            float latStop = _boundingBox[3] * Mathf.Deg2Rad;
-            float latSweep = latStop - latStart;
-
-            bool reverseLonOrder = BoundingBoxUtils.ReverseLonOrder(_boundingBox);
-            float lonStart = _boundingBox[reverseLonOrder ? 2 : 0];
-            float lonStop = _boundingBox[reverseLonOrder ? 0 : 2];
-            float lonSweep = Mathf.DeltaAngle(lonStart, lonStop);
-
-            Debug.Log($"{latSweep * Mathf.Rad2Deg}, {lonSweep}");
-
-            float latIncrement = latSweep / (latVertCount - 1);
-            float lonIncrement = lonSweep / (lonVertCount - 1);
+            float latIncrement = _boundingBox.LatSwing * Mathf.Deg2Rad / (latVertCount - 1);
+            float lonIncrement = _boundingBox.LonSwing / (lonVertCount - 1);
 
             Vector3[] verts = new Vector3[latVertCount * lonVertCount];
             Vector2[] uvs = new Vector2[latVertCount * lonVertCount];
@@ -57,7 +46,7 @@ namespace TrekVRApplication {
             Vector3 offset = BoundingBoxUtils.MedianDirection(_boundingBox);
 
             int yIndex = 0, vertexIndex = 0;
-            for (float vy = latStart; yIndex < latVertCount; vy += latIncrement) {
+            for (float vy = _boundingBox.LatStart * Mathf.Deg2Rad; yIndex < latVertCount; vy += latIncrement) {
 
                 // The y-coordinate on the image that corresponds to the current row of vertices.
                 // Note this is actually inverted since we are traversing from bottom up.
@@ -68,7 +57,7 @@ namespace TrekVRApplication {
                 Vector3 baseLatVertex = new Vector3(Mathf.Cos(vy), Mathf.Sin(vy), 0);
 
                 int xIndex = 0;
-                for (float vx = lonStart; xIndex < lonVertCount; vx += lonIncrement) {
+                for (float vx = _boundingBox.LonStart; xIndex < lonVertCount; vx += lonIncrement) {
 
                     // The x-coordinate on the image that corresponds to the current vertex.
                     int x = (xIndex + imageStartX) * downsample;

@@ -24,19 +24,8 @@ namespace TrekVRApplication {
 
         protected override void Generate() {
 
-            float latStart = _boundingBox[1] * Mathf.Deg2Rad;
-            float latStop = _boundingBox[3] * Mathf.Deg2Rad;
-            float latSweep = latStop - latStart;
-
-            bool reverseLonOrder = BoundingBoxUtils.ReverseLonOrder(_boundingBox);
-            float lonStart = _boundingBox[reverseLonOrder ? 2 : 0];
-            float lonStop = _boundingBox[reverseLonOrder ? 0 : 2];
-            float lonSweep = Mathf.DeltaAngle(lonStart, lonStop);
-
-            Debug.Log($"{latSweep * Mathf.Rad2Deg}, {lonSweep}");
-
-            float latIncrement = latSweep / (LatLongVertCount - 1);
-            float lonIncrement = lonSweep / (LatLongVertCount - 1);
+            float latIncrement = _boundingBox.LatSwing * Mathf.Deg2Rad / (LatLongVertCount - 1);
+            float lonIncrement = _boundingBox.LonSwing / (LatLongVertCount - 1);
 
             Vector3[] verts = new Vector3[LatLongVertCount * LatLongVertCount];
             Vector2[] uvs = new Vector2[LatLongVertCount * LatLongVertCount];
@@ -44,14 +33,14 @@ namespace TrekVRApplication {
             Vector3 offset = BoundingBoxUtils.MedianDirection(_boundingBox);
 
             int yIndex = 0, vertexIndex = 0;
-            for (float vy = latStart; yIndex < LatLongVertCount; vy += latIncrement) {
+            for (float vy = _boundingBox.LatStart * Mathf.Deg2Rad; yIndex < LatLongVertCount; vy += latIncrement) {
 
                 // Create a new vertex using the latitude angle. The coordinates of this
                 // vertex will serve as a base for all the other vertices in this latitude.
                 Vector3 baseLatVertex = new Vector3(Mathf.Cos(vy), Mathf.Sin(vy), 0);
 
                 int xIndex = 0;
-                for (float vx = lonStart; xIndex < LatLongVertCount; vx += lonIncrement) {
+                for (float vx = _boundingBox.LonStart; xIndex < LatLongVertCount; vx += lonIncrement) {
 
                     // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
                     verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - vx, 0) * baseLatVertex - offset);
