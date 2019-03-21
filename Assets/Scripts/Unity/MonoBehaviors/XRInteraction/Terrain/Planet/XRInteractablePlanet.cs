@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Rendering;
 using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
@@ -518,15 +518,18 @@ namespace TrekVRApplication {
         }
 
         private void SendBoundingBoxUpdateToControllerModal(BoundingBox bbox) {
-            Browser browser = UserInterfaceManager.Instance
-                .GetControllerModalWithActivity(ControllerModalActivity.BBoxSelection)
-                .Browser;
+            ControllerModal controllerModal = UserInterfaceManager.Instance
+                .GetControllerModalWithActivity(ControllerModalActivity.BBoxSelection);
+
+            if (!controllerModal) {
+                return;
+            }
 
             string js =
                 $"let component = {AngularComponentContainerPath}.{BoundingBoxSelectionModalName};" +
                 $"component && component.updateBoundingBox({bbox.ToString(", ", 7)}, {_selectionIndex});";
 
-            browser.EvalJSCSP(js);
+            controllerModal.Browser.EvalJS(js);
             _framesSinceLastControllerModalUpdate = 0;
         }
 
