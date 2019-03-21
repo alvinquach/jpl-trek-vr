@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
+    /// <summary>
+    ///     A geographic bounding box that is restricted to a maximum longitudinal
+    ///     angle sweep of 180°. The restriction is automatically applied. If a
+    ///     larger angle sweep is required, use UnrestrictedBoundingBox instead.
+    /// </summary>
     public struct BoundingBox : IEquatable<IBoundingBox>, IBoundingBox {
 
         public static BoundingBox Zero { get { return new BoundingBox(0f, 0f, 0f, 0f); } }
