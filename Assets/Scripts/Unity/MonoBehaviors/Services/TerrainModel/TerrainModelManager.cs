@@ -24,25 +24,14 @@ namespace TrekVRApplication {
         public static TerrainModelManager Instance { get; private set; }
 
         [SerializeField]
-        [Tooltip("The material that is used as a base for new terrain models' enabled material.")]
-        private Material _baseEnabledMaterial;
+        [Tooltip("The material that is used as a base for new terrain models.")]
+        private Material _baseMaterial;
 
         /// <summary>
-        ///     The material that is used as a base for new terrain models' enabled material.
+        ///     The material that is used as a base for new terrain models.
         /// </summary>
-        public Material BaseEnabledMaterial {
-            get { return _baseEnabledMaterial; }
-        }
-
-        [SerializeField]
-        [Tooltip("The material that is used as a base for new terrain models' disabled material.")]
-        private Material _baseDisabledMaterial;
-
-        /// <summary>
-        ///     The material that is used as a base for new terrain models' disabled material.
-        /// </summary>
-        public Material BaseDisabledMaterial {
-            get { return _baseDisabledMaterial; }
+        public Material BaseMaterial {
+            get { return _baseMaterial; }
         }
 
         #region Global planet fields/properties.
@@ -61,8 +50,6 @@ namespace TrekVRApplication {
 
         public GlobalTerrainModel GlobalPlanetModel { get; private set; }
 
-        public Texture GlobalPlanetTexture { get; set; }
-
         #endregion
 
         // TODO Find out how the initial capacity for lists works in C#.
@@ -78,6 +65,14 @@ namespace TrekVRApplication {
                 return _terrainModels.Find(model => model.Visible);
             }
         }
+
+        /// <summary>
+        ///     Whether the terrain models are set to render in opaque (enabled) mode
+        ///     or semi-transparent (disabled) mode.
+        /// </summary>
+        public bool TerrainRenderMode { get; private set; } = true;
+
+        public event Action<bool> OnRenderModeChange = opaque => { };
 
         private void Awake() {
 
@@ -199,6 +194,13 @@ namespace TrekVRApplication {
 
         public Transform GetGlobalPlanetModelTransform() {
             return GlobalPlanetModel.transform;
+        }
+
+        public void SetTerrainRenderMode(bool mode) {
+            if (TerrainRenderMode != mode) {
+                TerrainRenderMode = mode;
+                OnRenderModeChange.Invoke(mode);
+            }
         }
 
         private TerrainModel AddTerrainModel(TerrainModel terrainModel) {

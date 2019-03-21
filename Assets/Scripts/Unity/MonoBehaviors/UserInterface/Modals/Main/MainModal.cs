@@ -36,16 +36,8 @@ namespace TrekVRApplication {
             set {
                 if (value) {
                     OpenModal();
-                        
-                    // FIXME Need to set the mode for all the terrain models, not just the current model.
-                    // Or need to implement a way to inherit modes when switching to different models.
-                    TerrainModel model = TerrainModelManager.Instance.CurrentVisibleModel;
-                    if (model && model.GetType() == typeof(GlobalTerrainModel)) {
-                        model.GetComponent<XRInteractablePlanet>()?.SwitchToMode(XRInteractablePlanetMode.Disabled);
-                    } else {
-                        model?.UseDisabledMaterial();
-                    }
                 }
+                TerrainModelManager.Instance.SetTerrainRenderMode(!value);
                 base.Visible = value;
             }
         }

@@ -40,14 +40,10 @@ namespace TrekVRApplication {
 
         protected LOD[] _lods;
 
-        protected virtual Material EnabledMaterial { get; set; }
-
-        protected virtual Material DisabledMaterial { get; set; }
-
-        private Material _currentMaterial;
-        public Material CurrentMaterial {
+        private Material _material;
+        public Material Material {
             get {
-                return _currentMaterial;
+                return _material;
             }
             set {
                 Transform lodContainer = transform.Find(GameObjectName.LODGroupContainer);
@@ -58,7 +54,7 @@ namespace TrekVRApplication {
                         meshRenderer.material = value;
                     }
                 }
-                _currentMaterial = value;
+                _material = value;
             }
         }
 
@@ -88,21 +84,18 @@ namespace TrekVRApplication {
 
         #region Unity lifecycle methods
 
+        protected virtual void Awake() {
+            TerrainModelManager.Instance.OnRenderModeChange += SetRenderMode;
+        }
+
         // Start is used instead of Awake so that property values can 
         // be assigned before the model intialization starts.
         protected virtual void Start() {
             InitModel();
-            if (UserInterfaceManager.Instance.MainModal.Visible) {
-                UseDisabledMaterial();
-            } else {
-                UseEnabledMaterial();
-            }
         }
 
-        // If this method is overriden, then this method should be 
-        // called from the overriding method.
-        protected override void Update() {
-            base.Update();
+        protected virtual void OnDestroy() {
+            TerrainModelManager.Instance.OnRenderModeChange -= SetRenderMode;
         }
 
         #endregion
@@ -114,17 +107,17 @@ namespace TrekVRApplication {
             }
             _initTaskStatus = TaskStatus.Started;
 
-            GenerateMaterials();
+            GenerateMaterial();
             GenerateMesh();
         }
 
-        protected virtual void GenerateMaterials() {
+        protected virtual void GenerateMaterial() {
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            if (!terrainModelManager.BaseEnabledMaterial || !terrainModelManager.BaseDisabledMaterial) {
+            if (!terrainModelManager.BaseMaterial) {
                 // TODO Throw exception.
             }
-            EnabledMaterial = new Material(terrainModelManager.BaseEnabledMaterial);
-            DisabledMaterial = new Material(terrainModelManager.BaseDisabledMaterial);
+            _material = new Material(terrainModelManager.BaseMaterial);
+            SetRenderMode(TerrainModelManager.Instance.TerrainRenderMode);
             // Population of the material's texture slots is up to the implementing class.
         }
 
@@ -142,8 +135,6 @@ namespace TrekVRApplication {
         ///     </para>
         /// </summary>
         protected virtual void ProcessMeshData(MeshData[] meshData) {
-
-            _currentMaterial = UserInterfaceManager.Instance.MainModal.Visible ? DisabledMaterial : EnabledMaterial;
 
             // Minimum base downsampling level should be 1.
             _baseDownsampleLevel = _baseDownsampleLevel < 1 ? 1 : _baseDownsampleLevel;
@@ -178,8 +169,8 @@ namespace TrekVRApplication {
                 lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _lodLevels, 2), new Renderer[] { meshRenderer });
 
                 // Add material to the MeshRenderer.
-                if (_currentMaterial != null) {
-                    meshRenderer.material = _currentMaterial;
+                if (_material != null) {
+                    meshRenderer.material = _material;
                 }
 
                 MeshFilter meshFilter = child.AddComponent<MeshFilter>();
@@ -234,14 +225,21 @@ namespace TrekVRApplication {
 
         protected abstract TerrainModelMetadata GenerateTerrainModelMetadata();
 
-        public void UseEnabledMaterial() {
-            Debug.Log("SWITCHING TO ENABLED MATERIAL");
-            CurrentMaterial = EnabledMaterial;
+        protected virtual void SetRenderMode(bool enabled) {
+            string shaderName = enabled ? "Custom/MultiDiffuseShader" : "Custom/MultiDiffuseTransparentShader";
+            SwitchToShader(shaderName);
+            if (!enabled) {
+                Material.SetFloat("_Opacity", 0.5f);
+            }
         }
 
-        public void UseDisabledMaterial() {
-            Debug.Log("SWITCHING TO DISABLED MATERIAL");
-            CurrentMaterial = DisabledMaterial;
+        private void SwitchToShader(string shaderName) {
+            Shader shader = Shader.Find(shaderName);
+            if (shader) {
+                Material.shader = shader;
+            } else {
+                Debug.LogError($"Could not find shader {shaderName}.");
+            }
         }
 
     }

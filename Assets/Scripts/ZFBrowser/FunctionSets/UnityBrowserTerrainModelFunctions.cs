@@ -28,7 +28,7 @@ namespace TrekVRApplication {
         // Temporary
         [RegisterToBrowser]
         public void AdjustLayer(double layer, double value) {
-            Material material = TerrainModelManager.Instance.CurrentVisibleModel.CurrentMaterial;
+            Material material = TerrainModelManager.Instance.CurrentVisibleModel.Material;
             if (material) {
                 material.SetFloat($"_Diffuse{(int)layer}Opacity", (float)(value / 100));
             }
@@ -38,7 +38,7 @@ namespace TrekVRApplication {
         [RegisterToBrowser]
         public void GetCurrentLayers(string requestId) {
             // TODO Un-hardcode this data
-            Material material = TerrainModelManager.Instance.CurrentVisibleModel.CurrentMaterial;
+            Material material = TerrainModelManager.Instance.CurrentVisibleModel.Material;
             IList<object> layers = new List<object>() {
                 new Dictionary<string, object>() {
                     { "name", "Test Texture" },

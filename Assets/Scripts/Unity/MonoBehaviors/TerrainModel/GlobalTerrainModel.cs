@@ -17,12 +17,12 @@ namespace TrekVRApplication {
             }
         }
 
-        protected override void GenerateMaterials() {
-            base.GenerateMaterials();
+        protected override void GenerateMaterial() {
+            base.GenerateMaterial();
 
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
             textureManager.GetGlobalMosaicTexture(texture => {
-                CurrentMaterial.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
+                Material.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
             });
         }
 
@@ -30,8 +30,10 @@ namespace TrekVRApplication {
             TerrainModelMetadata metadata = GenerateTerrainModelMetadata();
             GenerateTerrainMeshTask generateMeshTask = new GenerateDigitalElevationModelSphericalTerrainMeshTask(metadata);
             generateMeshTask.Execute((meshData) => {
-                QueueTask(() => ProcessMeshData(meshData));
-                _initTaskStatus = TaskStatus.Completed;
+                QueueTask(() => {
+                    ProcessMeshData(meshData);
+                    _initTaskStatus = TaskStatus.Completed;
+                });
             });
         }
 
@@ -51,6 +53,19 @@ namespace TrekVRApplication {
                 lodLevels = _lodLevels,
                 baseDownsample = _baseDownsampleLevel
             };
+        }
+
+        protected override void SetRenderMode(bool enabled) {
+            base.SetRenderMode(enabled);
+            if (_initTaskStatus == TaskStatus.Completed) {
+                if (!enabled) {
+                    XRInteractablePlanet planet = GetComponent<XRInteractablePlanet>();
+                    planet.SwitchToMode(XRInteractablePlanetMode.Disabled);
+                }
+                else {
+                    // TODO ...
+                }
+            }
         }
 
         private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int width, int height) {

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Rendering;
-using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
@@ -356,8 +355,6 @@ namespace TrekVRApplication {
                     break;
                 case XRInteractablePlanetMode.Disabled:
                     GetComponent<SphereCollider>().enabled = true;
-                    GlobalTerrainModel globe = GetComponent<GlobalTerrainModel>();
-                    globe.UseEnabledMaterial();
                     break;
             }
 
@@ -370,8 +367,6 @@ namespace TrekVRApplication {
                     break;
                 case XRInteractablePlanetMode.Disabled:
                     GetComponent<SphereCollider>().enabled = false;
-                    GlobalTerrainModel globe = GetComponent<GlobalTerrainModel>();
-                    globe.UseDisabledMaterial();
                     break;
             }
 

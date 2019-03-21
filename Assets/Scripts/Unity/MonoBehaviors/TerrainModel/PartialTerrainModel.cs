@@ -64,8 +64,8 @@ namespace TrekVRApplication {
 
         #endregion
 
-        protected override void GenerateMaterials() {
-            base.GenerateMaterials();
+        protected override void GenerateMaterial() {
+            base.GenerateMaterial();
             LoadDetailedTextures();
         }
 
@@ -80,8 +80,8 @@ namespace TrekVRApplication {
                 QueueTask(() => {
                     ProcessMeshData(meshData);
                     PostProcessMeshData();
+                    _initTaskStatus = TaskStatus.Completed;
                 });
-                _initTaskStatus = TaskStatus.Completed;
             });
 
             // Load the DEM data, and then generate another mesh after using the data.
@@ -111,7 +111,10 @@ namespace TrekVRApplication {
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
             TerrainModelProductMetadata texInfo = GenerateTerrainModelProductMetadata(GlobalMosaicUUID);
             textureManager.GetTexture(texInfo, texture => {
-                CurrentMaterial.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
+                int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
+                Material.SetTexture(diffuseBaseId, texture);
+                Material.SetTextureOffset(diffuseBaseId, Vector2.zero);
+                Material.SetTextureScale(diffuseBaseId, Vector2.one);
                 textureManager.RegisterUsage(texInfo, true);
             });
 
