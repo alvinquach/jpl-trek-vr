@@ -6,7 +6,7 @@ namespace TrekVRApplication {
 
         private const float DirectionalLightMaxIntensity = 0.8f;
 
-        private const float PointLightMaxIntensity = 0.69f;
+        private const float PointLightMaxIntensity = 0.8f;
 
         private const float DimIncrement = 0.2f;
 
