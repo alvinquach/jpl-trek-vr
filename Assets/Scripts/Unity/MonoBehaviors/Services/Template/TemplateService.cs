@@ -11,7 +11,6 @@ namespace TrekVRApplication {
         private Dictionary<string, GameObject> _templates = new Dictionary<string, GameObject>();
 
         void Awake() {
-
             if (!Instance) {
                 Instance = this;
             }
@@ -19,14 +18,13 @@ namespace TrekVRApplication {
                 Destroy(gameObject);
                 return;
             }
-
         }
 
         public GameObject GetTemplate(string name) {
-            if (!_templates.ContainsKey(name)) {
-                _templates[name] = transform.Find(name).gameObject;
+            if (!_templates.TryGetValue(name, out GameObject result)) {
+                _templates[name] = result = transform.Find(name).gameObject;
             }
-            return _templates[name];
+            return result;
         }
 
     }

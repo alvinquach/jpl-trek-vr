@@ -7,12 +7,12 @@ namespace TrekVRApplication {
     public static class XRInteractablePlanetUtils {
 
         /// <param name="latitude">Angle in degress.</param>
-        public static void GeneratePointsForLongitudeIndicator(LineRenderer lineRenderer, float longitude = float.NaN) {
+        public static void GeneratePointsForLongitudeIndicator(LineRenderer lineRenderer, float longitude = float.NaN, float scale = 1f) {
             lineRenderer.positionCount = CoordinateIndicatorSegmentCount;
             float angleIncrement = 2 * Mathf.PI / CoordinateIndicatorSegmentCount;
             for (int i = 0; i < CoordinateIndicatorSegmentCount; i++) {
                 float angle = i * angleIncrement;
-                Vector3 basePosition = new Vector3(0, Mathf.Sin(angle), Mathf.Cos(angle));
+                Vector3 basePosition = scale * new Vector3(0, Mathf.Sin(angle), Mathf.Cos(angle));
                 if (float.IsNaN(longitude)) {
                     lineRenderer.SetPosition(i, basePosition);
                 }
@@ -23,17 +23,16 @@ namespace TrekVRApplication {
         }
 
         /// <param name="latitude">Angle in degress.</param>
-        public static void GeneratePointsForLatitudeIndicator(LineRenderer lineRenderer, float latitude = float.NaN) {
+        public static void GeneratePointsForLatitudeIndicator(LineRenderer lineRenderer, float latitude = float.NaN, float scale = 1f) {
             lineRenderer.positionCount = CoordinateIndicatorSegmentCount;
             float angleIncrement = 2 * Mathf.PI / CoordinateIndicatorSegmentCount;
-            Vector2 offsetAndScale = CalculateLatitudeIndicatorOffsetAndScale(float.IsNaN(latitude) ? 0.0f : latitude);
+            Vector2 offsetAndScale = scale * CalculateLatitudeIndicatorOffsetAndScale(float.IsNaN(latitude) ? 0.0f : latitude);
             for (int i = 0; i < CoordinateIndicatorSegmentCount; i++) {
                 float angle = i * angleIncrement;
                 Vector3 basePosition = new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
                 if (float.IsNaN(latitude)) {
                     lineRenderer.SetPosition(i, basePosition);
-                }
-                else {
+                } else {
                     lineRenderer.SetPosition(i, offsetAndScale.x * basePosition + offsetAndScale.y * Vector3.up);
                 }
             }

@@ -15,17 +15,15 @@ namespace TrekVRApplication {
         /// </summary>
         public bool alignUpDirection = true;
 
-        void Awake() {
-            GameObject camera = GameObject.Find(GameObjectName.CameraRig);
-            if (camera) {
-                _eye = camera.GetComponentInChildren<Camera>();
-            }
+        void Start() {
+            _eye = UserInterfaceManager.Instance.XRCamera;
         }
 
         void Update() {
-            transform.rotation = _eye.transform.rotation;
-            if (!alignUpDirection) {
-                transform.up = Vector3.up;
+            if (alignUpDirection) {
+                transform.rotation = _eye.transform.rotation;
+            } else {
+                transform.forward = _eye.transform.forward;
             }
         }
 

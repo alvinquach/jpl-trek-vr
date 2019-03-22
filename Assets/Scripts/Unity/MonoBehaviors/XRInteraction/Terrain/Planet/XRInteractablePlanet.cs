@@ -295,7 +295,7 @@ namespace TrekVRApplication {
             }
 
             // Add container for coordinate lines
-            GameObject coordinateLines = new GameObject(GameObjectName.PlanetCoordinateLines);
+            GameObject coordinateLines = new GameObject(GameObjectName.PlanetStaticCoordinateLines);
             coordinateLines.transform.SetParent(transform, false);
             _coordinateLines = coordinateLines.AddComponent<XRInteractiblePlanetCoordinateLines>();
             _coordinateLines.SetVisible(false);

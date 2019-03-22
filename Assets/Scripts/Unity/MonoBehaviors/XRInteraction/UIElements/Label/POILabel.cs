@@ -12,14 +12,23 @@ namespace TrekVRApplication {
                 return _labelText?.text;
             }
             set {
-                if (_labelText) {
-                    _labelText.text = value;
+                if (!_labelText) {
+                    _labelText = gameObject.GetComponentInChildren<Text>();
                 }
+                _labelText.text = value;
             }
         }
 
-        void Awake() {
-            _labelText = gameObject.GetComponentInChildren<Text>();
+        public Material Material {
+            get {
+                return _labelText?.material;
+            }
+            set {
+                if (!_labelText) {
+                    _labelText = gameObject.GetComponentInChildren<Text>();
+                }
+                _labelText.material = value;
+            }
         }
 
     }

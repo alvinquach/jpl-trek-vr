@@ -12,7 +12,7 @@
 
         public const string PlanetSelectionIndicatorContainer = "SelectionIndicatorContainer";
 
-        public const string PlanetCoordinateLines = "CoordniateLines";
+        public const string PlanetStaticCoordinateLines = "CoordniateLines";
 
         public const string LODGroupContainer = "LodGroupContainer";
 
@@ -25,6 +25,8 @@
         public const string PinTemplate = "PinTemplate";
 
         public const string CoordinateTemplate = "CoordinateTemplate";
+
+        public const string StaticCoordinateTemplate = "StaticCoordinateTemplate";
 
         #endregion
 
