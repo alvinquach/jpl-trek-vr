@@ -58,7 +58,7 @@ namespace TrekVRApplication {
         }
 
         protected override void PadClickedHandler(object sender, ClickedEventArgs e) {
-            Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
+            //Debug.Log("Pad clicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = true;
             XRInteractableObject obj = GetInteractableObjectIfHit();
             if (obj && obj.padClick) {
@@ -68,7 +68,7 @@ namespace TrekVRApplication {
         }
 
         protected override void PadUnclickedHandler(object sender, ClickedEventArgs e) {
-            Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
+            //Debug.Log("Pad unclicked at (" + e.padX + ", " + e.padY + ")");
             _padClicked = false;
             XRInteractableObject obj = GetInteractableObjectIfHit();
             if (obj && obj.padClick) {

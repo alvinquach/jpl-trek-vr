@@ -5,11 +5,11 @@ namespace TrekVRApplication {
 
     public static class XRInteractablePlanetConstants {
 
-        public const int CoordinateIndicatorSegmentCount = 72;
+        public const int CoordinateIndicatorMaxSegmentCount = 128;
 
         public const float CoordinateIndicatorStaticThickness = 1e-3f;
 
-        public const float CoordinateIndicatorStaticBoldThickness = 2.5e-3f;
+        public const float CoordinateIndicatorStaticBoldThickness = 3.1e-3f;
 
         public const float CoordinateIndicatorThickness = 1.5e-3f;
 
@@ -31,7 +31,7 @@ namespace TrekVRApplication {
 
         public static readonly Color32 CoordinateIndicatorColor = new Color32(0, 224, 255, 255);
 
-        public static readonly Color32 CoordinateIndicatorStaticColor = new Color32(255, 127, 32, 255);
+        public static readonly Color32 CoordinateIndicatorStaticColor = new Color32(255, 160, 96, 255);
 
         public const int HemisphereLongLatCoordinateIndicatorCount = 5;
 

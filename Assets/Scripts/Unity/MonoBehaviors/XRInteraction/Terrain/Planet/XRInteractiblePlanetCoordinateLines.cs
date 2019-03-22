@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 using static TrekVRApplication.XRInteractablePlanetConstants;
 using static TrekVRApplication.XRInteractablePlanetUtils;
 
@@ -7,11 +7,23 @@ namespace TrekVRApplication {
 
     public class XRInteractiblePlanetCoordinateLines : MonoBehaviour {
 
-        private readonly IList<LineRenderer> _longitudeLines = new List<LineRenderer>();
+        //private readonly IList<LineRenderer> _longitudeLines = new List<LineRenderer>();
 
-        private readonly IList<LineRenderer> _latitudeLines = new List<LineRenderer>();
+        //private readonly IList<LineRenderer> _latitudeLines = new List<LineRenderer>();
 
-        private readonly IList<GameObject> _latitudeLabels = new List<GameObject>();
+        //private readonly IList<GameObject> _latitudeLabels = new List<GameObject>();
+
+        #region Line and label counts (for naming purposes)
+
+        private int _longitudeLineCount = 0;
+
+        private int _latitudeLineCount = 0;
+
+        private int _longitudeLabelCount = 0;
+
+        private int _latitudeLabelCount = 0;
+
+        #endregion
 
         private float _coordinateLineOpacity = 1.0f;
 
@@ -20,6 +32,8 @@ namespace TrekVRApplication {
         private float _coordinateLabelOpacity = 1.0f;
 
         private Material _coordinateLabelMaterial;
+
+        private Material _verticalAxisMaterial;
 
         #region Unity lifecycle methods
 
@@ -31,6 +45,7 @@ namespace TrekVRApplication {
             Camera eye = UserInterfaceManager.Instance.XRCamera;
             float distance = Vector3.Distance(eye.transform.position, transform.position);
             UpdateCoordinateLinesOpacity(distance);
+            UpdateCoordinateLabelsOpacity(distance);
             UpdateCoordinateLabelsOpacity(distance);
         }
 
@@ -48,9 +63,10 @@ namespace TrekVRApplication {
 
                 _coordinateLineOpacity = distance < CoordinateIndicatorStaticFadeOutDistance ? 1 : 0;
                 UpdateMaterialAlpha(_coordinateLineMaterial, _coordinateLineOpacity);
+                UpdateMaterialAlpha(_coordinateLabelMaterial, _coordinateLineOpacity);
 
                 _coordinateLabelOpacity = distance < CoordinateIndicatorStaticLabelFadeOutDistance ? 1 : 0;
-                UpdateMaterialAlpha(_coordinateLabelMaterial, _coordinateLabelOpacity);
+                UpdateMaterialAlpha(_verticalAxisMaterial, _coordinateLabelOpacity);
             }
         }
 
@@ -64,6 +80,10 @@ namespace TrekVRApplication {
             _coordinateLabelMaterial = new Material(Shader.Find("Custom/UnlitTransparentColorMasked"));
             _coordinateLabelMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
 
+            // Create material for vertical axis
+            _verticalAxisMaterial = new Material(Shader.Find("Custom/UnlitTransparentColorMasked"));
+            _verticalAxisMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
+
             // Scale
             float linesScale = Mars.Radius * GlobalTerrainModel.GlobalModelScale + CoordinateIndicatorRadiusOffset;
             float labelsScale = Mars.Radius * GlobalTerrainModel.GlobalModelScale + CoordinateIndicatorLabelRadiusOffset;
@@ -71,9 +91,9 @@ namespace TrekVRApplication {
             // Get template for labels
             GameObject labelTemplate = TemplateService.Instance.GetTemplate(GameObjectName.StaticCoordinateTemplate);
 
-            // Generate latitude and longitude lines
             float angleIncrement = 90.0f / (HemisphereLongLatCoordinateIndicatorCount + 1);
 
+            // Latitude lines and labels
             for (int i = 0; i <= HemisphereLongLatCoordinateIndicatorCount; i++) {
                 float latitude = i * angleIncrement;
 
@@ -97,18 +117,22 @@ namespace TrekVRApplication {
                 GenerateLatitudeCoordinateLabels(labelTemplate, -latitude, labelsScale);
             }
 
+            // Longitude lines
             for (int i = 0; i < 2 * (HemisphereLongLatCoordinateIndicatorCount + 1); i++) {
                 GenerateLongitudeCoordinateLine(i * angleIncrement, linesScale);
             }
 
+            // Longitude labels
             for (int i = 1; i < 4 * (HemisphereLongLatCoordinateIndicatorCount + 1); i++) {
                 GenerateLongitudeCoordinateLabel(labelTemplate, i * angleIncrement - 180, labelsScale);
             }
 
+            // Vertical axis
+            GenerateVerticalAxis(labelsScale, labelTemplate);
         }
 
         private LineRenderer GenerateLatitudeCoordinateLine(float latitude, float scale) {
-            GameObject gameObject = new GameObject($"Lat{GameObjectName.PlanetStaticCoordinateLines}{_latitudeLines.Count + 1}");
+            GameObject gameObject = new GameObject($"Lat{GameObjectName.PlanetStaticCoordinateLines}{++_latitudeLineCount}");
             gameObject.transform.SetParent(transform, false);
             LineRenderer lineRenderer = InitCoordinateIndicator(
                 gameObject,
@@ -116,12 +140,12 @@ namespace TrekVRApplication {
                 CoordinateIndicatorStaticThickness
             );
             GeneratePointsForLatitudeIndicator(lineRenderer, latitude, scale);
-            _latitudeLines.Add(lineRenderer);
+            //_latitudeLines.Add(lineRenderer);
             return lineRenderer;
         }
 
         private LineRenderer GenerateLongitudeCoordinateLine(float longitude, float scale) {
-            GameObject gameObject = new GameObject($"Lon{GameObjectName.PlanetStaticCoordinateLines}{_longitudeLines.Count + 1}");
+            GameObject gameObject = new GameObject($"Lon{GameObjectName.PlanetStaticCoordinateLines}{++_longitudeLineCount}");
             gameObject.transform.SetParent(transform, false);
             LineRenderer lineRenderer = InitCoordinateIndicator(
                 gameObject,
@@ -129,7 +153,7 @@ namespace TrekVRApplication {
                 CoordinateIndicatorStaticThickness
             );
             GeneratePointsForLongitudeIndicator(lineRenderer, longitude, scale);
-            _longitudeLines.Add(lineRenderer);
+            //_longitudeLines.Add(lineRenderer);
             return lineRenderer;
         }
 
@@ -140,19 +164,20 @@ namespace TrekVRApplication {
             Vector3 basePosition = positionalScale * new Vector3(0, Mathf.Sin(latitude), Mathf.Cos(latitude));
 
             GameObject label = Instantiate(template, transform, false);
-            label.name = $"LatLabel{_latitudeLabels.Count + 1}";
+            label.name = $"LatLabel{++_latitudeLabelCount}";
             label.transform.position = basePosition;
             label.SetActive(true);
-            POILabel text = label.GetComponent<POILabel>();
-            text.Text = formattedLatitude;
-            text.Material = _coordinateLabelMaterial;
-            _latitudeLabels.Add(label);
+            Text text = label.GetComponentInChildren<Text>();
+            text.text = formattedLatitude;
+            text.material = _coordinateLabelMaterial;
+            //_latitudeLabels.Add(label);
 
+            // Also generate labels on the opposite side of the globe.
             label = Instantiate(label, transform, false);
-            label.name = $"LatLabel{_latitudeLabels.Count + 1}";
+            label.name = $"LatLabel{++_latitudeLabelCount}";
             basePosition.z *= -1;
             label.transform.position = basePosition;
-            _latitudeLabels.Add(label);
+            //_latitudeLabels.Add(label);
         }
 
         private void GenerateLongitudeCoordinateLabel(GameObject template, float longitude, float positionalScale) {
@@ -162,13 +187,45 @@ namespace TrekVRApplication {
             Vector3 basePosition = new Vector3(Mathf.Sin(longitude), CoordinateIndicatorLabelRadiusOffset, Mathf.Cos(longitude));
 
             GameObject label = Instantiate(template, transform, false);
-            label.name = $"LatLabel{_latitudeLabels.Count + 1}";
+            label.name = $"LatLabel{++_longitudeLabelCount}";
             label.transform.position = positionalScale * basePosition;
             label.SetActive(true);
-            POILabel text = label.GetComponent<POILabel>();
-            text.Text = formattedLatitude;
-            text.Material = _coordinateLabelMaterial;
-            _latitudeLabels.Add(label);
+            Text text = label.GetComponentInChildren<Text>();
+            text.text = formattedLatitude;
+            text.material = _coordinateLabelMaterial;
+            //_longitudeLabels.Add(label);
+        }
+
+        private void GenerateVerticalAxis(float positionalScale, GameObject labelTemplate) {
+            GameObject gameObject = new GameObject("VerticalAxis");
+            gameObject.transform.SetParent(transform, false);
+
+            LineRenderer lineRenderer = InitCoordinateIndicator(
+                gameObject,
+                _coordinateLineMaterial,
+                CoordinateIndicatorStaticBoldThickness
+            );
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, positionalScale * Vector3.up);
+            lineRenderer.SetPosition(1, positionalScale * Vector3.down);
+
+            // North label
+            GameObject label = Instantiate(labelTemplate, transform, false);
+            label.name = "NorthLabel";
+            label.transform.position = 1.05f * positionalScale * Vector3.up;
+            label.SetActive(true);
+            Text text = label.GetComponentInChildren<Text>();
+            text.text = "N";
+            text.fontSize = 36;
+            text.material = _verticalAxisMaterial;
+
+            // South label
+            label = Instantiate(label, transform, false);
+            label.name = "SouthLabel";
+            label.transform.position = 1.05f * positionalScale * Vector3.down;
+            text = label.GetComponentInChildren<Text>();
+            text.text = "S";
+
         }
 
         private void UpdateCoordinateLinesOpacity(float eyeDistance) {
@@ -188,6 +245,10 @@ namespace TrekVRApplication {
             if (changed) {
                 _coordinateLineOpacity = MathUtils.Clamp(_coordinateLineOpacity, 0f, 1f);
                 UpdateMaterialAlpha(_coordinateLineMaterial, _coordinateLineOpacity);
+
+                // The vertical axis fades in and out along with the coordinate lines,
+                // so update the vertical axis material here too.
+                UpdateMaterialAlpha(_verticalAxisMaterial, _coordinateLineOpacity);
             }
         }
 
