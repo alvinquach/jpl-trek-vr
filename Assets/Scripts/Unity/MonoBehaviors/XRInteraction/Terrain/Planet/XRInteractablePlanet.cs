@@ -296,9 +296,9 @@ namespace TrekVRApplication {
 
             // Add container for coordinate lines
             GameObject coordinateLines = new GameObject(GameObjectName.PlanetCoordinateLines);
-            coordinateLines.SetActive(false);
             coordinateLines.transform.SetParent(transform, false);
             _coordinateLines = coordinateLines.AddComponent<XRInteractiblePlanetCoordinateLines>();
+            _coordinateLines.SetVisible(false);
 
         }
 
@@ -563,7 +563,7 @@ namespace TrekVRApplication {
         #region Coordinate indicator methods
 
         public void SetCoordinateLinesVisiblity(bool visible) {
-            _coordinateLines.gameObject.SetActive(visible);
+            _coordinateLines.SetVisible(visible);
         }
 
         #endregion
