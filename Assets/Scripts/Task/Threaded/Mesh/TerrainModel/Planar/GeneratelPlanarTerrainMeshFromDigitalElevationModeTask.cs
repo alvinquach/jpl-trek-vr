@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public class GenerateDigitalElevationModelPlanarTerrainMeshTask : GenerateDigitalElevationModelTerrainMeshTask {
+    [Obsolete("No longer used, but code is retained for reference.")]
+    public class GeneratelPlanarTerrainMeshFromDigitalElevationModeTask : GenerateTerrainMeshFromDigitalElevationModelTask {
 
-        public GenerateDigitalElevationModelPlanarTerrainMeshTask(TerrainModelMetadata metadata) : base(metadata) {
+        public GeneratelPlanarTerrainMeshFromDigitalElevationModeTask(TerrainModelMetadata metadata) : base(metadata) {
 
         }
 

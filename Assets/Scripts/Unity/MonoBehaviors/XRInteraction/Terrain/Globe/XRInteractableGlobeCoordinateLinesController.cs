@@ -1,17 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using static TrekVRApplication.XRInteractablePlanetConstants;
-using static TrekVRApplication.XRInteractablePlanetUtils;
+using static TrekVRApplication.XRInteractableGlobeConstants;
+using static TrekVRApplication.XRInteractableGlobeUtils;
 
 namespace TrekVRApplication {
 
-    public class XRInteractiblePlanetCoordinateLines : MonoBehaviour {
-
-        //private readonly IList<LineRenderer> _longitudeLines = new List<LineRenderer>();
-
-        //private readonly IList<LineRenderer> _latitudeLines = new List<LineRenderer>();
-
-        //private readonly IList<GameObject> _latitudeLabels = new List<GameObject>();
+    /// <summary>
+    ///     Controller responsible for managing the static coordinate
+    ///     elements that are rendered on the planet, such as the
+    ///     coordinate lines and coordinate labels.
+    /// </summary>
+    public class XRInteractableGlobeCoordinateLinesController : MonoBehaviour {
 
         #region Line and label counts (for naming purposes)
 
@@ -85,8 +84,8 @@ namespace TrekVRApplication {
             _verticalAxisMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
 
             // Scale
-            float linesScale = Mars.Radius * GlobalTerrainModel.GlobalModelScale + CoordinateIndicatorRadiusOffset;
-            float labelsScale = Mars.Radius * GlobalTerrainModel.GlobalModelScale + CoordinateIndicatorLabelRadiusOffset;
+            float linesScale = Mars.Radius * GlobeTerrainModel.GlobeModelScale + CoordinateIndicatorRadiusOffset;
+            float labelsScale = Mars.Radius * GlobeTerrainModel.GlobeModelScale + CoordinateIndicatorLabelRadiusOffset;
 
             // Get template for labels
             GameObject labelTemplate = TemplateService.Instance.GetTemplate(GameObjectName.StaticCoordinateTemplate);
@@ -140,7 +139,6 @@ namespace TrekVRApplication {
                 CoordinateIndicatorStaticThickness
             );
             GeneratePointsForLatitudeIndicator(lineRenderer, latitude, scale);
-            //_latitudeLines.Add(lineRenderer);
             return lineRenderer;
         }
 
@@ -153,7 +151,6 @@ namespace TrekVRApplication {
                 CoordinateIndicatorStaticThickness
             );
             GeneratePointsForLongitudeIndicator(lineRenderer, longitude, scale);
-            //_longitudeLines.Add(lineRenderer);
             return lineRenderer;
         }
 
@@ -170,14 +167,12 @@ namespace TrekVRApplication {
             Text text = label.GetComponentInChildren<Text>();
             text.text = formattedLatitude;
             text.material = _coordinateLabelMaterial;
-            //_latitudeLabels.Add(label);
 
             // Also generate labels on the opposite side of the globe.
             label = Instantiate(label, transform, false);
             label.name = $"LatLabel{++_latitudeLabelCount}";
             basePosition.z *= -1;
             label.transform.position = basePosition;
-            //_latitudeLabels.Add(label);
         }
 
         private void GenerateLongitudeCoordinateLabel(GameObject template, float longitude, float positionalScale) {
@@ -193,7 +188,6 @@ namespace TrekVRApplication {
             Text text = label.GetComponentInChildren<Text>();
             text.text = formattedLatitude;
             text.material = _coordinateLabelMaterial;
-            //_longitudeLabels.Add(label);
         }
 
         private void GenerateVerticalAxis(float positionalScale, GameObject labelTemplate) {

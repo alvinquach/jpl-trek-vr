@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    [RequireComponent(typeof(XRInteractablePlanet))]
-    public class GlobalTerrainModel : TerrainModel {
+    [RequireComponent(typeof(XRInteractableGlobe))]
+    public class GlobeTerrainModel : TerrainModel {
 
-        public const float GlobalModelScale = 2.5e-7f;
+        public const float GlobeModelScale = 2.5e-7f;
 
         private float _radius;
         public float Radius {
-            get { return _radius * GlobalModelScale; }
+            get { return _radius * GlobeModelScale; }
             set {
                 if (_initTaskStatus == TaskStatus.NotStarted) {
                     _radius = value;
@@ -31,7 +31,7 @@ namespace TrekVRApplication {
 
         protected override void GenerateMesh() {
             TerrainModelMetadata metadata = GenerateTerrainModelMetadata();
-            GenerateTerrainMeshTask generateMeshTask = new GenerateDigitalElevationModelSphericalTerrainMeshTask(metadata);
+            GenerateTerrainMeshTask generateMeshTask = new GenerateGlobeTerrainMeshFromDigitalElevationModelTask(metadata);
             generateMeshTask.Execute((meshData) => {
                 QueueTask(() => {
                     ProcessMeshData(meshData);
@@ -53,7 +53,7 @@ namespace TrekVRApplication {
             return new TerrainModelMetadata() {
                 demFilePath = _demFilePath,
                 radius = Radius,
-                heightScale = HeightScale * GlobalModelScale,
+                heightScale = HeightScale * GlobeModelScale,
                 lodLevels = _lodLevels,
                 baseDownsample = _baseDownsampleLevel
             };
@@ -63,8 +63,8 @@ namespace TrekVRApplication {
             base.SetRenderMode(enabled);
             if (_initTaskStatus == TaskStatus.Completed) {
                 if (!enabled) {
-                    XRInteractablePlanet planet = GetComponent<XRInteractablePlanet>();
-                    planet.SwitchToMode(XRInteractablePlanetMode.Disabled);
+                    XRInteractableGlobe planet = GetComponent<XRInteractableGlobe>();
+                    planet.SwitchToMode(XRInteractableGlobeMode.Disabled);
                 }
                 else {
                     // TODO ...

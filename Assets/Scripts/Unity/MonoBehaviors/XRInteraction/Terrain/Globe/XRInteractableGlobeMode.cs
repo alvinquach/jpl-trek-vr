@@ -1,6 +1,6 @@
 ﻿namespace TrekVRApplication {
 
-    public enum XRInteractablePlanetMode {
+    public enum XRInteractableGlobeMode {
         Navigate,
         Select,
         Disabled

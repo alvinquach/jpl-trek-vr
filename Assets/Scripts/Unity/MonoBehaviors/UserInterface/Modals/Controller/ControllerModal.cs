@@ -72,22 +72,22 @@ namespace TrekVRApplication {
             ZFBrowserUtils.NavigateTo(Browser, activity.GetModalUrl());
 
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-            XRInteractablePlanet planet;
+            XRInteractableGlobe globe;
 
             // Switch to new acivity.
             // TODO Convert this to switch case.
             switch (activity) {
                 case ControllerModalActivity.BBoxSelection:
-                    if (terrainModelController.GlobalPlanetModelIsVisible()) {
+                    if (terrainModelController.GlobeModelIsVisible()) {
 
                         // FIXME Need to set the mode for all the terrain models, not just the planet.
-                        planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                        planet.SwitchToMode(XRInteractablePlanetMode.Select);
+                        globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobe>();
+                        globe.SwitchToMode(XRInteractableGlobeMode.Select);
 
                         UserInterfaceManager.Instance.MainModal.Visible = false;
                     }
                     else {
-                        terrainModelController.ShowGlobalPlanetModel(); // Hacky demo code
+                        terrainModelController.ShowGlobeModel(); // Hacky demo code
                         //Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
                         return;
                     }
@@ -98,8 +98,8 @@ namespace TrekVRApplication {
                 case ControllerModalActivity.LayerManager:
 
                     // FIXME Need to set the mode for all the terrain models, not just the planet.
-                    planet = terrainModelController.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                    planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
+                    globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobe>();
+                    globe.SwitchToMode(XRInteractableGlobeMode.Navigate);
 
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;

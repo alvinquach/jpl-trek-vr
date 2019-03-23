@@ -28,8 +28,8 @@ namespace TrekVRApplication {
             
             // FIXME Need to set the mode for all the terrain models, not just the planet.
             if (!visible) {
-                XRInteractablePlanet planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractablePlanet>();
-                planet.SwitchToMode(XRInteractablePlanetMode.Navigate);
+                XRInteractableGlobe globe = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobe>();
+                globe.SwitchToMode(XRInteractableGlobeMode.Navigate);
             }
         }
 

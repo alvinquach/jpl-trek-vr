@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using static TrekVRApplication.XRInteractablePlanetConstants;
+using static TrekVRApplication.XRInteractableGlobeConstants;
 
 namespace TrekVRApplication {
 
-    public static class XRInteractablePlanetUtils {
+    public static class XRInteractableGlobeUtils {
 
         /// <param name="latitude">Angle in degress.</param>
         public static void GeneratePointsForLongitudeIndicator(LineRenderer lineRenderer, float longitude = float.NaN, float scale = 1f) {

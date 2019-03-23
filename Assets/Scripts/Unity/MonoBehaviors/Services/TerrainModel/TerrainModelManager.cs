@@ -34,21 +34,18 @@ namespace TrekVRApplication {
             get { return _baseMaterial; }
         }
 
-        #region Global planet fields/properties.
+        #region Globe model fields/properties.
 
         [SerializeField]
-        private string _globalPlanetDEMFilepath;
+        private string _globalDEMFilepath;
 
         [SerializeField]
-        private string _globalPlanetAlbedoFilepath;
+        private int _globeModelBaseDownsampleLevel = 1;
 
         [SerializeField]
-        private int _globalPlanetBaseDownsampleLevel = 1;
+        private int _globeModelLODLevels = 2;
 
-        [SerializeField]
-        private int _globalPlanetLODLevels = 2;
-
-        public GlobalTerrainModel GlobalPlanetModel { get; private set; }
+        public GlobeTerrainModel GlobeModel { get; private set; }
 
         #endregion
 
@@ -59,8 +56,8 @@ namespace TrekVRApplication {
 
         public TerrainModel CurrentVisibleModel {
             get {
-                if (GlobalPlanetModel.Visible) {
-                    return GlobalPlanetModel;
+                if (GlobeModel.Visible) {
+                    return GlobeModel;
                 }
                 return _terrainModels.Find(model => model.Visible);
             }
@@ -84,24 +81,24 @@ namespace TrekVRApplication {
             _terrainModelsContainer = new GameObject();
             _terrainModelsContainer.name = GameObjectName.TerrainModelsContainer;
 
-            // Create the global planet game object.
-            GameObject globalPlanetModelGameObject = new GameObject();
-            globalPlanetModelGameObject.transform.parent = _terrainModelsContainer.transform;
-            globalPlanetModelGameObject.name = typeof(Mars).Name;
-            GlobalPlanetModel = globalPlanetModelGameObject.AddComponent<GlobalTerrainModel>();
+            // Create the globe model conatiner game object.
+            GameObject globeModelGameObject = new GameObject();
+            globeModelGameObject.transform.parent = _terrainModelsContainer.transform;
+            globeModelGameObject.name = typeof(Mars).Name;
+            GlobeModel = globeModelGameObject.AddComponent<GlobeTerrainModel>();
 
             // TEMPORARY -- DO THIS PROPERLY
-            GlobalPlanetModel.DemFilePath = Path.Combine(
+            GlobeModel.DemFilePath = Path.Combine(
                 FilePath.StreamingAssetsRoot,
                 FilePath.JetPropulsionLaboratory,
                 FilePath.DigitalElevationModel,
-                _globalPlanetDEMFilepath
+                _globalDEMFilepath
             );
 
-            GlobalPlanetModel.Radius = Mars.Radius;
-            GlobalPlanetModel.BaseDownSampleLevel = _globalPlanetBaseDownsampleLevel;
-            GlobalPlanetModel.LodLevels = _globalPlanetLODLevels;
-            GlobalPlanetModel.Visible = true;
+            GlobeModel.Radius = Mars.Radius;
+            GlobeModel.BaseDownSampleLevel = _globeModelBaseDownsampleLevel;
+            GlobeModel.LodLevels = _globeModelLODLevels;
+            GlobeModel.Visible = true;
 
             // Shift up 1 meter.
             _terrainModelsContainer.transform.position = Vector3.up;
@@ -111,13 +108,13 @@ namespace TrekVRApplication {
         // TEMPORARY
         private int _counter = 0;
 
-        public TerrainModel CreatePartial(BoundingBox boundingBox, string demPath, string albedoPath = null) {
+        public TerrainModel CreateSectionModel(BoundingBox boundingBox, string demPath, string albedoPath = null) {
             GameObject terrainModelContainer = new GameObject();
             terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform);
             terrainModelContainer.name = $"Model {++_counter}";
             terrainModelContainer.SetActive(false);
 
-            PartialTerrainModel terrainModel = terrainModelContainer.AddComponent<PartialTerrainModel>();
+            SectionTerrainModel terrainModel = terrainModelContainer.AddComponent<SectionTerrainModel>();
             try {
                 terrainModel.Radius = 3.39f;
                 terrainModel.HeightScale = 1e-6f;
@@ -139,19 +136,19 @@ namespace TrekVRApplication {
         }
 
         /// <summary>
-        ///     Whether the global planet model is currently visible as per this controller.
+        ///     Whether the globe model is currently visible as per this controller.
         /// </summary>
-        public bool GlobalPlanetModelIsVisible() {
-            return GlobalPlanetModel.Visible;
+        public bool GlobeModelIsVisible() {
+            return GlobeModel.Visible;
         }
 
         /// <summary>
-        ///     Shows the global planet model and hides the other TerrainModelBase objects
-        ///     that are managed by this controller.
+        ///     Shows the globe model and hides the other TerrainModelBase objects that are
+        ///     managed by this controller.
         /// </summary>
-        public void ShowGlobalPlanetModel() {
+        public void ShowGlobeModel() {
             _terrainModels.ForEach(t => t.Visible = false);
-            GlobalPlanetModel.Visible = true;
+            GlobeModel.Visible = true;
         }
 
         /// <summary>
@@ -171,7 +168,7 @@ namespace TrekVRApplication {
             HideAll();
             terrainModel.Visible = true;
             if (cloneRotation) {
-                terrainModel.transform.rotation = GlobalPlanetModel.transform.rotation;
+                terrainModel.transform.rotation = GlobeModel.transform.rotation;
             }
             return true;
         }
@@ -181,19 +178,19 @@ namespace TrekVRApplication {
         ///     GameObjects to inactive. Includes the default planet model.
         /// </summary>
         public void HideAll() {
-            GlobalPlanetModel.Visible = false;
+            GlobeModel.Visible = false;
             _terrainModels.ForEach(w => w.Visible = false);
         }
 
         public T GetComponentFromCurrentModel<T>() {
 
             // FIXME Change this so that it actually gets the component
-            // for the current model instead of the global model.
-            return GlobalPlanetModel.GetComponent<T>();
+            // for the current model instead of the globe model.
+            return GlobeModel.GetComponent<T>();
         }
 
-        public Transform GetGlobalPlanetModelTransform() {
-            return GlobalPlanetModel.transform;
+        public Transform GetGlobeModelTransform() {
+            return GlobeModel.transform;
         }
 
         public void SetTerrainRenderMode(bool mode) {

@@ -1,22 +1,22 @@
 using System;
 using UnityEngine;
-using static TrekVRApplication.XRInteractablePlanetConstants;
-using static TrekVRApplication.XRInteractablePlanetUtils;
+using static TrekVRApplication.XRInteractableGlobeConstants;
+using static TrekVRApplication.XRInteractableGlobeUtils;
 using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
-    public class XRInteractablePlanet : XRInteractableObject {
+    public class XRInteractableGlobe : XRInteractableObject {
 
         private const int ControllerModalBoundingBoxUpdateInterval = 10;
 
-        public XRInteractablePlanetMode InteractionMode { get; private set; } = XRInteractablePlanetMode.Navigate;
+        public XRInteractableGlobeMode InteractionMode { get; private set; } = XRInteractableGlobeMode.Navigate;
 
         private Material _coordinateIndicatorMaterial;
 
-        private XRInteractiblePlanetCoordinateLines _coordinateLines;
+        private XRInteractableGlobeCoordinateLinesController _coordinateLinesController;
 
-        private GlobalTerrainModel _globalTerrainModel;
+        private GlobeTerrainModel _globeModel;
 
         #region Grab variables
 
@@ -84,7 +84,7 @@ namespace TrekVRApplication {
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
 
-            if (InteractionMode == XRInteractablePlanetMode.Navigate) {
+            if (InteractionMode == XRInteractableGlobeMode.Navigate) {
                 if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _gripGrabbed) {
                     return;
                 }
@@ -95,7 +95,7 @@ namespace TrekVRApplication {
                 _grabber.LaserPointer.Active = true;
             }
 
-            else if (InteractionMode == XRInteractablePlanetMode.Select) {
+            else if (InteractionMode == XRInteractableGlobeMode.Select) {
 
                 Vector3 direction = transform.InverseTransformPoint(hit.point);
                 Vector3 flattened = new Vector3(direction.x, 0, direction.z);
@@ -128,7 +128,7 @@ namespace TrekVRApplication {
                 if (_selectionIndex == 4) {
                     Debug.Log("Selection Complete: " + _selectionBoundingBox);
                     TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                    TerrainModel terrainModel = terrainModelManager.CreatePartial(_selectionBoundingBox, null);
+                    TerrainModel terrainModel = terrainModelManager.CreateSectionModel(_selectionBoundingBox, null);
                     terrainModelManager.ShowTerrainModel(terrainModel, false);
                     ExitSelectionMode();
                 }
@@ -148,7 +148,7 @@ namespace TrekVRApplication {
         }
 
         public override void OnTriggerDoubleClick(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            if (InteractionMode == XRInteractablePlanetMode.Navigate) {
+            if (InteractionMode == XRInteractableGlobeMode.Navigate) {
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
                 NavigateTo(hit.point - transform.position, eye.transform.position);
             }
@@ -177,7 +177,7 @@ namespace TrekVRApplication {
              * 2. A text overlay at the cursor location indicatest the current longitude or 
              * latitude angle.
              */
-            if (InteractionMode == XRInteractablePlanetMode.Select) {
+            if (InteractionMode == XRInteractableGlobeMode.Select) {
 
                 // Update the position and angle of the coordinate selection label.
                 _coordSelectionLabel.transform.position = hit.point;
@@ -208,8 +208,8 @@ namespace TrekVRApplication {
                     if (direction.y < 0) {
                         angle = -angle;
                     }
-                    Vector2 offsetAndScale = XRInteractablePlanetUtils.CalculateLatitudeIndicatorOffsetAndScale(angle);
-                    float modelRadius = Mars.Radius * GlobalTerrainModel.GlobalModelScale;
+                    Vector2 offsetAndScale = XRInteractableGlobeUtils.CalculateLatitudeIndicatorOffsetAndScale(angle);
+                    float modelRadius = Mars.Radius * GlobeTerrainModel.GlobeModelScale;
 
                     currentCoordinateIndicator.transform.localPosition = new Vector3(0, modelRadius * offsetAndScale.y, 0);
                     currentCoordinateIndicator.transform.localScale = (offsetAndScale.x * modelRadius + CoordinateIndicatorRadiusOffset) * Vector3.one;
@@ -233,7 +233,7 @@ namespace TrekVRApplication {
 
         private void Awake() {
 
-            float indicatorRadius = Mars.Radius * GlobalTerrainModel.GlobalModelScale + CoordinateIndicatorRadiusOffset;
+            float indicatorRadius = Mars.Radius * GlobeTerrainModel.GlobeModelScale + CoordinateIndicatorRadiusOffset;
 
             // Create material for coordinate indicators
             _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));
@@ -297,19 +297,19 @@ namespace TrekVRApplication {
             // Add container for coordinate lines
             GameObject coordinateLines = new GameObject(GameObjectName.PlanetStaticCoordinateLines);
             coordinateLines.transform.SetParent(transform, false);
-            _coordinateLines = coordinateLines.AddComponent<XRInteractiblePlanetCoordinateLines>();
-            _coordinateLines.SetVisible(false);
+            _coordinateLinesController = coordinateLines.AddComponent<XRInteractableGlobeCoordinateLinesController>();
+            _coordinateLinesController.SetVisible(false);
 
         }
 
         // Use this for initialization
         void Start() {
-            if (!_globalTerrainModel) {
-                _globalTerrainModel = GetComponent<GlobalTerrainModel>();
+            if (!_globeModel) {
+                _globeModel = GetComponent<GlobeTerrainModel>();
 
                 // There is no way to unsubscribe from this...but unsubscribing
                 // is not really necessary in this case.
-                _globalTerrainModel.OnInitComplete += () => {
+                _globeModel.OnInitComplete += () => {
                     SetCoordinateLinesVisiblity(true);
                 };
             }
@@ -371,17 +371,17 @@ namespace TrekVRApplication {
 
         #endregion
 
-        public void SwitchToMode(XRInteractablePlanetMode mode) {
+        public void SwitchToMode(XRInteractableGlobeMode mode) {
             if (InteractionMode == mode) {
                 return;
             }
 
             // Switching away from current mode.
             switch (InteractionMode) {
-                case XRInteractablePlanetMode.Select:
+                case XRInteractableGlobeMode.Select:
                     CancelSelection(true);
                     break;
-                case XRInteractablePlanetMode.Disabled:
+                case XRInteractableGlobeMode.Disabled:
                     GetComponent<SphereCollider>().enabled = true;
                     SetCoordinateLinesVisiblity(true);
                     break;
@@ -389,12 +389,12 @@ namespace TrekVRApplication {
 
             // Switch to new mode.
             switch (mode) {
-                case XRInteractablePlanetMode.Select:
+                case XRInteractableGlobeMode.Select:
                     _lonSelectionStartIndicator.startWidth = CoordinateIndicatorActiveThickness;
                     _lonSelectionStartIndicator.enabled = true;
                     _coordSelectionLabel.gameObject.SetActive(true);
                     break;
-                case XRInteractablePlanetMode.Disabled:
+                case XRInteractableGlobeMode.Disabled:
                     GetComponent<SphereCollider>().enabled = false;
                     SetCoordinateLinesVisiblity(false);
                     break;
@@ -479,7 +479,7 @@ namespace TrekVRApplication {
         #region Selection methods
 
         public void CancelSelection(bool cancelAll = false) {
-            if (InteractionMode != XRInteractablePlanetMode.Select) {
+            if (InteractionMode != XRInteractableGlobeMode.Select) {
                 return;
             }
             if (cancelAll) {
@@ -499,7 +499,7 @@ namespace TrekVRApplication {
                     CurrentSelectionIndicator.enabled = true;
                 }
                 else {
-                    InteractionMode = XRInteractablePlanetMode.Navigate;
+                    InteractionMode = XRInteractableGlobeMode.Navigate;
                     ExitSelectionMode(true);
                 }
             }
@@ -517,7 +517,7 @@ namespace TrekVRApplication {
             _lonSelectionEndIndicator.enabled = false;
             _latSelectionEndIndicator.enabled = false;
             _coordSelectionLabel.gameObject.SetActive(false);
-            InteractionMode = XRInteractablePlanetMode.Navigate;
+            InteractionMode = XRInteractableGlobeMode.Navigate;
             UserInterfaceManager.Instance.HideControllerModalsWithActivity(ControllerModalActivity.BBoxSelection);
             if (openMainModal) {
                 UserInterfaceManager.Instance.MainModal.Visible = true;
@@ -525,7 +525,7 @@ namespace TrekVRApplication {
         }
 
         private LineRenderer GetSelectionIndicatorByIndex(int index) {
-            if (InteractionMode != XRInteractablePlanetMode.Select) {
+            if (InteractionMode != XRInteractableGlobeMode.Select) {
                 return null;
             }
             switch (index) {
@@ -563,7 +563,7 @@ namespace TrekVRApplication {
         #region Coordinate indicator methods
 
         public void SetCoordinateLinesVisiblity(bool visible) {
-            _coordinateLines.SetVisible(visible);
+            _coordinateLinesController.SetVisible(visible);
         }
 
         #endregion

@@ -1,8 +1,8 @@
 ﻿namespace TrekVRApplication {
 
-    public abstract class GenerateDigitalElevationModelTerrainMeshTask : GenerateTerrainMeshTask {
+    public abstract class GenerateTerrainMeshFromDigitalElevationModelTask : GenerateTerrainMeshTask {
 
-        public GenerateDigitalElevationModelTerrainMeshTask(TerrainModelMetadata metadata) : base(metadata) {
+        public GenerateTerrainMeshFromDigitalElevationModelTask(TerrainModelMetadata metadata) : base(metadata) {
 
         }
 

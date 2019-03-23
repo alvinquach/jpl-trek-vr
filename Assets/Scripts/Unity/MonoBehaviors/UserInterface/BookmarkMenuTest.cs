@@ -16,7 +16,7 @@ namespace TrekVRApplication {
 
         public GameObject buttonTemplate;
 
-        public GlobalTerrainModel planet;
+        public GlobeTerrainModel planet;
 
         private void OnEnable() {
             if (!_pinTemplate) {

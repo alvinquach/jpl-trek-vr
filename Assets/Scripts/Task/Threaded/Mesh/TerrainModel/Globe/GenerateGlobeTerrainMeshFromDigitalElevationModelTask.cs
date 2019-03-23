@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public class GenerateDigitalElevationModelSphericalTerrainMeshTask : GenerateDigitalElevationModelTerrainMeshTask {
+    public class GenerateGlobeTerrainMeshFromDigitalElevationModelTask : GenerateTerrainMeshFromDigitalElevationModelTask {
 
-        public GenerateDigitalElevationModelSphericalTerrainMeshTask(TerrainModelMetadata metadata) : base(metadata) {
+        public GenerateGlobeTerrainMeshFromDigitalElevationModelTask(TerrainModelMetadata metadata) : base(metadata) {
 
         }
 

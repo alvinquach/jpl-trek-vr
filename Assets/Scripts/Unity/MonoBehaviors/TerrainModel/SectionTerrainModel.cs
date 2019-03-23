@@ -3,7 +3,7 @@ using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
-    public class PartialTerrainModel : TerrainModel {
+    public class SectionTerrainModel : TerrainModel {
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
 
@@ -33,14 +33,6 @@ namespace TrekVRApplication {
         private Quaternion _startRotation;
         private Quaternion _targetRotation;
         private float _targetScale;
-
-
-        /// <summary>
-        ///     For generating a mesh without any height data. The gernated mesh will be
-        ///     temporarily displayed while the DEM and textures are retrieved, and a new
-        ///     mesh with height data is generated.
-        /// </summary>
-        private GenerateBasePartialTerrainMeshTask _baseMeshGenerator;
 
         #region Unity lifecycle methods
 
@@ -73,7 +65,7 @@ namespace TrekVRApplication {
         protected override void GenerateMesh() {
             TerrainModelMetadata metadata = GenerateTerrainModelMetadata();
             UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(_squareBoundingBox, _boundingBox);
-            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBasePartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
+            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseSectionTerrainMeshTask(metadata, _boundingBox, uvBounds);
 
             // Generate a base mesh first to be displayed temporarily
             // while the DEM data is being loaded.
@@ -86,11 +78,11 @@ namespace TrekVRApplication {
             });
 
             // Load the DEM data, and then generate another mesh after using the data.
-            _dataElevationModelWebService.GetDEM(_squareBoundingBox, 1024, (demFilePath) => {
+            _dataElevationModelWebService.GetDEM(_squareBoundingBox, 1024, demFilePath => {
                 //_demFilePath = demFilePath; // Should this be allowed?
                 metadata.demFilePath = demFilePath; // Temporary fix
                 GenerateTerrainMeshTask generateMeshTask = 
-                    new GenerateDigitalElevationModelPartialTerrainMeshTask(metadata, _boundingBox, uvBounds);
+                    new GenerateSectionTerrainMeshFromDigitalElevationModeTask(metadata, _boundingBox, uvBounds);
 
                 generateMeshTask.Execute((meshData) => {
                     QueueTask(() => {
@@ -111,7 +103,7 @@ namespace TrekVRApplication {
         ///     the more detailed local textures can be loaded.
         /// </summary>
         private void ApplyTemporaryTextures() {
-            // TODO Inherit layers from global terrain model.
+            // TODO Inherit layers from globe terrain model.
             TerrainModelTextureManager.Instance.GetGlobalMosaicTexture(texture => {
                 int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
                 Material.SetTexture(diffuseBaseId, texture);
@@ -126,7 +118,7 @@ namespace TrekVRApplication {
         ///     Loads the local textures and replaces the placeholder textures.
         /// </summary>
         private void LoadDetailedTextures() {
-            // TODO Inherit layers from global terrain model.
+            // TODO Inherit layers from globe terrain model.
 
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
             TerrainModelProductMetadata texInfo = GenerateTerrainModelProductMetadata(GlobalMosaicUUID);
@@ -144,7 +136,7 @@ namespace TrekVRApplication {
         ///     Positions the model after the mesh is generated, and starts the view transition process.
         /// </summary>
         private void PostProcessMeshData() {
-            transform.rotation = TerrainModelManager.Instance.GetGlobalPlanetModelTransform().rotation;
+            transform.rotation = TerrainModelManager.Instance.GetGlobeModelTransform().rotation;
             transform.localPosition = transform.rotation * (0.25f * 3.39f * BoundingBoxUtils.MedianDirection(_boundingBox));
 
             // Start the view transition.

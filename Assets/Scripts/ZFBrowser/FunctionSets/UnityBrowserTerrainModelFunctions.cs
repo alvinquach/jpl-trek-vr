@@ -15,13 +15,13 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void NavigateToCoordinate(string bbox) {
-            Transform planetTransform = TerrainModelManager.Instance.GetGlobalPlanetModelTransform();
-            XRInteractablePlanet planet = planetTransform.GetComponent<XRInteractablePlanet>();
-            if (planet != null) {
+            Transform planetTransform = TerrainModelManager.Instance.GetGlobeModelTransform();
+            XRInteractableGlobe globe = planetTransform.GetComponent<XRInteractableGlobe>();
+            if (globe) {
                 BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(bbox);
                 Vector2 latLon = BoundingBoxUtils.MedianLatLon(boundingBox);
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
-                planet.NavigateTo(latLon, eye.transform.position);
+                globe.NavigateTo(latLon, eye.transform.position);
             }
         }
 
