@@ -1,5 +1,5 @@
-using System;
 using UnityEngine;
+using static TrekVRApplication.TerrainModelConstants;
 using static TrekVRApplication.XRInteractableGlobeConstants;
 using static TrekVRApplication.XRInteractableGlobeUtils;
 using static TrekVRApplication.ZFBrowserConstants;
@@ -208,8 +208,8 @@ namespace TrekVRApplication {
                     if (direction.y < 0) {
                         angle = -angle;
                     }
-                    Vector2 offsetAndScale = XRInteractableGlobeUtils.CalculateLatitudeIndicatorOffsetAndScale(angle);
-                    float modelRadius = Mars.Radius * GlobeTerrainModel.GlobeModelScale;
+                    Vector2 offsetAndScale = CalculateLatitudeIndicatorOffsetAndScale(angle);
+                    float modelRadius = Mars.Radius * TerrainModelScale;
 
                     currentCoordinateIndicator.transform.localPosition = new Vector3(0, modelRadius * offsetAndScale.y, 0);
                     currentCoordinateIndicator.transform.localScale = (offsetAndScale.x * modelRadius + CoordinateIndicatorRadiusOffset) * Vector3.one;
@@ -233,7 +233,7 @@ namespace TrekVRApplication {
 
         private void Awake() {
 
-            float indicatorRadius = Mars.Radius * GlobeTerrainModel.GlobeModelScale + CoordinateIndicatorRadiusOffset;
+            float indicatorRadius = Mars.Radius * TerrainModelScale + CoordinateIndicatorRadiusOffset;
 
             // Create material for coordinate indicators
             _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));

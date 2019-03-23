@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
@@ -11,6 +12,13 @@ namespace TrekVRApplication {
         public string DemFilePath {
             get { return _demFilePath; }
             set { if (_initTaskStatus == TaskStatus.NotStarted) _demFilePath = value; }
+        }
+
+        [SerializeField]
+        protected float _radius;
+        public float Radius {
+            get { return _radius; }
+            set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
         }
 
         [SerializeField]
@@ -57,8 +65,6 @@ namespace TrekVRApplication {
                 _material = value;
             }
         }
-
-
 
         protected TaskStatus _initTaskStatus = TaskStatus.NotStarted;
 
@@ -223,7 +229,15 @@ namespace TrekVRApplication {
 
         }
 
-        protected abstract TerrainModelMetadata GenerateTerrainModelMetadata();
+        protected virtual TerrainModelMetadata GenerateTerrainModelMetadata() {
+            return new TerrainModelMetadata() {
+                demFilePath = _demFilePath,
+                radius = _radius * TerrainModelScale,
+                heightScale = _heightScale * TerrainModelScale,
+                lodLevels = _lodLevels,
+                baseDownsample = _baseDownsampleLevel
+            };
+        }
 
         protected virtual void SetRenderMode(bool enabled) {
             string shaderName = enabled ? "Custom/MultiDiffuseShader" : "Custom/MultiDiffuseTransparentShader";

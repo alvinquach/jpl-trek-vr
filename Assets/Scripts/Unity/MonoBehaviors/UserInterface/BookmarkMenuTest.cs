@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
@@ -16,7 +17,7 @@ namespace TrekVRApplication {
 
         public GameObject buttonTemplate;
 
-        public GlobeTerrainModel planet;
+        public GlobeTerrainModel globe;
 
         private void OnEnable() {
             if (!_pinTemplate) {
@@ -55,18 +56,18 @@ namespace TrekVRApplication {
                     obj.SetActive(true);
                 }
 
-                if (_pinTemplate && planet) {
+                if (_pinTemplate && globe) {
 
-                    GameObject pin = Instantiate(_pinTemplate, planet.transform);
+                    GameObject pin = Instantiate(_pinTemplate, globe.transform);
 
-                    pin.transform.forward = planet.transform.forward;
+                    pin.transform.forward = globe.transform.forward;
 
-                    pin.transform.Rotate(planet.transform.right, -centerCoords.x, Space.World);
-                    pin.transform.Rotate(planet.transform.up, -centerCoords.y, Space.World);
+                    pin.transform.Rotate(globe.transform.right, -centerCoords.x, Space.World);
+                    pin.transform.Rotate(globe.transform.up, -centerCoords.y, Space.World);
 
-                    pin.transform.position = planet.transform.position + planet.transform.localScale.x * planet.Radius * pin.transform.forward;
+                    pin.transform.position = globe.transform.position + globe.transform.localScale.x * globe.Radius * TerrainModelScale * pin.transform.forward;
 
-                    pin.transform.forward = planet.transform.position - pin.transform.position;
+                    pin.transform.forward = globe.transform.position - pin.transform.position;
 
                     pin.transform.localScale = 4 * pin.transform.localScale;
 

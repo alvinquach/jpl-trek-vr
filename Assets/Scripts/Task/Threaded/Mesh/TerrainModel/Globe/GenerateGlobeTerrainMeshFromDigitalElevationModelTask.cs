@@ -63,11 +63,12 @@ namespace TrekVRApplication {
                         image.GetPixel(x, y) :
                         image.GetCenteredAverage(x, y, downsample + 1);
 
-                    // Scale the intensity value by the height scale.
-                    float scaled = value * _metadata.heightScale;
+                    // Scale the intensity value by the height scale, and
+                    // then add it to the radius to get the final "height".
+                    float height = value * _metadata.heightScale + _metadata.radius;
 
                     // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
-                    verts[vertexIndex] = Quaternion.Euler(0, -90 - vx * lonStepSize, 0) * ((_metadata.radius + _metadata.heightScale * value) * baseLatVertex);
+                    verts[vertexIndex] = Quaternion.Euler(0, -90 - vx * lonStepSize, 0) * (height * baseLatVertex);
                     uvs[vertexIndex] = MeshGenerationUtils.GenerateUVCoord(vx, vy, lonVertCount, latVertCount);
                     vertexIndex++;
                 }

@@ -7,13 +7,6 @@ namespace TrekVRApplication {
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
 
-        [SerializeField]
-        private float _radius;
-        public float Radius {
-            get { return _radius; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
-        }
-
         private BoundingBox _boundingBox;
         private BoundingBox _squareBoundingBox;
 
@@ -156,16 +149,6 @@ namespace TrekVRApplication {
             if (_viewTransitionProgress >= 1.0f) {
                 _viewTransitionTaskStatus = TaskStatus.Completed;
             }
-        }
-
-        protected override TerrainModelMetadata GenerateTerrainModelMetadata() {
-            return new TerrainModelMetadata() {
-                demFilePath = _demFilePath,
-                radius = _radius,
-                heightScale = _heightScale,
-                lodLevels = _lodLevels,
-                baseDownsample = _baseDownsampleLevel
-            };
         }
 
         private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int size = 1024) {

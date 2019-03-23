@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using static TrekVRApplication.XRInteractableGlobeConstants;
 using static TrekVRApplication.XRInteractableGlobeUtils;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
@@ -84,8 +85,8 @@ namespace TrekVRApplication {
             _verticalAxisMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
 
             // Scale
-            float linesScale = Mars.Radius * GlobeTerrainModel.GlobeModelScale + CoordinateIndicatorRadiusOffset;
-            float labelsScale = Mars.Radius * GlobeTerrainModel.GlobeModelScale + CoordinateIndicatorLabelRadiusOffset;
+            float linesScale = Mars.Radius * TerrainModelScale + CoordinateIndicatorRadiusOffset;
+            float labelsScale = Mars.Radius * TerrainModelScale + CoordinateIndicatorLabelRadiusOffset;
 
             // Get template for labels
             GameObject labelTemplate = TemplateService.Instance.GetTemplate(GameObjectName.StaticCoordinateTemplate);

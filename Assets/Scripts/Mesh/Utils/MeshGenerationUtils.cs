@@ -2,6 +2,9 @@
 
 namespace TrekVRApplication {
 
+    /// <summary>
+    ///     Common helper methods for generating meshes.
+    /// </summary>
     public static class MeshGenerationUtils {
 
         /// <summary>

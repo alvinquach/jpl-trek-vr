@@ -109,22 +109,19 @@ namespace TrekVRApplication {
         private int _counter = 0;
 
         public TerrainModel CreateSectionModel(BoundingBox boundingBox, string demPath, string albedoPath = null) {
-            GameObject terrainModelContainer = new GameObject();
-            terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform);
-            terrainModelContainer.name = $"Model {++_counter}";
+            GameObject terrainModelContainer = new GameObject($"Model {++_counter}");
+            terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform, false);
             terrainModelContainer.SetActive(false);
 
             SectionTerrainModel terrainModel = terrainModelContainer.AddComponent<SectionTerrainModel>();
             try {
-                terrainModel.Radius = 3.39f;
-                terrainModel.HeightScale = 1e-6f;
-                // Bounding box is in the format (lonStart, latStart, lonEnd, latEnd)
+                terrainModel.Radius = Mars.Radius;
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
                 terrainModel.InitModel();
 
-                terrainModelContainer.transform.localPosition = Vector3.up;
-                terrainModelContainer.transform.localScale = 0.25f * Vector3.one;
+                //terrainModelContainer.transform.localPosition = Vector3.up;
+                //terrainModelContainer.transform.localScale = 0.25f * Vector3.one;
             }
             catch (Exception e) {
                 Debug.LogError(e.Message);

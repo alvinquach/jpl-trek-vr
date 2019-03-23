@@ -1,22 +1,11 @@
 ﻿using System;
 using UnityEngine;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
     [RequireComponent(typeof(XRInteractableGlobe))]
     public class GlobeTerrainModel : TerrainModel {
-
-        public const float GlobeModelScale = 2.5e-7f;
-
-        private float _radius;
-        public float Radius {
-            get { return _radius * GlobeModelScale; }
-            set {
-                if (_initTaskStatus == TaskStatus.NotStarted) {
-                    _radius = value;
-                }
-            }
-        }
 
         public event Action OnInitComplete = () => { };
 
@@ -46,17 +35,7 @@ namespace TrekVRApplication {
 
             // Adds a sphere collider to the mesh, so that it can be manipulated using the controller.
             SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-            collider.radius = Radius;
-        }
-
-        protected override TerrainModelMetadata GenerateTerrainModelMetadata() {
-            return new TerrainModelMetadata() {
-                demFilePath = _demFilePath,
-                radius = Radius,
-                heightScale = HeightScale * GlobeModelScale,
-                lodLevels = _lodLevels,
-                baseDownsample = _baseDownsampleLevel
-            };
+            collider.radius = Radius * TerrainModelScale;
         }
 
         protected override void SetRenderMode(bool enabled) {

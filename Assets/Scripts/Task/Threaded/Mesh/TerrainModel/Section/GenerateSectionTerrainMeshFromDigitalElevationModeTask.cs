@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using static TrekVRApplication.SectionTerrainMeshGenerationUtils;
 
 namespace TrekVRApplication {
 
@@ -37,7 +38,7 @@ namespace TrekVRApplication {
             int lonVertCount = imageEndX - imageStartX + 1;
             int latVertCount = imageEndY - imageStartY + 1;
 
-            float latIncrement = _boundingBox.LatSwing * Mathf.Deg2Rad / (latVertCount - 1);
+            float latIncrement = _boundingBox.LatSwing / (latVertCount - 1);
             float lonIncrement = _boundingBox.LonSwing / (lonVertCount - 1);
 
             Vector3[] verts = new Vector3[latVertCount * lonVertCount];
@@ -46,15 +47,15 @@ namespace TrekVRApplication {
             Vector3 offset = BoundingBoxUtils.MedianDirection(_boundingBox);
 
             int yIndex = 0, vertexIndex = 0;
-            for (float vy = _boundingBox.LatStart * Mathf.Deg2Rad; yIndex < latVertCount; vy += latIncrement) {
+            for (float vy = _boundingBox.LatStart; yIndex < latVertCount; vy += latIncrement) {
 
                 // The y-coordinate on the image that corresponds to the current row of vertices.
                 // Note this is actually inverted since we are traversing from bottom up.
                 int y = (latVertCount - yIndex - 1 + imageStartY) * downsample;
 
-                // Create a new vertex using the latitude angle. The coordinates of this
-                // vertex will serve as a base for all the other vertices in this latitude.
-                Vector3 baseLatVertex = new Vector3(Mathf.Cos(vy), Mathf.Sin(vy), 0);
+                // Create a new vertex using the latitude angle. The coordinates of this vertex
+                // will serve as a base for all the other vertices of the same latitude.
+                Vector3 baseLatVertex = GenerateBaseLatitudeVertex(vy);
 
                 int xIndex = 0;
                 for (float vx = _boundingBox.LonStart; xIndex < lonVertCount; vx += lonIncrement) {
@@ -67,20 +68,17 @@ namespace TrekVRApplication {
                         image.GetPixel(x, y) :
                         image.GetCenteredAverage(x, y, downsample + 1);
 
-                    // Scale the intensity value by the height scale.
-                    float scaled = 1 + value * _metadata.heightScale / _metadata.radius;
+                    // Scale the intensity value by the height scale, and
+                    // then add it to the radius to get the final "height".
+                    float height = value * _metadata.heightScale + _metadata.radius;
 
-                    // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
-                    verts[vertexIndex] = _metadata.radius * (Quaternion.Euler(0, -90 - vx, 0) * (scaled * baseLatVertex) - offset);
-
-                    Vector2 uvScale = new Vector2(_uvBounds.U2 - _uvBounds.U1, _uvBounds.V2 - _uvBounds.V1);
-                    Vector2 uvOffset = new Vector2(-_uvBounds.U1, -_uvBounds.V1);
-                    uvs[vertexIndex] = MeshGenerationUtils.GenerateUVCoord(xIndex, latVertCount - yIndex,
-                        lonVertCount, latVertCount,uvScale, uvOffset);
+                    verts[vertexIndex] = GenerateVertex(height * baseLatVertex, vx, _boundingBox, _metadata.radius);
+                    uvs[vertexIndex] = GenerateUVCoord(xIndex, yIndex, lonVertCount, latVertCount, _uvBounds);
 
                     xIndex++;
                     vertexIndex++;
                 }
+
                 yIndex++;
             }
 
