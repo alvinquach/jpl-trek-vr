@@ -31,7 +31,7 @@ namespace TrekVRApplication {
             Vector3[] verts = new Vector3[LatLongVertCount * LatLongVertCount];
             Vector2[] uvs = new Vector2[LatLongVertCount * LatLongVertCount];
 
-            //Vector3 offset = BoundingBoxUtils.MedianDirection(_boundingBox);
+            Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(_boundingBox);
 
             int yIndex = 0, vertexIndex = 0;
             for (float vy = _boundingBox.LatStart; yIndex < LatLongVertCount; vy += latIncrement) {
@@ -43,7 +43,7 @@ namespace TrekVRApplication {
                 int xIndex = 0;
                 for (float vx = _boundingBox.LonStart; xIndex < LatLongVertCount; vx += lonIncrement) {
 
-                    verts[vertexIndex] = GenerateVertex(baseLatVertex, vx, _boundingBox, _metadata.radius);
+                    verts[vertexIndex] = GenerateVertex(baseLatVertex, vx, latLongOffset, _metadata.radius);
                     uvs[vertexIndex] = GenerateUVCoord(xIndex, yIndex, LatLongVertCount, LatLongVertCount, _uvBounds);
 
                     xIndex++;

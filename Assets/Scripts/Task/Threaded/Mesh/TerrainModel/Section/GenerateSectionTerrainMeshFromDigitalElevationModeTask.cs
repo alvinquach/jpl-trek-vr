@@ -44,7 +44,7 @@ namespace TrekVRApplication {
             Vector3[] verts = new Vector3[latVertCount * lonVertCount];
             Vector2[] uvs = new Vector2[latVertCount * lonVertCount];
 
-            Vector3 offset = BoundingBoxUtils.MedianDirection(_boundingBox);
+            Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(_boundingBox);
 
             int yIndex = 0, vertexIndex = 0;
             for (float vy = _boundingBox.LatStart; yIndex < latVertCount; vy += latIncrement) {
@@ -72,7 +72,7 @@ namespace TrekVRApplication {
                     // then add it to the radius to get the final "height".
                     float height = value * _metadata.heightScale + _metadata.radius;
 
-                    verts[vertexIndex] = GenerateVertex(height * baseLatVertex, vx, _boundingBox, _metadata.radius);
+                    verts[vertexIndex] = GenerateVertex(height * baseLatVertex, vx, latLongOffset, _metadata.radius);
                     uvs[vertexIndex] = GenerateUVCoord(xIndex, yIndex, lonVertCount, latVertCount, _uvBounds);
 
                     xIndex++;

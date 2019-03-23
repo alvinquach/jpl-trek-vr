@@ -35,12 +35,12 @@ namespace TrekVRApplication {
         ///     not longitude) already accounted for.
         /// </param>
         /// <param name="longitude">Angle in degrees.</param>
+        /// <param name="latLongOffset">
+        ///     The coordinate offset that needs to be applied so that the overall
+        ///     mesh faces the (0°, 0°) direction.
+        /// </param>
         /// <returns></returns>
-        public static Vector3 GenerateVertex(Vector3 baseVertex, float longitude, BoundingBox bbox, float radius) {
-
-            // The coordinate offset that needs to be applied so that the
-            // overall mesh faces the (0°, 0°) direction.
-            Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(bbox);
+        public static Vector3 GenerateVertex(Vector3 baseVertex, float longitude, Vector2 latLongOffset, float radius) {
 
             // Apply y-axis rotation first to correct for longitude offset.
             Vector3 result = Quaternion.Euler(0, latLongOffset.y - longitude, 0) * baseVertex;
@@ -48,7 +48,8 @@ namespace TrekVRApplication {
             // Then, apply z-axis rotation to correct for latitude offset.
             result = Quaternion.Euler(0, 0, -latLongOffset.x) * result;
 
-            // TODO Apply radius offset
+            // Apply radius offset.
+            result -= new Vector3(radius, 0, 0);
 
             return result;
         }
