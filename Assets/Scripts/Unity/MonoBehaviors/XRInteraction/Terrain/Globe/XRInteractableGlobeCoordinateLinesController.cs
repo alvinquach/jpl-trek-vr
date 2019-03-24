@@ -181,7 +181,7 @@ namespace TrekVRApplication {
         }
 
         private void GenerateLongitudeCoordinateLabel(GameObject template, float longitude, float positionalScale) {
-            string formattedLatitude = string.Format("{0:0.#}", longitude) + "°";
+            string formattedLatitude = string.Format("{0:0.#}", -longitude) + "°";
 
             longitude *= Mathf.Deg2Rad;
             Vector3 basePosition = new Vector3(Mathf.Sin(longitude), CoordinateIndicatorLabelRadiusOffset, Mathf.Cos(longitude));
