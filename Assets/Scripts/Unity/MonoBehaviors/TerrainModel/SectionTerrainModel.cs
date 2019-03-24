@@ -5,7 +5,7 @@ namespace TrekVRApplication {
 
     public class SectionTerrainModel : TerrainModel {
 
-        private const float ViewTransitionDuration = 1.0f;
+        private const float ViewTransitionDuration = 1.6f;
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
 
@@ -29,8 +29,6 @@ namespace TrekVRApplication {
         private Vector3 _targetPosition;
         private Quaternion _startRotation;
         private Quaternion _targetRotation;
-        private Vector3 _childStartPosition;
-        private Vector3 _childTargetPosition;
         private float _targetScale = 1f;
 
         #region Unity lifecycle methods
@@ -91,8 +89,6 @@ namespace TrekVRApplication {
                             Destroy(lodGroupContainer.gameObject);
                         }
                         ProcessMeshData(meshData);
-                        lodGroupContainer = transform.Find(GameObjectName.LODGroupContainer);
-                        lodGroupContainer.localPosition = Vector3.Lerp(_childStartPosition, _childTargetPosition, _viewTransitionProgress);
                     });
                 });
             });
@@ -149,40 +145,35 @@ namespace TrekVRApplication {
             VectorUtils.Print(bounds.size);
 
             // Initially position the mesh to match its visual position on the globe.
-            lodGroupContainer.localPosition = new Vector3(Radius * TerrainModelScale, 0, 0);
+            //lodGroupContainer.localPosition = new Vector3(Radius * TerrainModelScale, 0, 0);
 
             Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(_boundingBox);
             Quaternion rotation = TerrainModelManager.Instance.GetGlobeModelTransform().rotation;
             rotation *= Quaternion.Euler(0, -latLongOffset.y - 90, 0);
             rotation *= Quaternion.Euler(0, 0, latLongOffset.x);
             transform.rotation = rotation;
+            transform.Translate(Radius * TerrainModelScale, 0, 0);
 
             // TODO Move these to constants file.
             float tableWidth = 2.0f;
             float tableHeight = 0.5f;
+            float tableTopGap = 0.05f;
 
             // Start the view transition.
             _targetScale = tableWidth / meshWidth;
-            _startPosition = transform.localPosition;
-            _targetPosition = new Vector3(0, _targetScale * meshDepth + tableHeight, 0) - transform.position;
+            _startPosition = transform.position;
+            _targetPosition = (_targetScale * meshDepth + tableHeight + tableTopGap) * Vector3.up;
             _startRotation = transform.rotation;
             _targetRotation = Quaternion.Euler(0, 0, 90);
-            _childStartPosition = lodGroupContainer.localPosition;
-            _childTargetPosition = Vector3.zero;
             _viewTransitionTaskStatus = TaskStatus.Started;
         }
 
         private void TransitionView() {
             _viewTransitionProgress += Time.deltaTime / ViewTransitionDuration;
 
-            transform.rotation = Quaternion.Lerp(_startRotation, _targetRotation, _viewTransitionProgress);
-            transform.localPosition = Vector3.Lerp(_startPosition, _targetPosition, (_viewTransitionProgress - 0.5f) * 2);
+            transform.rotation = Quaternion.Lerp(_startRotation, _targetRotation, _viewTransitionProgress * 2);
+            transform.position = Vector3.Lerp(_startPosition, _targetPosition, _viewTransitionProgress);
             transform.localScale = Vector3.Lerp(Vector3.one, _targetScale * Vector3.one, _viewTransitionProgress);
-
-            Transform lodGroupContainer = transform.Find(GameObjectName.LODGroupContainer);
-            if (lodGroupContainer) {
-                lodGroupContainer.localPosition = Vector3.Lerp(_childStartPosition, _childTargetPosition, _viewTransitionProgress);
-            }
 
             // TODO Animate tabletop...
 
