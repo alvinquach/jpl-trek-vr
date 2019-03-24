@@ -70,9 +70,9 @@ namespace TrekVRApplication {
 
                     // Scale the intensity value by the height scale, and
                     // then add it to the radius to get the final "height".
-                    float height = value * _metadata.heightScale + _metadata.radius;
+                    float height = value * _metadata.HeightScale + _metadata.Radius;
 
-                    verts[vertexIndex] = GenerateVertex(height * baseLatVertex, vx, latLongOffset, _metadata.radius);
+                    verts[vertexIndex] = GenerateVertex(height * baseLatVertex, vx, latLongOffset, _metadata.Radius);
                     uvs[vertexIndex] = GenerateUVCoord(xIndex, yIndex, lonVertCount, latVertCount, _uvBounds);
 
                     xIndex++;

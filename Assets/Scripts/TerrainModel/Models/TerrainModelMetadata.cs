@@ -1,22 +1,18 @@
-﻿namespace TrekVRApplication {
+namespace TrekVRApplication {
 
     public struct TerrainModelMetadata {
 
-        // TODO Refactor this to be properties instead of fields.
+        public string DemFilePath { get; set; }
 
-        public string demFilePath;
+        public float Radius { get; set; }
 
-        //public string albedoFilePath;
+        public float HeightScale { get; set; }
 
-        public float size;
+        public int LodLevels { get; set; }
 
-        public float radius;
+        public int BaseDownsample { get; set; }
 
         public float heightScale;
-
-        public int lodLevels;
-
-        public int baseDownsample;
 
     }
 

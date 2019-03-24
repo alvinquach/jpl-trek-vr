@@ -248,11 +248,11 @@ namespace TrekVRApplication {
 
         protected virtual TerrainModelMetadata GenerateTerrainModelMetadata() {
             return new TerrainModelMetadata() {
-                demFilePath = _demFilePath,
-                radius = _radius * TerrainModelScale,
-                heightScale = _heightScale * TerrainModelScale,
-                lodLevels = _lodLevels,
-                baseDownsample = _baseDownsampleLevel
+                DemFilePath = _demFilePath,
+                Radius = _radius * TerrainModelScale,
+                HeightScale = _heightScale * TerrainModelScale,
+                LodLevels = _lodLevels,
+                BaseDownsample = _baseDownsampleLevel
             };
         }
 

@@ -38,12 +38,12 @@ namespace TrekVRApplication {
 
                 // Create a new vertex using the latitude angle. The coordinates of this vertex
                 // will serve as a base for all the other vertices of the same latitude.
-                Vector3 baseLatVertex = _metadata.radius * GenerateBaseLatitudeVertex(vy);
+                Vector3 baseLatVertex = _metadata.Radius * GenerateBaseLatitudeVertex(vy);
 
                 int xIndex = 0;
                 for (float vx = _boundingBox.LonStart; xIndex < LatLongVertCount; vx += lonIncrement) {
 
-                    verts[vertexIndex] = GenerateVertex(baseLatVertex, vx, latLongOffset, _metadata.radius);
+                    verts[vertexIndex] = GenerateVertex(baseLatVertex, vx, latLongOffset, _metadata.Radius);
                     uvs[vertexIndex] = GenerateUVCoord(xIndex, yIndex, LatLongVertCount, LatLongVertCount, _uvBounds);
 
                     xIndex++;

@@ -16,12 +16,12 @@
             // TODO Add support other image types if necessary.
 
             // Use TIFF as source for DEM data.
-            IntensityImage image = new LoadIntensityImageFromFileTask(_metadata.demFilePath).ExecuteInSameThread();
+            IntensityImage image = new LoadIntensityImageFromFileTask(_metadata.DemFilePath).ExecuteInSameThread();
 
-            MeshData[] meshData = new MeshData[_metadata.lodLevels + 1];
+            MeshData[] meshData = new MeshData[_metadata.LodLevels + 1];
 
-            for (int lodLevel = 0; lodLevel <= _metadata.lodLevels; lodLevel++) {
-                int downsample = _metadata.baseDownsample << lodLevel;
+            for (int lodLevel = 0; lodLevel <= _metadata.LodLevels; lodLevel++) {
+                int downsample = _metadata.BaseDownsample << lodLevel;
                 meshData[lodLevel] = GenerateForLod(image, downsample);
             }
 

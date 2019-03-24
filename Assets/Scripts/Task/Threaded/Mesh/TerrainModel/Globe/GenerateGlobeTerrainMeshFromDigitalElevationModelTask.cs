@@ -65,7 +65,7 @@ namespace TrekVRApplication {
 
                     // Scale the intensity value by the height scale, and
                     // then add it to the radius to get the final "height".
-                    float height = value * _metadata.heightScale + _metadata.radius;
+                    float height = value * _metadata.HeightScale + _metadata.Radius;
 
                     // Longitude is offset by 90 degrees so that the foward vector is at 0,0 lat and long.
                     verts[vertexIndex] = Quaternion.Euler(0, -90 - vx * lonStepSize, 0) * (height * baseLatVertex);
