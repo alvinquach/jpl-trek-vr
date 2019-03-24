@@ -98,7 +98,7 @@ namespace TrekVRApplication {
             );
 
             GlobeModel.Radius = Mars.Radius;
-            GlobeModel.BaseDownSampleLevel = _globeModelBaseDownsampleLevel;
+            GlobeModel.BaseDownsampleLevel = _globeModelBaseDownsampleLevel;
             GlobeModel.LodLevels = _globeModelLODLevels;
             GlobeModel.Visible = true;
 

@@ -2,7 +2,7 @@
 
     public abstract class GenerateTerrainMeshFromDigitalElevationModelTask : GenerateTerrainMeshTask {
 
-        public GenerateTerrainMeshFromDigitalElevationModelTask(TerrainModelMetadata metadata) : base(metadata) {
+        public GenerateTerrainMeshFromDigitalElevationModelTask(TerrainModelMeshMetadata metadata) : base(metadata) {
 
         }
 
@@ -18,11 +18,15 @@
             // Use TIFF as source for DEM data.
             IntensityImage image = new LoadIntensityImageFromFileTask(_metadata.DemFilePath).ExecuteInSameThread();
 
-            MeshData[] meshData = new MeshData[_metadata.LodLevels + 1];
+            MeshData[] meshData = new MeshData[_metadata.TotalLodLevels];
 
             for (int lodLevel = 0; lodLevel <= _metadata.LodLevels; lodLevel++) {
-                int downsample = _metadata.BaseDownsample << lodLevel;
+                int downsample = 1 << (_metadata.BaseDownsample + lodLevel);
                 meshData[lodLevel] = GenerateForLod(image, downsample);
+            }
+
+            if (_metadata.GenerateAdditionalPhysicsLod) {
+                meshData[meshData.Length - 1] = GenerateForLod(image, 1 << _metadata.PhysicsDownsample);
             }
 
             _progress = 1.0f;

@@ -4,9 +4,9 @@ namespace TrekVRApplication {
 
     public abstract class GenerateTerrainMeshTask : GenerateMeshTask {
 
-        protected TerrainModelMetadata _metadata;
+        protected TerrainModelMeshMetadata _metadata;
 
-        public GenerateTerrainMeshTask(TerrainModelMetadata metadata) {
+        public GenerateTerrainMeshTask(TerrainModelMeshMetadata metadata) {
             _metadata = metadata;
             // TODO Check if baseDownsample is power of 2.
         }

@@ -61,7 +61,7 @@ namespace TrekVRApplication {
         }
 
         protected override void GenerateMesh() {
-            TerrainModelMetadata metadata = GenerateTerrainModelMetadata();
+            TerrainModelMeshMetadata metadata = GenerateTerrainModelMeshMetadata();
             UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(_squareBoundingBox, _boundingBox);
             GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseSectionTerrainMeshTask(metadata, _boundingBox, uvBounds);
 

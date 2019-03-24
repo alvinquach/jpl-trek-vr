@@ -7,6 +7,8 @@ namespace TrekVRApplication {
 
     public abstract class TerrainModel : MonoBehaviourWithTaskQueue {
 
+        protected GameObject _lodGroupContainer;
+
         [SerializeField]
         protected string _demFilePath;
         public string DemFilePath {
@@ -29,24 +31,69 @@ namespace TrekVRApplication {
             set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
         }
 
-        [SerializeField]
-        protected int _baseDownsampleLevel = 2;
-
-        public int BaseDownSampleLevel {
-            get { return _baseDownsampleLevel; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _baseDownsampleLevel = value; }
-        }
-
         // TODO Add option to use linear LOD downsampling.
 
         [SerializeField]
-        protected int _lodLevels = 2;
+        protected int _lodLevels = 1;
+        /// <summary>
+        ///     The number of LOD levels to be generated, excluding LOD 0 and physics LOD.
+        /// </summary>
         public int LodLevels {
-            get { return _lodLevels; }
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _lodLevels = value; }
+            get => _lodLevels;
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    // Number of LOD levels must be a non-negative integer.
+                    _lodLevels = MathUtils.Clamp(value, 0);
+                }
+            }
         }
 
-        protected LOD[] _lods;
+        [SerializeField]
+        protected int _baseDownsampleLevel = 0;
+        /// <summary>
+        ///     <para>
+        ///         The amount of downsampling applied to the DEM file to generate the 
+        ///         mesh (LOD 0). The actual amount of downsampling applied is 2^value.
+        ///     </para>
+        ///     <para>
+        ///         For example, a value of 0 will have no downsampling, while a value
+        ///         of 3 will downsample the DEM image by a factor of 8.
+        ///     </para>
+        /// </summary>
+        public int BaseDownsampleLevel {
+            get => _baseDownsampleLevel;
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    // Downsampling level must be a non-negative integer.
+                    _baseDownsampleLevel = MathUtils.Clamp(value, 0);
+                }
+            }
+        }
+
+        [SerializeField]
+        protected int _physicsDownsampleLevel = -1;
+        /// <summary>
+        ///     <para>
+        ///         The amount of downsampling applied to the DEM file to generate the 
+        ///         physics mesh. The actual amount of downsampling applied is 2^value.
+        ///     </para>
+        ///     <para>
+        ///         For example, a value of 0 will have no downsampling, while a value
+        ///         of 3 will downsample the DEM image by a factor of 8.
+        ///     </para>
+        ///     <para>
+        ///         Set this to a negative number to indicate that a physics mesh does
+        ///         not need to be generated.
+        ///     </para>
+        /// </summary>
+        public int PhysicsDownsampleLevel {
+            get => _physicsDownsampleLevel;
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    _physicsDownsampleLevel = value;
+                }
+            }
+        }
 
         private Material _material;
         public Material Material {
@@ -135,26 +182,27 @@ namespace TrekVRApplication {
         ///     <para>
         ///         Processes the generated mesh data. Creates a mesh renderer and mesh
         ///         filter for each LOD mesh, and assigns material to the mesh. Also creates
-        ///         a LOD group containing the LOD mesh levels.
+        ///         a LOD group containing the LOD mesh levels. Note that this method does
+        ///         not process the physics mesh (if one has been generated) — it is up to
+        ///         the implementing class to add logic to process the phycics mesh.
         ///     </para>
         ///     <para>
         ///         This method is intended to be called from implementations of TerrainModel;
         ///         it is not called by the TerrainModel abstract class itself.
         ///     </para>
+        ///     <para>
+        ///         After this is called, the member variable _lodGroupContainer will be accessible.
+        ///     </para>
         /// </summary>
         protected virtual void ProcessMeshData(MeshData[] meshData) {
 
-            // Minimum base downsampling level should be 1.
-            _baseDownsampleLevel = _baseDownsampleLevel < 1 ? 1 : _baseDownsampleLevel;
-
             // Add LOD group manager.
-            // TODO Make this a class member variable.
-            GameObject lodGroupContainer = new GameObject(GameObjectName.LODGroupContainer) {
+            _lodGroupContainer = new GameObject(GameObjectName.LODGroupContainer) {
                 layer = (int)CullingLayer.Terrain
             };
-            lodGroupContainer.transform.SetParent(transform, false);
+            _lodGroupContainer.transform.SetParent(transform, false);
 
-            LODGroup lodGroup = lodGroupContainer.AddComponent<LODGroup>();
+            LODGroup lodGroup = _lodGroupContainer.AddComponent<LODGroup>();
             LOD[] lods = new LOD[_lodLevels + 1];
 
             // Get Tiff file from the file path.
@@ -165,7 +213,7 @@ namespace TrekVRApplication {
                 GameObject child = new GameObject($"LOD_{i}") {
                     layer = (int)CullingLayer.Terrain
                 };
-                child.transform.SetParent(lodGroupContainer.transform);
+                child.transform.SetParent(_lodGroupContainer.transform);
 
                 // Use the parent's tranformations.
                 child.transform.localPosition = Vector3.zero;
@@ -181,40 +229,9 @@ namespace TrekVRApplication {
                     meshRenderer.material = _material;
                 }
 
-                MeshFilter meshFilter = child.AddComponent<MeshFilter>();
-
-                Mesh mesh = new Mesh();
-
-                // Assign mesh data
-                MeshData lodMeshData = meshData[i];
-
-                // If needed, set the index format of the mesh to 32-bits,
-                // so that the mesh can have more than 65k vertices.
-                if (lodMeshData.Vertices.Length > (1 << 16)) {
-                    mesh.indexFormat = IndexFormat.UInt32;
-                }
-
-                float start = Time.realtimeSinceStartup;
-                mesh.vertices = lodMeshData.Vertices;
-                Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign vertices.");
-
-                start = Time.realtimeSinceStartup;
-                mesh.uv = lodMeshData.TexCoords;
-                Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign UVs.");
-
-
-                start = Time.realtimeSinceStartup;
-                mesh.triangles = lodMeshData.Triangles;
-                Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to assign triangles.");
-
-                // This is a time consuming operation, and may cause the app to pause
-                // for a couple of miliseconds since it runs on the main thread.
-                start = Time.realtimeSinceStartup;
-                mesh.RecalculateNormals();
-                Debug.Log($"{child.name} took {Time.realtimeSinceStartup - start} seconds to recalculate normals.");
-
-                meshFilter.mesh = mesh;
-
+                // Create a Mesh from the mesh data and add the mesh to a MeshFilter.
+                Mesh mesh = ConvertToMesh(meshData[i], child.name);
+                child.AddComponent<MeshFilter>().mesh = mesh;
             }
 
             // Assign LOD meshes to LOD group.
@@ -229,6 +246,37 @@ namespace TrekVRApplication {
                 lodGroup.enabled = false;
             }
 
+        }
+
+        protected Mesh ConvertToMesh(MeshData meshData, string label = "ProcessMeshData()") {
+            Mesh mesh = new Mesh();
+
+            // If needed, set the index format of the mesh to 32-bits,
+            // so that the mesh can have more than 65k vertices.
+            if (meshData.Vertices.Length > (1 << 16)) {
+                mesh.indexFormat = IndexFormat.UInt32;
+            }
+
+            float start = Time.realtimeSinceStartup;
+            mesh.vertices = meshData.Vertices;
+            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to assign vertices.");
+
+            start = Time.realtimeSinceStartup;
+            mesh.uv = meshData.TexCoords;
+            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to assign UVs.");
+
+
+            start = Time.realtimeSinceStartup;
+            mesh.triangles = meshData.Triangles;
+            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to assign triangles.");
+
+            // This is a time consuming operation, and may cause the app to pause
+            // for a couple of miliseconds since it runs on the main thread.
+            start = Time.realtimeSinceStartup;
+            mesh.RecalculateNormals();
+            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to recalculate normals.");
+
+            return mesh;
         }
 
         /** Helper method for added a shadow casting mesh to the terrain. */
@@ -246,13 +294,14 @@ namespace TrekVRApplication {
             return shadowCaster;
         }
 
-        protected virtual TerrainModelMetadata GenerateTerrainModelMetadata() {
-            return new TerrainModelMetadata() {
-                DemFilePath = _demFilePath,
-                Radius = _radius * TerrainModelScale,
-                HeightScale = _heightScale * TerrainModelScale,
-                LodLevels = _lodLevels,
-                BaseDownsample = _baseDownsampleLevel
+        protected virtual TerrainModelMeshMetadata GenerateTerrainModelMeshMetadata() {
+            return new TerrainModelMeshMetadata() {
+                DemFilePath = DemFilePath,
+                Radius = Radius * TerrainModelScale,
+                HeightScale = HeightScale * TerrainModelScale,
+                LodLevels = LodLevels,
+                BaseDownsample = BaseDownsampleLevel,
+                PhysicsDownsample = PhysicsDownsampleLevel
             };
         }
 
