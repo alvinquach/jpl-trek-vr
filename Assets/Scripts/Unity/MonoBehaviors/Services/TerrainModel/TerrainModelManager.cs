@@ -123,9 +123,6 @@ namespace TrekVRApplication {
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
                 terrainModel.InitModel();
-
-                //terrainModelContainer.transform.localPosition = Vector3.up;
-                //terrainModelContainer.transform.localScale = 0.25f * Vector3.one;
             }
             catch (Exception e) {
                 Debug.LogError(e.Message);
