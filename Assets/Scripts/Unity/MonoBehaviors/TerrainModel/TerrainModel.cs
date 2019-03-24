@@ -102,6 +102,8 @@ namespace TrekVRApplication {
 
         protected virtual void OnDestroy() {
             TerrainModelManager.Instance.OnRenderModeChange -= SetRenderMode;
+            Destroy(_material);
+            // TODO Destroy more thisngs
         }
 
         #endregion
@@ -227,6 +229,21 @@ namespace TrekVRApplication {
                 lodGroup.enabled = false;
             }
 
+        }
+
+        /** Helper method for added a shadow casting mesh to the terrain. */
+        protected GameObject AddShadowCaster(Mesh mesh) {
+            GameObject shadowCaster = new GameObject(GameObjectName.TerrainShadowCaster) {
+                layer = (int)CullingLayer.TerrainShadowCaster
+            };
+            shadowCaster.transform.SetParent(transform, false);
+            MeshRenderer meshRenderer = shadowCaster.AddComponent<MeshRenderer>();
+            meshRenderer.material = Material;
+            meshRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+            meshRenderer.receiveShadows = false;
+            MeshFilter meshFilter = shadowCaster.AddComponent<MeshFilter>();
+            meshFilter.mesh = mesh;
+            return shadowCaster;
         }
 
         protected virtual TerrainModelMetadata GenerateTerrainModelMetadata() {

@@ -8,6 +8,8 @@
 
         public const string TerrainModelsContainer = "Terrain Models Container";
 
+        public const string TerrainShadowCaster = "TerrainShadowCaster";
+
         public const string PlanetSelectionIndicator = "SelectionIndicator";
 
         public const string PlanetSelectionIndicatorContainer = "SelectionIndicatorContainer";

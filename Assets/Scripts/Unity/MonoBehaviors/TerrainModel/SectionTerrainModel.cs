@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
@@ -130,14 +131,19 @@ namespace TrekVRApplication {
         }
 
         /// <summary>
-        ///     Positions the model after the mesh is generated, and starts the view transition process.
+        ///     Positions the model after the basic placeholder mesh is generated,
+        ///     and starts the view transition process.
         /// </summary>
         private void PostProcessMeshData() {
 
             Transform lodGroupContainer = transform.Find(GameObjectName.LODGroupContainer);
+            GameObject meshContainer = lodGroupContainer.GetChild(0).gameObject;
+
+            // Copy the placeholder mesh to use as a shadow caster.
+            MeshFilter meshFilter = meshContainer.GetComponent<MeshFilter>();
+            AddShadowCaster(meshFilter.mesh);
 
             // Calculate the dimensions of the mesh in world space.
-            GameObject meshContainer = lodGroupContainer.GetChild(0).gameObject;
             MeshRenderer meshRenderer = meshContainer.GetComponent<MeshRenderer>();
             Bounds bounds = meshRenderer.bounds;
             float meshDepth = bounds.size.x;
@@ -145,8 +151,6 @@ namespace TrekVRApplication {
             VectorUtils.Print(bounds.size);
 
             // Initially position the mesh to match its visual position on the globe.
-            //lodGroupContainer.localPosition = new Vector3(Radius * TerrainModelScale, 0, 0);
-
             Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(_boundingBox);
             Quaternion rotation = TerrainModelManager.Instance.GetGlobeModelTransform().rotation;
             rotation *= Quaternion.Euler(0, -latLongOffset.y - 90, 0);

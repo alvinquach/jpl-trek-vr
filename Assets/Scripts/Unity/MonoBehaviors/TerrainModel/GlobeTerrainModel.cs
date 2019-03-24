@@ -33,9 +33,18 @@ namespace TrekVRApplication {
         protected override void ProcessMeshData(MeshData[] meshData) {
             base.ProcessMeshData(meshData);
 
+            float radius = Radius * TerrainModelScale;
+
             // Adds a sphere collider to the mesh, so that it can be manipulated using the controller.
             SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-            collider.radius = Radius * TerrainModelScale;
+            collider.radius = radius;
+
+            // Add a sphere to cast shadows
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Mesh mesh = sphere.GetComponent<MeshFilter>().mesh;
+            GameObject shadowCaster = AddShadowCaster(mesh);
+            shadowCaster.transform.localScale = 2 * radius * Vector3.one;
+            Destroy(sphere);
         }
 
         protected override void SetRenderMode(bool enabled) {
