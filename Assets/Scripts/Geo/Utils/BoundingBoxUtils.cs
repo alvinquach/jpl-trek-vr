@@ -162,6 +162,18 @@ namespace TrekVRApplication {
         }
 
         /// <summary>
+        ///     Calculates the latitude and longitude from a UV coordinate and a
+        ///     corresponding bounding box.
+        /// </summary>
+        /// <returns>A Vector2 where x is the latitude and y is the longitude.</returns>
+        public static Vector2 UVToCoordinates(IBoundingBox boundingBox, Vector2 uv) {
+            return new Vector2(
+                boundingBox.LatStart + (1 - uv.y) * boundingBox.LatSwing,
+                boundingBox.LonStart + uv.x * boundingBox.LonSwing
+            );
+        }
+
+        /// <summary>
         ///     Calculates the largest dimension (width or height) of the terrain slice
         ///     enclosed by the bounding box if the terrain slice is rotated such that
         ///     the median direction is pointing upwards in world space. Currently only

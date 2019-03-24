@@ -4,6 +4,7 @@ using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
+    [RequireComponent(typeof(XRInteractableTerrainSection))]
     public class SectionTerrainModel : TerrainModel {
 
         private const float ViewTransitionDuration = 1.6f;
@@ -11,17 +12,17 @@ namespace TrekVRApplication {
         private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
 
         private BoundingBox _boundingBox;
-        private BoundingBox _squareBoundingBox;
-
         public BoundingBox BoundingBox {
-            get { return _boundingBox; }
+            get => _boundingBox;
             set {
                 if (_initTaskStatus == TaskStatus.NotStarted) {
                     _boundingBox = value;
-                    _squareBoundingBox = BoundingBoxUtils.ExpandToSquare(value);
+                    SquareBoundingBox = BoundingBoxUtils.ExpandToSquare(value);
                 }
             }
         }
+
+        public BoundingBox SquareBoundingBox { get; private set; }
 
         private TaskStatus _viewTransitionTaskStatus = TaskStatus.NotStarted;
         private float _viewTransitionProgress = 0.0f;
@@ -62,34 +63,34 @@ namespace TrekVRApplication {
 
         protected override void GenerateMesh() {
             TerrainModelMeshMetadata metadata = GenerateTerrainModelMeshMetadata();
-            UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(_squareBoundingBox, _boundingBox);
-            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseSectionTerrainMeshTask(metadata, _boundingBox, uvBounds);
+            UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(SquareBoundingBox, BoundingBox);
+            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseSectionTerrainMeshTask(metadata, BoundingBox, uvBounds);
 
             // Generate a base mesh first to be displayed temporarily
             // while the DEM data is being loaded.
-            generateBaseMeshTask.Execute((meshData) => {
+            generateBaseMeshTask.Execute(meshData => {
                 QueueTask(() => {
                     ProcessMeshData(meshData);
-                    PostProcessMeshData();
+                    PostProcessPlaceholderMeshData();
                     _initTaskStatus = TaskStatus.Completed;
                 });
             });
 
             // Load the DEM data, and then generate another mesh after using the data.
-            _dataElevationModelWebService.GetDEM(_squareBoundingBox, 1024, demFilePath => {
+            _dataElevationModelWebService.GetDEM(SquareBoundingBox, 1024, demFilePath => {
                 //_demFilePath = demFilePath; // Should this be allowed?
                 metadata.DemFilePath = demFilePath; // Temporary fix
                 GenerateTerrainMeshTask generateMeshTask = 
-                    new GenerateSectionTerrainMeshFromDigitalElevationModeTask(metadata, _boundingBox, uvBounds);
+                    new GenerateSectionTerrainMeshFromDigitalElevationModeTask(metadata, BoundingBox, uvBounds);
 
                 // Generate the high detailed mesh using the DEM.
                 generateMeshTask.Execute((meshData) => {
                     QueueTask(() => {
-                        Transform lodGroupContainer = transform.Find(GameObjectName.LODGroupContainer);
-                        if (lodGroupContainer) {
-                            Destroy(lodGroupContainer.gameObject);
+                        if (_lodGroupContainer) {
+                            Destroy(_lodGroupContainer);
                         }
                         ProcessMeshData(meshData);
+                        PostProcessDetailedMeshData(meshData, metadata);
                     });
                 });
             });
@@ -106,7 +107,7 @@ namespace TrekVRApplication {
                 int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
                 Material.SetTexture(diffuseBaseId, texture);
 
-                UVScaleOffset uvScaleOffset = BoundingBoxUtils.CalculateUVScaleOffset(UnrestrictedBoundingBox.Global, _squareBoundingBox);
+                UVScaleOffset uvScaleOffset = BoundingBoxUtils.CalculateUVScaleOffset(UnrestrictedBoundingBox.Global, SquareBoundingBox);
                 Material.SetTextureScale(diffuseBaseId, uvScaleOffset.Scale);
                 Material.SetTextureOffset(diffuseBaseId, uvScaleOffset.Offset);
             });
@@ -134,10 +135,9 @@ namespace TrekVRApplication {
         ///     Positions the model after the basic placeholder mesh is generated,
         ///     and starts the view transition process.
         /// </summary>
-        private void PostProcessMeshData() {
+        private void PostProcessPlaceholderMeshData() {
 
-            Transform lodGroupContainer = transform.Find(GameObjectName.LODGroupContainer);
-            GameObject meshContainer = lodGroupContainer.GetChild(0).gameObject;
+            GameObject meshContainer = _lodGroupContainer.transform.GetChild(0).gameObject;
 
             // Copy the placeholder mesh to use as a shadow caster.
             MeshFilter meshFilter = meshContainer.GetComponent<MeshFilter>();
@@ -151,7 +151,7 @@ namespace TrekVRApplication {
             VectorUtils.Print(bounds.size);
 
             // Initially position the mesh to match its visual position on the globe.
-            Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(_boundingBox);
+            Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(BoundingBox);
             Quaternion rotation = TerrainModelManager.Instance.GetGlobeModelTransform().rotation;
             rotation *= Quaternion.Euler(0, -latLongOffset.y - 90, 0);
             rotation *= Quaternion.Euler(0, 0, latLongOffset.x);
@@ -172,6 +172,21 @@ namespace TrekVRApplication {
             _viewTransitionTaskStatus = TaskStatus.Started;
         }
 
+        private void PostProcessDetailedMeshData(MeshData[] meshData, TerrainModelMeshMetadata metadata) {
+
+            // Add mesh collider, if a physics mesh was generated.
+            int physicsMeshIndex = metadata.PhyiscsLodMeshIndex;
+            if (physicsMeshIndex < 0) {
+                return;
+            }
+            // Do the heavy processing in the next update (does this help with the stutter?).
+            QueueTask(() => {
+                MeshCollider collider = gameObject.AddComponent<MeshCollider>();
+                Mesh physicsMesh = ConvertToMesh(meshData[physicsMeshIndex]);
+                collider.sharedMesh = physicsMesh;
+            });
+        }
+
         private void TransitionView() {
             _viewTransitionProgress += Time.deltaTime / ViewTransitionDuration;
 
@@ -187,7 +202,7 @@ namespace TrekVRApplication {
         }
 
         private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int size = 1024) {
-            return new TerrainModelProductMetadata(productId, _squareBoundingBox, size);
+            return new TerrainModelProductMetadata(productId, SquareBoundingBox, size);
         }
 
     }

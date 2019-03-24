@@ -122,6 +122,7 @@ namespace TrekVRApplication {
                 terrainModel.Radius = Mars.Radius;
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
+                terrainModel.PhysicsDownsampleLevel = 4;
                 terrainModel.InitModel();
             }
             catch (Exception e) {

@@ -1,9 +1,8 @@
 using UnityEngine;
-using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
-    public class XRInteractableGlobe : XRInteractableObject {
+    public class XRInteractableGlobe : XRInteractableTerrain {
 
         public XRInteractableGlobeMode InteractionMode { get; private set; } = XRInteractableGlobeMode.Navigate;
 
@@ -11,7 +10,7 @@ namespace TrekVRApplication {
 
         private XRInteractableGlobeBoundingBoxSelectionController _bboxSelectionController;
 
-        private GlobeTerrainModel _globeModel;
+        private GlobeTerrainModel _terrainModel;
 
         #region Grab variables
 
@@ -117,17 +116,15 @@ namespace TrekVRApplication {
 
         }
 
-        // Use this for initialization
         void Start() {
-            if (!_globeModel) {
-                _globeModel = GetComponent<GlobeTerrainModel>();
+            _terrainModel = GetComponent<GlobeTerrainModel>();
 
-                // There is no way to unsubscribe from this...but unsubscribing
-                // is not really necessary in this case.
-                _globeModel.OnInitComplete += () => {
-                    SetCoordinateLinesVisiblity(true);
-                };
-            }
+            // There is no way to unsubscribe from this...but unsubscribing
+            // is not really necessary in this case.
+            _terrainModel.OnInitComplete += () => {
+                SetCoordinateLinesVisiblity(true);
+            };
+
             _bboxSelectionController.ResetSelectionBoundingBox();
         }
 
