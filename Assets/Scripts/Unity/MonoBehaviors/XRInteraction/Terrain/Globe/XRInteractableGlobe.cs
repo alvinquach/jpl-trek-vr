@@ -240,11 +240,14 @@ namespace TrekVRApplication {
             _coordinateIndicatorMaterial.SetColor("_Color", CoordinateIndicatorColor);
 
             // Create the latitude and longitude selection indicators.
-            GameObject selectionIndicatorsContainer = new GameObject();
+            GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.PlanetSelectionIndicatorContainer) {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             selectionIndicatorsContainer.transform.SetParent(transform, false);
-            selectionIndicatorsContainer.name = GameObjectName.PlanetSelectionIndicatorContainer;
 
-            GameObject lonSelectionStartIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}1");
+            GameObject lonSelectionStartIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}1") {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             lonSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             lonSelectionStartIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
             _lonSelectionStartIndicator = InitCoordinateIndicator(
@@ -255,7 +258,9 @@ namespace TrekVRApplication {
             _lonSelectionStartIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionStartIndicator);
 
-            GameObject latSelectionStartIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}1");
+            GameObject latSelectionStartIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}1") {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             latSelectionStartIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             _latSelectionStartIndicator = InitCoordinateIndicator(
                 latSelectionStartIndicator,
@@ -265,7 +270,9 @@ namespace TrekVRApplication {
             _latSelectionStartIndicator.enabled = false;
             GeneratePointsForLatitudeIndicator(_latSelectionStartIndicator);
 
-            GameObject lonSelectionEndIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}2");
+            GameObject lonSelectionEndIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}2") {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             lonSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             lonSelectionEndIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
             _lonSelectionEndIndicator = InitCoordinateIndicator(
@@ -276,7 +283,9 @@ namespace TrekVRApplication {
             _lonSelectionEndIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionEndIndicator);
 
-            GameObject latSelectionEndIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}2");
+            GameObject latSelectionEndIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}2") {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             latSelectionEndIndicator.transform.SetParent(selectionIndicatorsContainer.transform, false);
             _latSelectionEndIndicator = InitCoordinateIndicator(
                 latSelectionEndIndicator,
@@ -288,6 +297,7 @@ namespace TrekVRApplication {
 
             // Instantiate a copy of the coordinate template to display the coordiate values.
             GameObject coordinateTemplate = TemplateService.Instance.GetTemplate(GameObjectName.CoordinateTemplate);
+            coordinateTemplate.layer = (int)CullingLayer.Terrain; // TODO Make a new layer for coordinate lines and labels
             if (coordinateTemplate) {
                 GameObject copy = Instantiate(coordinateTemplate);
                 copy.transform.SetParent(selectionIndicatorsContainer.transform); // TODO Move this to a container for labels.
@@ -295,7 +305,9 @@ namespace TrekVRApplication {
             }
 
             // Add container for coordinate lines
-            GameObject coordinateLines = new GameObject(GameObjectName.PlanetStaticCoordinateLines);
+            GameObject coordinateLines = new GameObject(GameObjectName.PlanetStaticCoordinateLines) {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             coordinateLines.transform.SetParent(transform, false);
             _coordinateLinesController = coordinateLines.AddComponent<XRInteractableGlobeCoordinateLinesController>();
             _coordinateLinesController.SetVisible(false);

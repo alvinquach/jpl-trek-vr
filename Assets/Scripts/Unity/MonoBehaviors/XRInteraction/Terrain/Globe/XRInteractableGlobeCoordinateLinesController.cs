@@ -132,7 +132,9 @@ namespace TrekVRApplication {
         }
 
         private LineRenderer GenerateLatitudeCoordinateLine(float latitude, float scale) {
-            GameObject gameObject = new GameObject($"Lat{GameObjectName.PlanetStaticCoordinateLines}{++_latitudeLineCount}");
+            GameObject gameObject = new GameObject($"Lat{GameObjectName.PlanetStaticCoordinateLines}{++_latitudeLineCount}") {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             gameObject.transform.SetParent(transform, false);
             LineRenderer lineRenderer = InitCoordinateIndicator(
                 gameObject,
@@ -144,7 +146,9 @@ namespace TrekVRApplication {
         }
 
         private LineRenderer GenerateLongitudeCoordinateLine(float longitude, float scale) {
-            GameObject gameObject = new GameObject($"Lon{GameObjectName.PlanetStaticCoordinateLines}{++_longitudeLineCount}");
+            GameObject gameObject = new GameObject($"Lon{GameObjectName.PlanetStaticCoordinateLines}{++_longitudeLineCount}") {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             gameObject.transform.SetParent(transform, false);
             LineRenderer lineRenderer = InitCoordinateIndicator(
                 gameObject,
@@ -192,7 +196,9 @@ namespace TrekVRApplication {
         }
 
         private void GenerateVerticalAxis(float positionalScale, GameObject labelTemplate) {
-            GameObject gameObject = new GameObject("VerticalAxis");
+            GameObject gameObject = new GameObject("VerticalAxis") {
+                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
+            };
             gameObject.transform.SetParent(transform, false);
 
             LineRenderer lineRenderer = InitCoordinateIndicator(

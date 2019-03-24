@@ -147,9 +147,10 @@ namespace TrekVRApplication {
 
             // Add LOD group manager.
             // TODO Make this a class member variable.
-            GameObject lodGroupContainer = new GameObject();
+            GameObject lodGroupContainer = new GameObject(GameObjectName.LODGroupContainer) {
+                layer = (int)CullingLayer.Terrain
+            };
             lodGroupContainer.transform.SetParent(transform, false);
-            lodGroupContainer.name = GameObjectName.LODGroupContainer;
 
             LODGroup lodGroup = lodGroupContainer.AddComponent<LODGroup>();
             LOD[] lods = new LOD[_lodLevels + 1];
@@ -159,11 +160,10 @@ namespace TrekVRApplication {
             // Create a child GameObject containing a mesh for each LOD level.
             for (int i = 0; i <= _lodLevels; i++) {
 
-                GameObject child = new GameObject();
+                GameObject child = new GameObject($"LOD_{i}") {
+                    layer = (int)CullingLayer.Terrain
+                };
                 child.transform.SetParent(lodGroupContainer.transform);
-
-                // Name the LOD game object.
-                child.name = $"LOD_{i}";
 
                 // Use the parent's tranformations.
                 child.transform.localPosition = Vector3.zero;

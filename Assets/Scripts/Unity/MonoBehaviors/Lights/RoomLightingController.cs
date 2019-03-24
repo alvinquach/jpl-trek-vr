@@ -4,9 +4,13 @@ namespace TrekVRApplication {
 
     public class RoomLightingController : MonoBehaviour {
 
-        private const float DirectionalLightMaxIntensity = 0.8f;
+        private const float DirectionalLightMaxIntensity = 0.5f;
 
-        private const float PointLightMaxIntensity = 0.8f;
+        private const float TerrainDirectionalLightMaxIntensity = 0.69f;
+
+        private const float PointLightMaxIntensity = 0.91f;
+
+        private const float SpotLightMaxIntensity = 0.69f;
 
         private const float DimIncrement = 0.2f;
 
@@ -31,11 +35,18 @@ namespace TrekVRApplication {
         private void AdjustLighting(float dimAmount) {
             Light[] lights = transform.GetComponentsInChildren<Light>();
             foreach (Light light in lights) {
-                if (light.type == LightType.Directional) {
-                    light.intensity = dimAmount * DirectionalLightMaxIntensity;
-                }
-                else if (light.type == LightType.Point) {
-                    light.intensity = dimAmount * PointLightMaxIntensity;
+                switch (light.type) {
+                    case LightType.Directional:
+                        Debug.Log(light.cullingMask);
+                        light.intensity = dimAmount * (light.cullingMask == 1 << (int)CullingLayer.Terrain ? 
+                            TerrainDirectionalLightMaxIntensity : DirectionalLightMaxIntensity);
+                        break;
+                    case LightType.Point:
+                        light.intensity = dimAmount * PointLightMaxIntensity;
+                        break;
+                    case LightType.Spot:
+                        light.intensity = dimAmount * SpotLightMaxIntensity;
+                        break;
                 }
             }
         }

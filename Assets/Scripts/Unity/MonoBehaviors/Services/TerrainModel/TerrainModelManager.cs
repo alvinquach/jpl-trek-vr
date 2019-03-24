@@ -78,13 +78,15 @@ namespace TrekVRApplication {
             }
 
             // Create a game object that will contain all the terrain model game objects.
-            _terrainModelsContainer = new GameObject();
-            _terrainModelsContainer.name = GameObjectName.TerrainModelsContainer;
+            _terrainModelsContainer = new GameObject(GameObjectName.TerrainModelsContainer) {
+                layer = (int)CullingLayer.Terrain
+            };
 
             // Create the globe model conatiner game object.
-            GameObject globeModelGameObject = new GameObject();
+            GameObject globeModelGameObject = new GameObject(typeof(Mars).Name) {
+                layer = (int)CullingLayer.Terrain
+            };
             globeModelGameObject.transform.parent = _terrainModelsContainer.transform;
-            globeModelGameObject.name = typeof(Mars).Name;
             GlobeModel = globeModelGameObject.AddComponent<GlobeTerrainModel>();
 
             // TEMPORARY -- DO THIS PROPERLY
@@ -109,7 +111,9 @@ namespace TrekVRApplication {
         private int _counter = 0;
 
         public TerrainModel CreateSectionModel(BoundingBox boundingBox, string demPath, string albedoPath = null) {
-            GameObject terrainModelContainer = new GameObject($"Model {++_counter}");
+            GameObject terrainModelContainer = new GameObject($"Model {++_counter}") {
+                layer = (int)CullingLayer.Terrain
+            };
             terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform, false);
             terrainModelContainer.SetActive(false);
 
