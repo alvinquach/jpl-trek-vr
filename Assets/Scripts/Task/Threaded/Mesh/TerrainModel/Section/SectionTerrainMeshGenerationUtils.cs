@@ -11,7 +11,7 @@ namespace TrekVRApplication {
         public static Vector2 GenerateUVCoord(int x, int y, int lonVertCount, int latVertCount, UVBounds uvBounds) {
             Vector2 uvScale = new Vector2(uvBounds.U2 - uvBounds.U1, uvBounds.V2 - uvBounds.V1);
             Vector2 uvOffset = new Vector2(-uvBounds.U1, -uvBounds.V1);
-            return MeshGenerationUtils.GenerateUVCoord(x, latVertCount - y, lonVertCount, latVertCount, uvScale, uvOffset);
+            return MeshGenerationUtils.GenerateUVCoord(x, latVertCount - y - 1, lonVertCount, latVertCount, uvScale, uvOffset);
         }
 
         /// <summary>
