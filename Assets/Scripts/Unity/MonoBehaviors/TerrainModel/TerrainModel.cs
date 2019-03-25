@@ -306,7 +306,7 @@ namespace TrekVRApplication {
         }
 
         protected virtual void SetRenderMode(bool enabled) {
-            string shaderName = enabled ? "Custom/MultiDiffuseShader" : "Custom/MultiDiffuseTransparentShader";
+            string shaderName = enabled ? "Custom/Terrain/MultiDiffuseShader" : "Custom/Terrain/MultiDiffuseTransparentShader";
             SwitchToShader(shaderName);
             if (!enabled) {
                 Material.SetFloat("_Opacity", 0.5f);

@@ -73,15 +73,15 @@ namespace TrekVRApplication {
         private void GenerateCoordinateLinesAndLabels() {
 
             // Create material for coordinate lines
-            _coordinateLineMaterial = new Material(Shader.Find("Custom/UnlitTransparentColor"));
+            _coordinateLineMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColor"));
             _coordinateLineMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
 
             // Create material for coordinate labels
-            _coordinateLabelMaterial = new Material(Shader.Find("Custom/UnlitTransparentColorMasked"));
+            _coordinateLabelMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColorMasked"));
             _coordinateLabelMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
 
             // Create material for vertical axis
-            _verticalAxisMaterial = new Material(Shader.Find("Custom/UnlitTransparentColorMasked"));
+            _verticalAxisMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColorMasked"));
             _verticalAxisMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
 
             // Scale

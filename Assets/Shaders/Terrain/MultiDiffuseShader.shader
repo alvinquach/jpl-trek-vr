@@ -1,5 +1,5 @@
-﻿Shader "Custom/MultiDiffuseShader"
-{
+﻿Shader "Custom/Terrain/MultiDiffuseShader" {
+
     Properties {
         _DiffuseBase ("Diffuse Base", 2D) = "black" {}
         _Diffuse1 ("Additional Diffuse 1", 2D) = "black" {}
