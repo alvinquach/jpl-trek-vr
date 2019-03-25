@@ -304,7 +304,7 @@ namespace TrekVRApplication {
             return shadowCaster;
         }
 
-        protected virtual TerrainModelMeshMetadata GenerateTerrainModelMeshMetadata() {
+        protected virtual TerrainModelMeshMetadata GenerateMeshMetadata() {
             return new TerrainModelMeshMetadata() {
                 DemFilePath = DemFilePath,
                 Radius = Radius * TerrainModelScale,

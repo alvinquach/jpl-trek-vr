@@ -19,7 +19,7 @@ namespace TrekVRApplication {
         }
 
         protected override void GenerateMesh() {
-            TerrainModelMeshMetadata metadata = GenerateTerrainModelMeshMetadata();
+            TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
             GenerateTerrainMeshTask generateMeshTask = new GenerateGlobeTerrainMeshFromDigitalElevationModelTask(metadata);
             generateMeshTask.Execute((meshData) => {
                 QueueTask(() => {

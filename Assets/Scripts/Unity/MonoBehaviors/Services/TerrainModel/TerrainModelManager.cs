@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
@@ -116,7 +117,7 @@ namespace TrekVRApplication {
                 terrainModel.Radius = Mars.Radius;
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
-                terrainModel.PhysicsDownsampleLevel = 4;
+                terrainModel.PhysicsDownsampleLevel = TerrainSectionPhysicsTargetDownsample;
                 terrainModel.InitModel();
             }
             catch (Exception e) {

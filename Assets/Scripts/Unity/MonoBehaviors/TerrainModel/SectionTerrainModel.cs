@@ -48,7 +48,7 @@ namespace TrekVRApplication {
 
         protected override void OnDestroy() {
             // TODO Unregister all layers
-            TerrainModelProductMetadata texInfo = GenerateTerrainModelProductMetadata(GlobalMosaicUUID);
+            TerrainModelProductMetadata texInfo = GenerateProductMetadata(GlobalMosaicUUID);
             TerrainModelTextureManager.Instance.RegisterUsage(texInfo, false);
         }
 
@@ -61,7 +61,7 @@ namespace TrekVRApplication {
         }
 
         protected override void GenerateMesh() {
-            TerrainModelMeshMetadata metadata = GenerateTerrainModelMeshMetadata();
+            TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
             UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(SquareBoundingBox, BoundingBox);
             GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseSectionTerrainMeshTask(metadata, BoundingBox, uvBounds);
 
@@ -76,7 +76,7 @@ namespace TrekVRApplication {
             });
 
             // Load the DEM data, and then generate another mesh after using the data.
-            _dataElevationModelWebService.GetDEM(SquareBoundingBox, 1024, demFilePath => {
+            _dataElevationModelWebService.GetDEM(SquareBoundingBox, TerrainSectionDemTargetSize, demFilePath => {
                 //_demFilePath = demFilePath; // Should this be allowed?
                 metadata.DemFilePath = demFilePath; // Temporary fix
                 GenerateTerrainMeshTask generateMeshTask = 
@@ -119,7 +119,7 @@ namespace TrekVRApplication {
             // TODO Inherit layers from globe terrain model.
 
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
-            TerrainModelProductMetadata texInfo = GenerateTerrainModelProductMetadata(GlobalMosaicUUID);
+            TerrainModelProductMetadata texInfo = GenerateProductMetadata(GlobalMosaicUUID);
             textureManager.GetTexture(texInfo, texture => {
                 int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
                 Material.SetTexture(diffuseBaseId, texture);
@@ -200,7 +200,7 @@ namespace TrekVRApplication {
             }
         }
 
-        private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int size = 1024) {
+        private TerrainModelProductMetadata GenerateProductMetadata(string productId, int size = TerrainSectionTextureTargetSize) {
             return new TerrainModelProductMetadata(productId, SquareBoundingBox, size);
         }
 
