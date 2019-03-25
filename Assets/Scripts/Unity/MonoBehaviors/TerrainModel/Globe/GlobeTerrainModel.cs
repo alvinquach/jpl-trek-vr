@@ -7,6 +7,8 @@ namespace TrekVRApplication {
     [RequireComponent(typeof(XRInteractableGlobe))]
     public class GlobeTerrainModel : TerrainModel {
 
+        public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableGlobe>();
+
         public event Action OnInitComplete = () => { };
 
         protected override void GenerateMaterial() {

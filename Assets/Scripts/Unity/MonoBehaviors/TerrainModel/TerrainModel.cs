@@ -9,6 +9,7 @@ namespace TrekVRApplication {
     public abstract class TerrainModel : MonoBehaviourWithTaskQueue {
 
         protected GameObject _lodGroupContainer;
+        public abstract XRInteractableTerrain InteractionController { get; }
 
         [SerializeField]
         protected string _demFilePath;

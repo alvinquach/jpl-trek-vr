@@ -54,9 +54,7 @@ namespace TrekVRApplication {
 
         private GameObject _terrainModelsContainer;
 
-        public TerrainModel CurrentVisibleModel {
-            get => GlobeModel.Visible ? GlobeModel : _terrainModels.Find(model => model.Visible);
-        }
+        public TerrainModel CurrentVisibleModel { get; private set; }
 
         /// <summary>
         ///     Whether the terrain models are set to render in opaque (enabled) mode
@@ -96,6 +94,7 @@ namespace TrekVRApplication {
             GlobeModel.BaseDownsampleLevel = _globeModelBaseDownsampleLevel;
             GlobeModel.LodLevels = _globeModelLODLevels;
             GlobeModel.Visible = true;
+            CurrentVisibleModel = GlobeModel;
 
             // Shift up 1 meter.
             _terrainModelsContainer.transform.position = Vector3.up;
@@ -105,7 +104,7 @@ namespace TrekVRApplication {
         // TEMPORARY
         private int _counter = 0;
 
-        public TerrainModel CreateSectionModel(BoundingBox boundingBox, string demPath, string albedoPath = null) {
+        public TerrainModel CreateSectionModel(BoundingBox boundingBox, bool initWithAnimations = true) {
             GameObject terrainModelContainer = new GameObject($"Model {++_counter}") {
                 layer = (int)CullingLayer.Terrain
             };
@@ -118,6 +117,7 @@ namespace TrekVRApplication {
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
                 terrainModel.PhysicsDownsampleLevel = TerrainSectionPhysicsTargetDownsample;
+                terrainModel.AnimateOnInitialization = initWithAnimations;
                 terrainModel.InitModel();
             }
             catch (Exception e) {
@@ -142,6 +142,7 @@ namespace TrekVRApplication {
         /// </summary>
         public void ShowGlobeModel() {
             _terrainModels.ForEach(t => t.Visible = false);
+            CurrentVisibleModel = GlobeModel;
             GlobeModel.Visible = true;
         }
 
@@ -160,6 +161,7 @@ namespace TrekVRApplication {
                 return false; // Retun false if the terrain model is already visible.
             }
             HideAll();
+            CurrentVisibleModel = terrainModel;
             terrainModel.Visible = true;
             if (cloneRotation) {
                 terrainModel.transform.rotation = GlobeModel.transform.rotation;
@@ -172,6 +174,7 @@ namespace TrekVRApplication {
         ///     GameObjects to inactive. Includes the default planet model.
         /// </summary>
         public void HideAll() {
+            CurrentVisibleModel = null;
             GlobeModel.Visible = false;
             _terrainModels.ForEach(w => w.Visible = false);
         }

@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using static TrekVRApplication.XRInteractableGlobeConstants;
+using static TrekVRApplication.GlobeTerrainConstants;
 
 namespace TrekVRApplication {
 
-    public static class XRInteractableGlobeUtils {
+    public static class TerrainModelOverlayUtils {
 
+        /// <summary>
+        ///     Generates the points for a longitude indicator that is
+        ///     displayed on the globe model.
+        /// </summary>
         /// <param name="latitude">Angle in degress.</param>
         public static void GeneratePointsForLongitudeIndicator(LineRenderer lineRenderer, float longitude = float.NaN, float scale = 1f) {
             lineRenderer.positionCount = CoordinateIndicatorMaxSegmentCount;
@@ -22,6 +26,10 @@ namespace TrekVRApplication {
             }
         }
 
+        /// <summary>
+        ///     Generates the points for a latituce indicator that is
+        ///     displayed on the globe model.
+        /// </summary>
         /// <param name="latitude">Angle in degress.</param>
         public static void GeneratePointsForLatitudeIndicator(LineRenderer lineRenderer, float latitude = float.NaN, float scale = 1f) {
 
@@ -46,6 +54,10 @@ namespace TrekVRApplication {
 
         }
 
+        /// <summary>
+        ///     Helper method for generating/updated longitude and
+        ///     latitude indicators on the globe model.
+        /// </summary>
         /// <param name="latitude">Angle in degress.</param>
         public static Vector2 CalculateLatitudeIndicatorOffsetAndScale(float latitude) {
             latitude *= Mathf.Deg2Rad;
@@ -54,6 +66,26 @@ namespace TrekVRApplication {
                 Mathf.Sin(latitude)     // Vertical offset
             );
         }
+
+        /// <summary>
+        ///     Draws a line inside the render texture camera area for
+        ///     display on terrain sections.
+        /// </summary>
+        public static LineRenderer DrawRenderTextureLine(Vector2 start, Vector2 end, Transform parent,
+            Material material, float baseThickness, string name = "Line") {
+
+            GameObject gameObject = new GameObject(name) {
+                layer = (int)CullingLayer.RenderToTexture
+            };
+            gameObject.transform.SetParent(parent, false);
+            LineRenderer lineRenderer = InitCoordinateIndicator(gameObject, material, baseThickness, false);
+            lineRenderer.enabled = false;
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, start);
+            lineRenderer.SetPosition(1, end);
+            return lineRenderer;
+        }
+
 
         public static LineRenderer InitCoordinateIndicator(GameObject gameObject, Material material, float thickness, bool loop = true) {
             LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();

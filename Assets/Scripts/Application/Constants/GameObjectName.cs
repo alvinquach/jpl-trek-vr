@@ -10,11 +10,11 @@
 
         public const string TerrainShadowCaster = "TerrainShadowCaster";
 
-        public const string PlanetSelectionIndicator = "SelectionIndicator";
+        public const string StaticCoordinateLines = "CoordniateLines";
 
-        public const string PlanetSelectionIndicatorContainer = "SelectionIndicatorContainer";
+        public const string SelectionIndicator = "SelectionIndicator";
 
-        public const string PlanetStaticCoordinateLines = "CoordniateLines";
+        public const string SelectionIndicatorContainer = "SelectionIndicatorContainer";
 
         public const string LODGroupContainer = "LodGroupContainer";
 

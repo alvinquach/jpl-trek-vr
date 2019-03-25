@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public static class XRInteractableGlobeConstants {
+    public static class GlobeTerrainConstants {
 
         public const int CoordinateIndicatorMaxSegmentCount = 128;
 
@@ -29,6 +29,7 @@ namespace TrekVRApplication {
 
         public const float CoordinateIndicatorStaticLabelFadeOutDistance = 2.5f;
 
+        // TODO Move this somewhere else since section terrains also use it.
         public static readonly Color32 CoordinateIndicatorColor = new Color32(0, 224, 255, 255);
 
         public static readonly Color32 CoordinateIndicatorStaticColor = new Color32(255, 160, 96, 255);

@@ -13,11 +13,11 @@ namespace TrekVRApplication {
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
             if (terrainModelController.GlobeModelIsVisible()) {
                 XRInteractableGlobe globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobe>();
-                if (globe.InteractionMode == XRInteractableGlobeMode.Navigate) {
-                    globe.SwitchToMode(XRInteractableGlobeMode.Select);
+                if (globe.CurrentActivity == XRInteractableTerrainActivity.Default) {
+                    globe.SwitchToActivity(XRInteractableTerrainActivity.BBoxSelection);
                 }
                 else {
-                    globe.SwitchToMode(XRInteractableGlobeMode.Navigate);
+                    globe.SwitchToActivity(XRInteractableTerrainActivity.Default);
                 }
             }
             else {

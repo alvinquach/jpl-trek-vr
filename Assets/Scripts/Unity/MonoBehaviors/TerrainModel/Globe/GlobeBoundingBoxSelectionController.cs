@@ -1,57 +1,24 @@
 ﻿using UnityEngine;
 using static TrekVRApplication.TerrainModelConstants;
-using static TrekVRApplication.XRInteractableGlobeConstants;
-using static TrekVRApplication.XRInteractableGlobeUtils;
-using static TrekVRApplication.ZFBrowserConstants;
+using static TrekVRApplication.GlobeTerrainConstants;
+using static TrekVRApplication.TerrainModelOverlayUtils;
 
 namespace TrekVRApplication {
 
-    public class XRInteractableGlobeBoundingBoxSelectionController : MonoBehaviour {
-
-        private const int ControllerModalBoundingBoxUpdateInterval = 10;
-
-        private Material _coordinateIndicatorMaterial;
-
-        private Vector4 _selectionBoundingBox;
-        public Vector4 SelectionBoundingBox {
-            get => _selectionBoundingBox;
-        }
+    public class GlobeBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
 
         private POILabel _coordSelectionLabel;
 
-        private LineRenderer _lonSelectionStartIndicator;
-        private LineRenderer _latSelectionStartIndicator;
-        private LineRenderer _lonSelectionEndIndicator;
-        private LineRenderer _latSelectionEndIndicator;
-
-        private byte _selectionIndex = 0;
-
-        private LineRenderer CurrentSelectionIndicator {
-            get => GetSelectionIndicatorByIndex(_selectionIndex);
-        }
-
-        private int _framesSinceLastControllerModalUpdate = 0;
-
         #region Unity lifecycle methods
 
-        private void Awake() {
-            GenerateSelectionIndicatorLines();
-        }
-
-        private void OnEnable() {
-            Debug.Log("ENABLED");
-            _lonSelectionStartIndicator.startWidth = CoordinateIndicatorActiveThickness;
-            _lonSelectionStartIndicator.enabled = true;
+        protected override void OnEnable() {
+            base.OnEnable();
             _coordSelectionLabel.gameObject.SetActive(true);
         }
 
         #endregion
 
-        public void SetEnabled(bool enabled) {
-            gameObject.SetActive(enabled);
-        }
-
-        public void MakeBoundarySelection(RaycastHit hit) {
+        public override void MakeBoundarySelection(RaycastHit hit) {
 
             Vector3 direction = transform.InverseTransformPoint(hit.point);
             Vector3 flattened = new Vector3(direction.x, 0, direction.z);
@@ -84,18 +51,15 @@ namespace TrekVRApplication {
             if (_selectionIndex == 4) {
                 Debug.Log("Selection Complete: " + _selectionBoundingBox);
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                TerrainModel terrainModel = terrainModelManager.CreateSectionModel(_selectionBoundingBox, null);
+                TerrainModel terrainModel = terrainModelManager.CreateSectionModel(_selectionBoundingBox);
                 terrainModelManager.ShowTerrainModel(terrainModel, false);
                 ExitSelectionMode();
             }
             else {
-                LineRenderer nextCoordinateIndicator = CurrentSelectionIndicator;
-                nextCoordinateIndicator.startWidth = CoordinateIndicatorActiveThickness;
-                nextCoordinateIndicator.enabled = true;
+                ActivateCurrentIndicator();
             }
 
             SendBoundingBoxUpdateToControllerModal(new BoundingBox(_selectionBoundingBox));
-
         }
 
         /// <summary>
@@ -113,7 +77,7 @@ namespace TrekVRApplication {
         ///         current longitude or latitude angle.
         ///     </para>
         ///     </summary>
-        public void UpdateCursorPosition(RaycastHit hit) {
+        public override float UpdateCursorPosition(RaycastHit hit) {
 
             // Update the position and angle of the coordinate selection label.
             _coordSelectionLabel.transform.position = hit.point;
@@ -161,77 +125,20 @@ namespace TrekVRApplication {
             }
 
             _framesSinceLastControllerModalUpdate++;
-
+            return angle;
         }
 
-        public bool CancelSelection(bool cancelAll = false) {
-
-            if (!cancelAll && _selectionIndex > 0) {
-
-                // Hide the previous indicator
-                CurrentSelectionIndicator.enabled = false;
-
-                // Reset selection value
-                _selectionBoundingBox[_selectionIndex--] = float.NaN;
-
-                // Show current indicator
-                CurrentSelectionIndicator.startWidth = CoordinateIndicatorActiveThickness;
-                CurrentSelectionIndicator.enabled = true;
-
-                return false;
-            }
-
-            ExitSelectionMode();
-            return true;
-        }
-
-        public void ResetSelectionBoundingBox() {
-            _selectionBoundingBox = new Vector4(float.NaN, float.NaN, float.NaN, float.NaN);
-        }
-
-        private void ExitSelectionMode() {
-            ResetSelectionBoundingBox();
-            _selectionIndex = 0;
-            _lonSelectionStartIndicator.enabled = false;
-            _latSelectionStartIndicator.enabled = false;
-            _lonSelectionEndIndicator.enabled = false;
-            _latSelectionEndIndicator.enabled = false;
+        protected override void ExitSelectionMode() {
+            base.ExitSelectionMode();
             _coordSelectionLabel.gameObject.SetActive(false);
-            UserInterfaceManager.Instance.HideControllerModalsWithActivity(ControllerModalActivity.BBoxSelection);
         }
 
-        private LineRenderer GetSelectionIndicatorByIndex(int index) {
-            switch (index) {
-                case 0:
-                    return _lonSelectionStartIndicator;
-                case 1:
-                    return _latSelectionStartIndicator;
-                case 2:
-                    return _lonSelectionEndIndicator;
-                case 3:
-                    return _latSelectionEndIndicator;
-                default:
-                    return null;
-            }
+        protected override void ActivateCurrentIndicator() {
+            CurrentSelectionIndicator.startWidth = CoordinateIndicatorActiveThickness;
+            CurrentSelectionIndicator.enabled = true;
         }
 
-        private void SendBoundingBoxUpdateToControllerModal(BoundingBox bbox) {
-            ControllerModal controllerModal = UserInterfaceManager.Instance
-                .GetControllerModalWithActivity(ControllerModalActivity.BBoxSelection);
-
-            if (!controllerModal) {
-                return;
-            }
-
-            string js =
-                $"let component = {AngularComponentContainerPath}.{BoundingBoxSelectionModalName};" +
-                $"component && component.updateBoundingBox({bbox.ToString(", ", 7)}, {_selectionIndex});";
-
-            controllerModal.Browser.EvalJS(js);
-            _framesSinceLastControllerModalUpdate = 0;
-        }
-
-        private void GenerateSelectionIndicatorLines() {
+        protected override void GenerateSelectionIndicatorLines() {
 
             float indicatorRadius = Mars.Radius * TerrainModelScale + CoordinateIndicatorRadiusOffset;
 
@@ -239,11 +146,11 @@ namespace TrekVRApplication {
             _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));
             _coordinateIndicatorMaterial.SetColor("_Color", CoordinateIndicatorColor);
 
-            GameObject lonSelectionStartIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}1") {
+            GameObject lonSelectionStartIndicator = new GameObject($"Lon{GameObjectName.SelectionIndicator}1") {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             lonSelectionStartIndicator.transform.SetParent(transform, false);
-            lonSelectionStartIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
+            lonSelectionStartIndicator.transform.localScale = indicatorRadius * Vector3.one;
             _lonSelectionStartIndicator = InitCoordinateIndicator(
                 lonSelectionStartIndicator,
                 _coordinateIndicatorMaterial,
@@ -252,7 +159,7 @@ namespace TrekVRApplication {
             _lonSelectionStartIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionStartIndicator);
 
-            GameObject latSelectionStartIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}1") {
+            GameObject latSelectionStartIndicator = new GameObject($"Lat{GameObjectName.SelectionIndicator}1") {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             latSelectionStartIndicator.transform.SetParent(transform, false);
@@ -264,11 +171,11 @@ namespace TrekVRApplication {
             _latSelectionStartIndicator.enabled = false;
             GeneratePointsForLatitudeIndicator(_latSelectionStartIndicator);
 
-            GameObject lonSelectionEndIndicator = new GameObject($"Lon{GameObjectName.PlanetSelectionIndicator}2") {
+            GameObject lonSelectionEndIndicator = new GameObject($"Lon{GameObjectName.SelectionIndicator}2") {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             lonSelectionEndIndicator.transform.SetParent(transform, false);
-            lonSelectionEndIndicator.transform.localScale = indicatorRadius * Vector3.one; // TODO Un-hardcode the radius.
+            lonSelectionEndIndicator.transform.localScale = indicatorRadius * Vector3.one;
             _lonSelectionEndIndicator = InitCoordinateIndicator(
                 lonSelectionEndIndicator,
                 _coordinateIndicatorMaterial,
@@ -277,7 +184,7 @@ namespace TrekVRApplication {
             _lonSelectionEndIndicator.enabled = false;
             GeneratePointsForLongitudeIndicator(_lonSelectionEndIndicator);
 
-            GameObject latSelectionEndIndicator = new GameObject($"Lat{GameObjectName.PlanetSelectionIndicator}2") {
+            GameObject latSelectionEndIndicator = new GameObject($"Lat{GameObjectName.SelectionIndicator}2") {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             latSelectionEndIndicator.transform.SetParent(transform, false);
@@ -298,6 +205,14 @@ namespace TrekVRApplication {
                 _coordSelectionLabel = copy.transform.GetComponent<POILabel>();
             }
 
+        }
+        protected override void ResetIndicatorPositions(bool disable) {
+            if (disable) {
+                _lonSelectionStartIndicator.enabled = false;
+                _latSelectionStartIndicator.enabled = false;
+                _lonSelectionEndIndicator.enabled = false;
+                _latSelectionEndIndicator.enabled = false;
+            }
         }
 
     }

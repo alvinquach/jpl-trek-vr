@@ -11,17 +11,14 @@ namespace TrekVRApplication {
 
         public static TerrainModelOverlayController Instance;
 
-        [SerializeField]
-        private RenderTexture _renderTexture;
-        public RenderTexture RenderTexture {
-            get => _renderTexture;
-        }
+        public RenderTexture RenderTexture { get; private set; }
+
+        public Camera RenderTextureCamera { get; private set;  }
 
         [SerializeField]
-        private Camera _renderTextureCamera;
-        public Camera RenderTextureCamera {
-            get => _renderTextureCamera;
-        }
+        private GameObject _renderTextureObjectsContainer;
+
+        public SectionTerrainBoundingBoxSelectionController BBoxSelectionController { get; private set; }
 
         private void Awake() {
 
@@ -31,14 +28,28 @@ namespace TrekVRApplication {
                 throw new Exception("Only one instace of TerrainModelOverlayController is allowed!");
             }
 
-            _renderTexture = new RenderTexture(RenderTextureSize, RenderTextureSize, 0);
-            _renderTexture.format = RenderTextureFormat.ARGB32;
-            _renderTexture.Create();
+            RenderTexture = new RenderTexture(RenderTextureSize, RenderTextureSize, 0);
+            RenderTexture.format = RenderTextureFormat.ARGB32;
+            RenderTexture.Create();
 
-            _renderTextureCamera.aspect = 1f;
-            _renderTextureCamera.targetTexture = RenderTexture;
-            _renderTextureCamera.enabled = false; // Disable automatic updates
-            _renderTextureCamera.Render();
+            RenderTextureCamera = GetComponent<Camera>();
+            RenderTextureCamera.aspect = 1f;
+            RenderTextureCamera.targetTexture = RenderTexture;
+            RenderTextureCamera.enabled = false; // Disable automatic updates
+            RenderTextureCamera.Render();
+
+            // Create the latitude and longitude selection indicators and controller.
+            GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.SelectionIndicatorContainer) {
+                layer = (int)CullingLayer.RenderToTexture
+            };
+            selectionIndicatorsContainer.transform.SetParent(_renderTextureObjectsContainer.transform, false);
+            BBoxSelectionController = selectionIndicatorsContainer.AddComponent<SectionTerrainBoundingBoxSelectionController>();
+            BBoxSelectionController.SetEnabled(false);
+
+        }
+
+        public void UpdateTexture() {
+            RenderTextureCamera.Render();
         }
 
     }

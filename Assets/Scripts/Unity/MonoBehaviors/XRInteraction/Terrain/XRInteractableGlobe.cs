@@ -4,11 +4,10 @@ namespace TrekVRApplication {
 
     public class XRInteractableGlobe : XRInteractableTerrain {
 
-        public XRInteractableGlobeMode InteractionMode { get; private set; } = XRInteractableGlobeMode.Navigate;
+        private GlobeCoordinateLinesController _coordinateLinesController;
 
-        private XRInteractableGlobeCoordinateLinesController _coordinateLinesController;
-
-        private XRInteractableGlobeBoundingBoxSelectionController _bboxSelectionController;
+        private GlobeBoundingBoxSelectionController _bboxSelectionController;
+        protected override TerrainBoundingBoxSelectionController BBoxSelectionController => _bboxSelectionController;
 
         private GlobeTerrainModel _terrainModel;
         public override TerrainModel TerrainModel => _terrainModel;
@@ -50,7 +49,7 @@ namespace TrekVRApplication {
         #region Event handlers
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            if (InteractionMode == XRInteractableGlobeMode.Navigate) {
+            if (CurrentActivity == XRInteractableTerrainActivity.Default) {
                 if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _gripGrabbed) {
                     return;
                 }
@@ -60,7 +59,7 @@ namespace TrekVRApplication {
                 _triggerGrabbed = true;
                 _grabber.LaserPointer.Active = true;
             }
-            else if (InteractionMode == XRInteractableGlobeMode.Select) {
+            else if (CurrentActivity == XRInteractableTerrainActivity.BBoxSelection) {
                 _bboxSelectionController.MakeBoundarySelection(hit);
             }
         }
@@ -70,7 +69,7 @@ namespace TrekVRApplication {
         }
 
         public override void OnTriggerDoubleClick(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            if (InteractionMode == XRInteractableGlobeMode.Navigate) {
+            if (CurrentActivity == XRInteractableTerrainActivity.Default) {
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
                 NavigateTo(hit.point - transform.position, eye.transform.position);
             }
@@ -88,7 +87,7 @@ namespace TrekVRApplication {
         }
 
         public override void OnCursorOver(XRController sender, RaycastHit hit) {
-            if (InteractionMode == XRInteractableGlobeMode.Select) {
+            if (CurrentActivity == XRInteractableTerrainActivity.BBoxSelection) {
                 _bboxSelectionController.UpdateCursorPosition(hit);
             }
         }
@@ -100,25 +99,25 @@ namespace TrekVRApplication {
         protected override void Awake() {
             base.Awake();
 
-            // Create the latitude and longitude selection indicators.
-            GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.PlanetSelectionIndicatorContainer) {
+            // Create the latitude and longitude selection indicators and controller.
+            GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.SelectionIndicatorContainer) {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             selectionIndicatorsContainer.transform.SetParent(transform, false);
-            _bboxSelectionController = selectionIndicatorsContainer.AddComponent<XRInteractableGlobeBoundingBoxSelectionController>();
+            _bboxSelectionController = selectionIndicatorsContainer.AddComponent<GlobeBoundingBoxSelectionController>();
             _bboxSelectionController.SetEnabled(false);
 
             // Add container for coordinate lines
-            GameObject coordinateLines = new GameObject(GameObjectName.PlanetStaticCoordinateLines) {
+            GameObject coordinateLines = new GameObject(GameObjectName.StaticCoordinateLines) {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             coordinateLines.transform.SetParent(transform, false);
-            _coordinateLinesController = coordinateLines.AddComponent<XRInteractableGlobeCoordinateLinesController>();
+            _coordinateLinesController = coordinateLines.AddComponent<GlobeCoordinateLinesController>();
             _coordinateLinesController.SetVisible(false);
 
         }
 
-        private void Start() {
+        protected override void Start() {
             _terrainModel = GetComponent<GlobeTerrainModel>();
 
             // There is no way to unsubscribe from this...but unsubscribing
@@ -127,7 +126,7 @@ namespace TrekVRApplication {
                 SetCoordinateLinesVisiblity(true);
             };
 
-            _bboxSelectionController.ResetSelectionBoundingBox();
+            base.Start();
         }
 
         private void Update() {
@@ -184,26 +183,17 @@ namespace TrekVRApplication {
 
         #endregion
 
-        protected override void EnableTerrainInteraction(bool enabled) {
-            base.EnableTerrainInteraction(enabled);
-            if (!enabled) {
-                SwitchToMode(XRInteractableGlobeMode.Disabled);
-            } else {
-                // TODO ...
-            }
-        }
-
-        public void SwitchToMode(XRInteractableGlobeMode mode) {
-            if (InteractionMode == mode) {
+        public override void SwitchToActivity(XRInteractableTerrainActivity activity) {
+            if (CurrentActivity == activity) {
                 return;
             }
 
             // Switching away from current mode.
-            switch (InteractionMode) {
-                case XRInteractableGlobeMode.Select:
-                    CancelSelection(true, mode);
+            switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.BBoxSelection:
+                    CancelSelection(true, activity);
                     break;
-                case XRInteractableGlobeMode.Disabled:
+                case XRInteractableTerrainActivity.Disabled:
                     Collider collider = GetComponent<SphereCollider>();
                     if (collider) {
                         collider.enabled = true;
@@ -213,11 +203,11 @@ namespace TrekVRApplication {
             }
 
             // Switch to new mode.
-            switch (mode) {
-                case XRInteractableGlobeMode.Select:
+            switch (activity) {
+                case XRInteractableTerrainActivity.BBoxSelection:
                     _bboxSelectionController.SetEnabled(true);
                     break;
-                case XRInteractableGlobeMode.Disabled:
+                case XRInteractableTerrainActivity.Disabled:
                     Collider collider = GetComponent<SphereCollider>();
                     if (collider) {
                         collider.enabled = false;
@@ -226,8 +216,8 @@ namespace TrekVRApplication {
                     break;
             }
 
-            Debug.Log($"SWITCHING MODES: {InteractionMode} --> {mode}");
-            InteractionMode = mode;
+            Debug.Log($"SWITCHING MODES: {CurrentActivity} --> {activity}");
+            CurrentActivity = activity;
         }
 
         #region Naviation methods
@@ -301,17 +291,6 @@ namespace TrekVRApplication {
         }
 
         #endregion
-
-        public void CancelSelection(bool cancelAll = false, XRInteractableGlobeMode nextMode = XRInteractableGlobeMode.Navigate) {
-            if (InteractionMode != XRInteractableGlobeMode.Select) {
-                return;
-            }
-            if (_bboxSelectionController.CancelSelection(cancelAll)) {
-                InteractionMode = nextMode;
-                _bboxSelectionController.SetEnabled(false);
-                UserInterfaceManager.Instance.MainModal.Visible = true;
-            }
-        }
 
         public void SetCoordinateLinesVisiblity(bool visible) {
             _coordinateLinesController.SetVisible(visible);

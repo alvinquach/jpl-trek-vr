@@ -10,6 +10,18 @@ namespace TrekVRApplication {
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
 
+        public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableTerrainSection>();
+
+        private bool _animateOnInitialization;
+        public bool AnimateOnInitialization {
+            get => _animateOnInitialization;
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    _animateOnInitialization = value;
+                }
+            }
+        }
+
         private BoundingBox _boundingBox;
         public BoundingBox BoundingBox {
             get => _boundingBox;
@@ -149,26 +161,39 @@ namespace TrekVRApplication {
             float meshWidth = Mathf.Max(bounds.size.y, bounds.size.z);
             VectorUtils.Print(bounds.size);
 
-            // Initially position the mesh to match its visual position on the globe.
-            Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(BoundingBox);
-            Quaternion rotation = TerrainModelManager.Instance.GetGlobeModelTransform().rotation;
-            rotation *= Quaternion.Euler(0, -latLongOffset.y - 90, 0);
-            rotation *= Quaternion.Euler(0, 0, latLongOffset.x);
-            transform.rotation = rotation;
-            transform.Translate(Radius * TerrainModelScale, 0, 0);
-
             // TODO Move these to constants file.
             float tableWidth = 2.0f;
             float tableHeight = 0.5f;
             float tableTopGap = 0.05f;
 
-            // Start the view transition.
+            // Compute the target transformations.
             _targetScale = tableWidth / meshWidth;
-            _startPosition = transform.position;
             _targetPosition = (_targetScale * meshDepth + tableHeight + tableTopGap) * Vector3.up;
-            _startRotation = transform.rotation;
             _targetRotation = Quaternion.Euler(0, 0, 90);
-            _viewTransitionTaskStatus = TaskStatus.Started;
+
+            if (AnimateOnInitialization) {
+
+                // Initially position the mesh to match its visual position on the globe.
+                Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(BoundingBox);
+                Quaternion rotation = TerrainModelManager.Instance.GetGlobeModelTransform().rotation;
+                rotation *= Quaternion.Euler(0, -latLongOffset.y - 90, 0);
+                rotation *= Quaternion.Euler(0, 0, latLongOffset.x);
+                transform.rotation = rotation;
+                transform.Translate(Radius * TerrainModelScale, 0, 0);
+
+                _startPosition = transform.position;
+                _startRotation = transform.rotation;
+                _viewTransitionTaskStatus = TaskStatus.Started;
+            }
+            else {
+
+                // Skip directly to final transform.
+                transform.rotation = _targetRotation;
+                transform.position = _targetPosition;
+                transform.localScale = _targetScale * Vector3.one;
+                _viewTransitionTaskStatus = TaskStatus.Completed;
+            }
+
         }
 
         private void PostProcessDetailedMeshData(MeshData[] meshData, TerrainModelMeshMetadata metadata) {

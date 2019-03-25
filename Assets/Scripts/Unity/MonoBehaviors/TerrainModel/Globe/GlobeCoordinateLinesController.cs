@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using static TrekVRApplication.XRInteractableGlobeConstants;
-using static TrekVRApplication.XRInteractableGlobeUtils;
+using static TrekVRApplication.GlobeTerrainConstants;
+using static TrekVRApplication.TerrainModelOverlayUtils;
 using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
@@ -11,7 +11,7 @@ namespace TrekVRApplication {
     ///     elements that are rendered on the planet, such as the
     ///     coordinate lines and coordinate labels.
     /// </summary>
-    public class XRInteractableGlobeCoordinateLinesController : MonoBehaviour {
+    public class GlobeCoordinateLinesController : MonoBehaviour {
 
         #region Line and label counts (for naming purposes)
 
@@ -134,7 +134,7 @@ namespace TrekVRApplication {
         }
 
         private LineRenderer GenerateLatitudeCoordinateLine(float latitude, float scale) {
-            GameObject gameObject = new GameObject($"Lat{GameObjectName.PlanetStaticCoordinateLines}{++_latitudeLineCount}") {
+            GameObject gameObject = new GameObject($"Lat{GameObjectName.StaticCoordinateLines}{++_latitudeLineCount}") {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             gameObject.transform.SetParent(transform, false);
@@ -148,7 +148,7 @@ namespace TrekVRApplication {
         }
 
         private LineRenderer GenerateLongitudeCoordinateLine(float longitude, float scale) {
-            GameObject gameObject = new GameObject($"Lon{GameObjectName.PlanetStaticCoordinateLines}{++_longitudeLineCount}") {
+            GameObject gameObject = new GameObject($"Lon{GameObjectName.StaticCoordinateLines}{++_longitudeLineCount}") {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             gameObject.transform.SetParent(transform, false);

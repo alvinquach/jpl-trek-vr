@@ -76,19 +76,10 @@ namespace TrekVRApplication {
             // TODO Convert this to switch case.
             switch (activity) {
                 case ControllerModalActivity.BBoxSelection:
-                    if (terrainModelController.GlobeModelIsVisible()) {
-
-                        // FIXME Need to set the mode for all the terrain models, not just the planet.
-                        globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobe>();
-                        globe.SwitchToMode(XRInteractableGlobeMode.Select);
-
-                        UserInterfaceManager.Instance.MainModal.Visible = false;
-                    }
-                    else {
-                        terrainModelController.ShowGlobeModel(); // Hacky demo code
-                        //Debug.LogError($"Cannot swtich to {activity} activity; planet model is currently not visible.");
-                        return;
-                    }
+                    TerrainModel terrainModel = terrainModelController.CurrentVisibleModel;
+                    XRInteractableTerrain interactableTerrain = terrainModel.InteractionController;
+                    interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.BBoxSelection);
+                    UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
 
                 case ControllerModalActivity.BookmarkResults:
@@ -97,7 +88,7 @@ namespace TrekVRApplication {
 
                     // FIXME Need to set the mode for all the terrain models, not just the planet.
                     globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobe>();
-                    globe.SwitchToMode(XRInteractableGlobeMode.Navigate);
+                    globe.SwitchToActivity(XRInteractableTerrainActivity.Default);
 
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
