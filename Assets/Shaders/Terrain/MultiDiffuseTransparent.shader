@@ -1,4 +1,4 @@
-﻿Shader "Custom/Terrain/MultiDiffuseTransparentShader" {
+﻿Shader "Custom/Terrain/MultiDiffuseTransparent" {
 
     Properties {
         _DiffuseBase ("Diffuse Base", 2D) = "black" {}
@@ -8,7 +8,7 @@
         _Diffuse2Opacity ("Additional Diffuse 2 Opacity", Range(0,1)) = 0.0
         _Diffuse3 ("Additional Diffuse 3", 2D) = "black" {}
         _Diffuse3Opacity ("Additional Diffuse 3 Opacity", Range(0,1)) = 0.0
-        _Opacity ("Opacity", Range(0,1)) = 1.0
+        _DiffuseOpacity ("Master Diffuse Opacity", Range(0, 1)) = 1.0
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
     }
@@ -42,7 +42,7 @@
 		half _Diffuse2Opacity;
 		half _Diffuse3Opacity;
 
-		half _Opacity;
+		half _DiffuseOpacity;
         half _Glossiness;
         half _Metallic;
 
@@ -113,7 +113,7 @@
 
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Alpha = _Opacity;
+            o.Alpha = _DiffuseOpacity;
         }
 
         ENDCG

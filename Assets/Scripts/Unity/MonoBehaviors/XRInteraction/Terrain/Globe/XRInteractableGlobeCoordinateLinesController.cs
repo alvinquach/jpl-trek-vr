@@ -72,17 +72,19 @@ namespace TrekVRApplication {
 
         private void GenerateCoordinateLinesAndLabels() {
 
+            int colorId = Shader.PropertyToID("_Color");
+
             // Create material for coordinate lines
             _coordinateLineMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColor"));
-            _coordinateLineMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
+            _coordinateLineMaterial.SetColor(colorId, CoordinateIndicatorStaticColor);
 
             // Create material for coordinate labels
             _coordinateLabelMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColorMasked"));
-            _coordinateLabelMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
+            _coordinateLabelMaterial.SetColor(colorId, CoordinateIndicatorStaticColor);
 
             // Create material for vertical axis
             _verticalAxisMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColorMasked"));
-            _verticalAxisMaterial.SetColor("_Color", CoordinateIndicatorStaticColor);
+            _verticalAxisMaterial.SetColor(colorId, CoordinateIndicatorStaticColor);
 
             // Scale
             float linesScale = Mars.Radius * TerrainModelScale + CoordinateIndicatorRadiusOffset;

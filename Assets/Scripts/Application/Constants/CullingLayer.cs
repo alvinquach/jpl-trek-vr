@@ -9,7 +9,8 @@
         UI = 5,
         TerrainShadowCaster = 8,
         Terrain = 9,
-        World = 10
+        World = 10,
+        RenderToTexture = 11
 
     }
 

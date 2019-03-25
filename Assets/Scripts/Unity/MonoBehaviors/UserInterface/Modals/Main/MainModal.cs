@@ -35,7 +35,7 @@ namespace TrekVRApplication {
                 if (value) {
                     OpenModal();
                 }
-                TerrainModelManager.Instance.SetTerrainRenderMode(!value);
+                TerrainModelManager.Instance.EnableTerrainInteraction(!value);
                 base.Visible = value;
             }
         }

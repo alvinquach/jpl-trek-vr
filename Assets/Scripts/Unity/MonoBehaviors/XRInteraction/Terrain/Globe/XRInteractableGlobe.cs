@@ -11,6 +11,7 @@ namespace TrekVRApplication {
         private XRInteractableGlobeBoundingBoxSelectionController _bboxSelectionController;
 
         private GlobeTerrainModel _terrainModel;
+        public override TerrainModel TerrainModel => _terrainModel;
 
         #region Grab variables
 
@@ -96,7 +97,8 @@ namespace TrekVRApplication {
 
         #region Unity lifecycle methods
 
-        private void Awake() {
+        protected override void Awake() {
+            base.Awake();
 
             // Create the latitude and longitude selection indicators.
             GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.PlanetSelectionIndicatorContainer) {
@@ -116,7 +118,7 @@ namespace TrekVRApplication {
 
         }
 
-        void Start() {
+        private void Start() {
             _terrainModel = GetComponent<GlobeTerrainModel>();
 
             // There is no way to unsubscribe from this...but unsubscribing
@@ -128,8 +130,7 @@ namespace TrekVRApplication {
             _bboxSelectionController.ResetSelectionBoundingBox();
         }
 
-        // Update is called once per frame
-        void Update() {
+        private void Update() {
 
             if (_navToProgress < 1) {
                 _navToProgress += Time.deltaTime / _navToDuration;
@@ -183,6 +184,15 @@ namespace TrekVRApplication {
 
         #endregion
 
+        protected override void EnableTerrainInteraction(bool enabled) {
+            base.EnableTerrainInteraction(enabled);
+            if (!enabled) {
+                SwitchToMode(XRInteractableGlobeMode.Disabled);
+            } else {
+                // TODO ...
+            }
+        }
+
         public void SwitchToMode(XRInteractableGlobeMode mode) {
             if (InteractionMode == mode) {
                 return;
@@ -194,7 +204,10 @@ namespace TrekVRApplication {
                     CancelSelection(true, mode);
                     break;
                 case XRInteractableGlobeMode.Disabled:
-                    GetComponent<SphereCollider>().enabled = true;
+                    Collider collider = GetComponent<SphereCollider>();
+                    if (collider) {
+                        collider.enabled = true;
+                    }
                     SetCoordinateLinesVisiblity(true);
                     break;
             }
@@ -205,7 +218,10 @@ namespace TrekVRApplication {
                     _bboxSelectionController.SetEnabled(true);
                     break;
                 case XRInteractableGlobeMode.Disabled:
-                    GetComponent<SphereCollider>().enabled = false;
+                    Collider collider = GetComponent<SphereCollider>();
+                    if (collider) {
+                        collider.enabled = false;
+                    }
                     SetCoordinateLinesVisiblity(false);
                     break;
             }

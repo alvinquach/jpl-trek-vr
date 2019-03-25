@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.FlagUtils;
 
 namespace TrekVRApplication {
 
@@ -99,15 +100,27 @@ namespace TrekVRApplication {
         public Material Material {
             get => _material;
             set {
-                Transform lodContainer = transform.Find(GameObjectName.LODGroupContainer);
-                Debug.Log($"{GameObjectName.LODGroupContainer} found = {lodContainer != null}");
-                if (lodContainer) {
-                    MeshRenderer[] meshRenderers = lodContainer.GetComponentsInChildren<MeshRenderer>();
-                    foreach (MeshRenderer meshRenderer in meshRenderers) {
-                        meshRenderer.material = value;
-                    }
-                }
                 _material = value;
+                UpdateMeshRendererMaterials();
+            }
+        }
+
+        public bool EnableOverlay {
+            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.Overlay);
+            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Overlay, value);
+        }
+
+        public bool UseDisabledMaterial {
+            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled);
+            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled, value);
+        }
+
+        private TerrainModelRenderMode _renderMode;
+        public TerrainModelRenderMode RenderMode {
+            get => _renderMode;
+            private set {
+                _renderMode = value;
+                UpdateMaterialProperties();
             }
         }
 
@@ -133,10 +146,6 @@ namespace TrekVRApplication {
 
         #region Unity lifecycle methods
 
-        protected virtual void Awake() {
-            TerrainModelManager.Instance.OnRenderModeChange += SetRenderMode;
-        }
-
         // Start is used instead of Awake so that property values can 
         // be assigned before the model intialization starts.
         protected virtual void Start() {
@@ -144,7 +153,6 @@ namespace TrekVRApplication {
         }
 
         protected virtual void OnDestroy() {
-            TerrainModelManager.Instance.OnRenderModeChange -= SetRenderMode;
             Destroy(_material);
             // TODO Destroy more thisngs
         }
@@ -168,7 +176,13 @@ namespace TrekVRApplication {
                 // TODO Throw exception.
             }
             _material = new Material(terrainModelManager.BaseMaterial);
-            SetRenderMode(TerrainModelManager.Instance.TerrainRenderMode);
+
+            TerrainModelOverlayController terrainModelOverlayController = TerrainModelOverlayController.Instance;
+            if (terrainModelOverlayController) {
+                _material.SetTexture("_Overlay", terrainModelOverlayController.RenderTexture);
+            }
+
+            UseDisabledMaterial = !TerrainModelManager.Instance.TerrainInteractionEnabled;
             // Population of the material's texture slots is up to the implementing class.
         }
 
@@ -301,12 +315,21 @@ namespace TrekVRApplication {
             };
         }
 
-        protected virtual void SetRenderMode(bool enabled) {
-            string shaderName = enabled ? "Custom/Terrain/MultiDiffuseShader" : "Custom/Terrain/MultiDiffuseTransparentShader";
-            SwitchToShader(shaderName);
-            if (!enabled) {
-                Material.SetFloat("_Opacity", 0.5f);
-            }
+        /// <summary>
+        ///     Update the material properties to reflect current render mode.
+        /// </summary>
+        private void UpdateMaterialProperties() {
+            string shaderName = UseDisabledMaterial ? "MultiDiffuseTransparent" :
+                EnableOverlay ? "MultiDiffuseOverlayMultipass" : "MultiDiffuse";
+
+            SwitchToShader($"Custom/Terrain/{shaderName}");
+
+            // TODO Define the opacity as a constant.
+            Material.SetFloat("_DiffuseOpacity", UseDisabledMaterial ? 0.5f : 1); 
+
+            // This is redundant, since the overlay shader is not used unless
+            // the overlay is enabled and the interaction is not disabled.
+            Material.SetFloat("_OverlayOpacity", EnableOverlay && !UseDisabledMaterial ? 1 : 0); 
         }
 
         private void SwitchToShader(string shaderName) {
@@ -315,6 +338,18 @@ namespace TrekVRApplication {
                 Material.shader = shader;
             } else {
                 Debug.LogError($"Could not find shader {shaderName}.");
+            }
+        }
+
+        private void UpdateMeshRendererMaterials() {
+            if (!_lodGroupContainer) {
+                return;
+            }
+
+            MeshRenderer[] meshRenderers = _lodGroupContainer.GetComponentsInChildren<MeshRenderer>();
+            foreach (MeshRenderer meshRenderer in meshRenderers) {
+                //meshRenderer.materials = materials;
+                meshRenderer.material = Material;
             }
         }
 

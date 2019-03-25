@@ -47,19 +47,6 @@ namespace TrekVRApplication {
             Destroy(sphere);
         }
 
-        protected override void SetRenderMode(bool enabled) {
-            base.SetRenderMode(enabled);
-            if (_initTaskStatus == TaskStatus.Completed) {
-                if (!enabled) {
-                    XRInteractableGlobe planet = GetComponent<XRInteractableGlobe>();
-                    planet.SwitchToMode(XRInteractableGlobeMode.Disabled);
-                }
-                else {
-                    // TODO ...
-                }
-            }
-        }
-
         private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int width, int height) {
             return new TerrainModelProductMetadata(productId, UnrestrictedBoundingBox.Global, width, height);
         }

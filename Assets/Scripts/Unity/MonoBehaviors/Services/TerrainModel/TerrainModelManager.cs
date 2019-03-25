@@ -61,9 +61,9 @@ namespace TrekVRApplication {
         ///     Whether the terrain models are set to render in opaque (enabled) mode
         ///     or semi-transparent (disabled) mode.
         /// </summary>
-        public bool TerrainRenderMode { get; private set; } = true;
+        public bool TerrainInteractionEnabled { get; private set; } = true;
 
-        public event Action<bool> OnRenderModeChange = opaque => { };
+        public event Action<bool> OnInteractionStatusChange = enabled => { };
 
         private void Awake() {
 
@@ -186,10 +186,10 @@ namespace TrekVRApplication {
             return GlobeModel.transform;
         }
 
-        public void SetTerrainRenderMode(bool mode) {
-            if (TerrainRenderMode != mode) {
-                TerrainRenderMode = mode;
-                OnRenderModeChange.Invoke(mode);
+        public void EnableTerrainInteraction(bool mode) {
+            if (TerrainInteractionEnabled != mode) {
+                TerrainInteractionEnabled = mode;
+                OnInteractionStatusChange.Invoke(mode);
             }
         }
 
