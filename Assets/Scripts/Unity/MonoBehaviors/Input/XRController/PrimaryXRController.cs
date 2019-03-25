@@ -21,7 +21,7 @@ namespace TrekVRApplication {
         private float _maxInteractionDistance = 20.0f;
 
         private MainModal MainModal {
-            get { return UserInterfaceManager.Instance.MainModal; }
+            get => UserInterfaceManager.Instance.MainModal;
         }
 
         [SerializeField]

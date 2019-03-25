@@ -18,7 +18,7 @@ namespace TrekVRApplication {
         public bool clampInput = true, enableX = true, enableY = true;
 
         public virtual bool OutputSampleReady {
-            get { return _inputSamples.Count > 0; }
+            get => _inputSamples.Count > 0;
         }
 
         public virtual void AddInputSample(Vector2 sample) {

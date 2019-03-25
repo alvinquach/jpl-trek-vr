@@ -24,7 +24,7 @@ namespace TrekVRApplication {
 
             private Texture2D _texture;
             public Texture2D Texture {
-                get { return _texture; }
+                get => _texture;
                 set {
                     _texture = value;
                     if (OnTextureLoad.Count > 0) {

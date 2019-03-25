@@ -38,7 +38,7 @@ namespace TrekVRApplication {
         public bool KeyboardHasFocus { get; private set; }
 
         public List<Event> KeyEvents {
-            get { return keyEvents.Events; }
+            get => keyEvents.Events;
         }
 
         public BrowserCursor BrowserCursor { get; private set; }

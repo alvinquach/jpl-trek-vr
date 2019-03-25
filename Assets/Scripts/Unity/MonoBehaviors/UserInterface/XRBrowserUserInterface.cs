@@ -9,9 +9,7 @@ namespace TrekVRApplication {
         public XRBrowser XRBrowser { get; protected set; }
 
         public override bool Visible {
-            get {
-                return _visible;
-            }
+            get => _visible;
             set {
                 _visible = value;
                 Browser.EnableInput = value;

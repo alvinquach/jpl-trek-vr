@@ -29,9 +29,7 @@ namespace TrekVRApplication {
 
         private float _distance = float.PositiveInfinity;
         public float Distance {
-            get {
-                return _distance;
-            }
+            get => _distance;
             set {
                 _distance = Mathf.Clamp(value, 0, MaxDistance);
                 Vector3 point = _distance * Vector3.forward;
@@ -43,9 +41,7 @@ namespace TrekVRApplication {
 
         private bool _active = false;
         public bool Active {
-            get {
-                return _active;
-            }
+            get => _active;
             set {
                 _cursor.transform.localScale = (value ? _endpointActiveScale : _endpointScale) * Vector3.one;
                 _lineRenderer.startWidth = value ? _laserActiveThickness : _laserThickeness;
@@ -55,9 +51,7 @@ namespace TrekVRApplication {
 
         private bool _visible = true;
         public bool Visible {
-            get {
-                return _visible;
-            }
+            get => _visible;
             set {
                 _lineRenderer.enabled = value;
                 _cursor.SetActive(value);

@@ -12,21 +12,21 @@ namespace TrekVRApplication {
         [SerializeField]
         protected string _demFilePath;
         public string DemFilePath {
-            get { return _demFilePath; }
+            get => _demFilePath;
             set { if (_initTaskStatus == TaskStatus.NotStarted) _demFilePath = value; }
         }
 
         [SerializeField]
         protected float _radius;
         public float Radius {
-            get { return _radius; }
+            get => _radius;
             set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
         }
 
         [SerializeField]
         protected float _heightScale = 1.0f;
         public float HeightScale {
-            get { return _heightScale; }
+            get => _heightScale;
             // TODO Allow height scale to be changed after mesh is already generated.
             set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
         }
@@ -97,9 +97,7 @@ namespace TrekVRApplication {
 
         private Material _material;
         public Material Material {
-            get {
-                return _material;
-            }
+            get => _material;
             set {
                 Transform lodContainer = transform.Find(GameObjectName.LODGroupContainer);
                 Debug.Log($"{GameObjectName.LODGroupContainer} found = {lodContainer != null}");
@@ -121,9 +119,7 @@ namespace TrekVRApplication {
         public long LastVisible { get; private set; } = 0L;
 
         public bool Visible {
-            get {
-                return gameObject.activeSelf;
-            }
+            get => gameObject.activeSelf;
             set {
                 if (!value) {
                     gameObject.SetActive(false);

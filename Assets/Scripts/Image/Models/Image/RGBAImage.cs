@@ -7,7 +7,7 @@ namespace TrekVRApplication {
     public class RGBAImage : ColorImage {
 
         protected override int DataPerPixel {
-            get { return 4; }
+            get => 4;
         }
 
         public RGBAImage(int width, int height) : base(width, height) {

@@ -14,9 +14,7 @@ namespace TrekVRApplication {
 
         private Vector4 _selectionBoundingBox;
         public Vector4 SelectionBoundingBox {
-            get {
-                return _selectionBoundingBox;
-            }
+            get => _selectionBoundingBox;
         }
 
         private POILabel _coordSelectionLabel;
@@ -29,9 +27,7 @@ namespace TrekVRApplication {
         private byte _selectionIndex = 0;
 
         private LineRenderer CurrentSelectionIndicator {
-            get {
-                return GetSelectionIndicatorByIndex(_selectionIndex);
-            }
+            get => GetSelectionIndicatorByIndex(_selectionIndex);
         }
 
         private int _framesSinceLastControllerModalUpdate = 0;

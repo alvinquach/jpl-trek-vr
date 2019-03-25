@@ -10,7 +10,7 @@ namespace TrekVRApplication {
         private KeyCode _padCurrentKey = 0;
 
         public override bool IsPrimary {
-            get { return false; }
+            get => false;
         }
 
         protected override void Awake() {

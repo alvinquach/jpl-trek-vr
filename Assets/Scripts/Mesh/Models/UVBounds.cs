@@ -5,7 +5,7 @@ namespace TrekVRApplication {
 
     public struct UVBounds {
 
-        public static UVBounds Default { get { return new UVBounds(0f, 0f, 1f, 1f); } }
+        public static UVBounds Default { get => new UVBounds(0f, 0f, 1f, 1f); }
 
         public float U1 { get; set; }
         public float V1 { get; set; }

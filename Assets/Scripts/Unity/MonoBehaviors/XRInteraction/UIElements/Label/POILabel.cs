@@ -8,9 +8,7 @@ namespace TrekVRApplication {
         private Text _labelText;
 
         public string Text {
-            get {
-                return _labelText?.text;
-            }
+            get => _labelText?.text;
             set {
                 if (!_labelText) {
                     _labelText = gameObject.GetComponentInChildren<Text>();
@@ -20,9 +18,7 @@ namespace TrekVRApplication {
         }
 
         public Material Material {
-            get {
-                return _labelText?.material;
-            }
+            get => _labelText?.material;
             set {
                 if (!_labelText) {
                     _labelText = gameObject.GetComponentInChildren<Text>();

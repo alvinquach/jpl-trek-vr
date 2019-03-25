@@ -11,9 +11,7 @@ namespace TrekVRApplication {
         protected DATA[] _rawData;
 
         public int Size {
-            get {
-                return Marshal.SizeOf(_rawData[0]) * _rawData.Length;
-            }
+            get => Marshal.SizeOf(_rawData[0]) * _rawData.Length;
         }
 
         public Image(int width, int height) : base(width, height) {

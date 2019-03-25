@@ -19,9 +19,7 @@ namespace TrekVRApplication {
         public abstract bool IsPrimary { get; }
 
         public override bool Visible {
-            get {
-                return base.Visible;
-            }
+            get => base.Visible;
             set {
                 base.Visible = value;
                 if (Input) {
@@ -32,7 +30,7 @@ namespace TrekVRApplication {
 
         private GeneratePlanarMenuMeshTask _generateMenuMeshTask;
         protected override GenerateMenuMeshTask GenerateMenuMeshTask {
-            get { return _generateMenuMeshTask; }
+            get => _generateMenuMeshTask;
         }
 
         protected override string DefaultUrl { get; } = $"{BaseUrl}#{ControllerModalUrl}";

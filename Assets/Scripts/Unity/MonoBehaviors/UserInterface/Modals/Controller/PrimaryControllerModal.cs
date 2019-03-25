@@ -5,7 +5,7 @@ namespace TrekVRApplication {
     public class PrimaryControllerModal : ControllerModal {
 
         public override bool IsPrimary {
-            get { return true; }
+            get => true;
         }
 
         public override void StartActivity(ControllerModalActivity activity) {

@@ -15,7 +15,7 @@ namespace TrekVRApplication {
         public int SamplingRate { get; set; } = 3;
 
         public override bool OutputSampleReady {
-            get { return _outputSamples.Count > 0; }
+            get => _outputSamples.Count > 0;
         }
 
         public override void AddInputSample(Vector2 sample) {

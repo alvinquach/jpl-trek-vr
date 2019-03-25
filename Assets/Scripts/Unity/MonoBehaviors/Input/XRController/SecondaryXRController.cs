@@ -7,13 +7,13 @@ namespace TrekVRApplication {
         [SerializeField]
         private FlashlightController _flashlight;
         public FlashlightController Flashlight {
-            get { return _flashlight; }
+            get => _flashlight;
         }
 
         [SerializeField]
         private RoomLightingController _roomLights;
         public RoomLightingController RoomLights {
-            get { return _roomLights; }
+            get => _roomLights;
         }
 
     }

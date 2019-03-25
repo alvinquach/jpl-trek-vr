@@ -5,7 +5,7 @@ namespace TrekVRApplication {
     public class IntensityImage : Image<float, float> {
 
         protected override int DataPerPixel {
-            get { return 1; }
+            get => 1;
         }
 
         public IntensityImage(int width, int height) : base(width, height) {

@@ -26,12 +26,11 @@ namespace TrekVRApplication {
         [SerializeField]
         [Tooltip("The material that is used as a base for new terrain models.")]
         private Material _baseMaterial;
-
         /// <summary>
         ///     The material that is used as a base for new terrain models.
         /// </summary>
         public Material BaseMaterial {
-            get { return _baseMaterial; }
+            get => _baseMaterial;
         }
 
         #region Globe model fields/properties.
@@ -55,12 +54,7 @@ namespace TrekVRApplication {
         private GameObject _terrainModelsContainer;
 
         public TerrainModel CurrentVisibleModel {
-            get {
-                if (GlobeModel.Visible) {
-                    return GlobeModel;
-                }
-                return _terrainModels.Find(model => model.Visible);
-            }
+            get => GlobeModel.Visible ? GlobeModel : _terrainModels.Find(model => model.Visible);
         }
 
         /// <summary>

@@ -15,25 +15,25 @@ namespace TrekVRApplication {
         [SerializeField]
         private Material _material;
         public Material UIMaterial {
-            get { return _material; }
+            get => _material;
         }
 
         [SerializeField]
         private PrimaryXRController _primaryController;
         public PrimaryXRController PrimaryController {
-            get { return _primaryController; }
+            get => _primaryController;
         }
 
         [SerializeField]
         private SecondaryXRController _secondaryController;
         public SecondaryXRController SecondaryController {
-            get { return _secondaryController; }
+            get => _secondaryController;
         }
 
         [SerializeField]
         protected GameObject _cameraRig;
         public Camera XRCamera {
-            get { return _cameraRig.GetComponentInChildren<Camera>(); }
+            get => _cameraRig.GetComponentInChildren<Camera>();
         }
 
         #region BrowserUserInterface instances

@@ -10,13 +10,13 @@ namespace TrekVRApplication {
     /// </summary>
     public struct UnrestrictedBoundingBox : IEquatable<IBoundingBox>, IBoundingBox {
 
-        public static UnrestrictedBoundingBox Zero { get { return new UnrestrictedBoundingBox(0f, 0f, 0f, 0f); } }
+        public static UnrestrictedBoundingBox Zero { get => new UnrestrictedBoundingBox(0f, 0f, 0f, 0f); } 
 
-        public static UnrestrictedBoundingBox Global { get { return new UnrestrictedBoundingBox(-180f, -90f, 180f, 90f); } }
+        public static UnrestrictedBoundingBox Global { get => new UnrestrictedBoundingBox(-180f, -90f, 180f, 90f); } 
 
         private float _lonStart;
         public float LonStart {
-            get { return _lonStart; }
+            get => _lonStart;
             set {
                 _lonStart = WrapLongitude(value);
                 SortBoundingBox();
@@ -25,7 +25,7 @@ namespace TrekVRApplication {
 
         private float _latStart;
         public float LatStart {
-            get { return _latStart; }
+            get => _latStart;
             set {
                 _latStart = WrapLatitude(value);
                 SortBoundingBox();
@@ -34,7 +34,7 @@ namespace TrekVRApplication {
 
         private float _lonEnd;
         public float LonEnd {
-            get { return _lonEnd; }
+            get => _lonEnd;
             set {
                 _lonEnd = WrapLongitude(value);
                 SortBoundingBox();
@@ -43,28 +43,17 @@ namespace TrekVRApplication {
 
         private float _latEnd;
         public float LatEnd {
-            get { return _latEnd; }
+            get => _latEnd;
             set {
                 _latEnd = WrapLatitude(value);
                 SortBoundingBox();
             }
         }
-
         public float LonSwing {
-            get {
-                if (this[0] > this[2]) {
-                    return 360 + this[2] - this[0];
-                }
-                else {
-                    return this[2] - this[0];
-                }
-            }
+            get => this[0] > this[2] ? 360 + this[2] - this[0] : this[2] - this[0];
         }
-
         public float LatSwing {
-            get {
-                return this[3] - this[1];
-            }
+            get => this[3] - this[1];
         }
 
         public float this[int index] {

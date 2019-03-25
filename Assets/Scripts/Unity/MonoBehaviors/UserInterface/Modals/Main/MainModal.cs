@@ -30,9 +30,7 @@ namespace TrekVRApplication {
         ///     </para>
         /// </summary>
         public override bool Visible {
-            get {
-                return _visible;
-            }
+            get => _visible;
             set {
                 if (value) {
                     OpenModal();
@@ -46,7 +44,7 @@ namespace TrekVRApplication {
 
         private GenerateCylindricalMenuMeshTask _generateMenuMeshTask;
         protected override GenerateMenuMeshTask GenerateMenuMeshTask {
-            get { return _generateMenuMeshTask; }
+            get => _generateMenuMeshTask;
         }
 
         protected override void Awake() {

@@ -5,7 +5,7 @@ namespace TrekVRApplication {
     public class BGRAImage : ColorImage {
 
         protected override int DataPerPixel {
-            get { return 4; }
+            get => 4;
         }
 
         public BGRAImage(int width, int height) : base(width, height) {
