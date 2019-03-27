@@ -6,10 +6,20 @@ namespace TrekVRApplication {
 
     public class MainModal : XRBrowserUserInterface {
 
-        public const float AngleSweep = 135;
-        public const float Height = 0.69f;
-        public const float Radius = 1.0f;
+        private const float AngleSweep = 135;
+        private const float Radius = 1.0f;
+        private const float WorldHeight = 0.69f;
+
+        /// <summary>
+        ///     Vertical resolution of the modal in pixels.
+        /// </summary>
         public const int Resolution = 720;
+
+        protected override int Width => Mathf.RoundToInt(Mathf.PI * Radius * AngleSweep / 180 / WorldHeight * Resolution);
+
+        protected override int Height => Resolution;
+
+        protected override bool RegisterToUserInterfaceManager => false;
 
         private UnityBrowserWebFunctions _webFunctions;
         private UnityBrowserSearchFunctions _searchFunctions;
@@ -40,25 +50,15 @@ namespace TrekVRApplication {
             }
         }
 
-        protected override string DefaultUrl { get; } = BaseUrl;
+        protected override string DefaultUrl => BaseUrl;
 
-        private GenerateCylindricalMenuMeshTask _generateMenuMeshTask;
-        protected override GenerateMenuMeshTask GenerateMenuMeshTask {
-            get => _generateMenuMeshTask;
-        }
+        private readonly GenerateCylindricalMenuMeshTask _generateMenuMeshTask = 
+            new GenerateCylindricalMenuMeshTask(AngleSweep, WorldHeight, Radius);
+        protected override GenerateMenuMeshTask GenerateMenuMeshTask => _generateMenuMeshTask;
 
         protected override void Awake() {
             transform.localEulerAngles = new Vector3(0, 180);
-            _generateMenuMeshTask = new GenerateCylindricalMenuMeshTask(AngleSweep, Height, Radius);
             base.Awake();
-        }
-
-        protected override int GetHeight() {
-            return Resolution;
-        }
-
-        protected override int GetWidth() {
-            return Mathf.RoundToInt(Mathf.PI * Radius * AngleSweep / 180 / Height * Resolution);
         }
 
         protected override void Init(Mesh mesh) {
@@ -85,7 +85,7 @@ namespace TrekVRApplication {
             Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
 
             Vector3 menuPosition = eye.transform.position;
-            menuPosition.y -= Mathf.Clamp(Height / 2, 0, float.PositiveInfinity); // TODO Max value
+            menuPosition.y -= Mathf.Clamp(WorldHeight / 2, 0, float.PositiveInfinity); // TODO Max value
             transform.position = menuPosition;
 
             Vector3 menuOrientation = eye.transform.forward;

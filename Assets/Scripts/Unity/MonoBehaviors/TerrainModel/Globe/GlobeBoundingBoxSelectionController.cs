@@ -53,7 +53,7 @@ namespace TrekVRApplication {
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
                 TerrainModel terrainModel = terrainModelManager.CreateSectionModel(_selectionBoundingBox);
                 terrainModelManager.ShowTerrainModel(terrainModel, false);
-                ExitSelectionMode();
+                terrainModelManager.GlobeModel.InteractionController.SwitchToActivity(XRInteractableTerrainActivity.Default);
             }
             else {
                 ActivateCurrentIndicator();

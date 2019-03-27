@@ -16,7 +16,9 @@ namespace TrekVRApplication {
         ///     Awake() is called. Browser game objects should start out
         ///     as active in order to get browser content load.
         /// </summary>
-        public bool hideAfterInit = true;
+        protected virtual bool HideAfterInit => true;
+
+        protected virtual bool RegisterToUserInterfaceManager => true;
 
         protected bool _visible;
         public virtual bool Visible {
@@ -33,9 +35,9 @@ namespace TrekVRApplication {
 
         protected abstract string DefaultUrl { get; }
 
-        protected abstract int GetWidth();
+        protected abstract int Width { get; }
 
-        protected abstract int GetHeight();
+        protected abstract int Height { get; }
 
         public Browser Browser { get; private set; }
 
@@ -45,13 +47,19 @@ namespace TrekVRApplication {
                 QueueTask(() => {
                     Mesh mesh = ProcessMeshData(meshData[0]);
                     Init(mesh);
-                    if (hideAfterInit) {
+                    if (HideAfterInit) {
                         Visible = false;
                     }
                     _initStatus = TaskStatus.Completed;
 
                 });
             });
+        }
+
+        protected virtual void Start() {
+            if (RegisterToUserInterfaceManager) {
+                UserInterfaceManager.Instance.RegisterBrowserUserInterface(this);
+            }
         }
 
         protected virtual void Init(Mesh mesh) {
@@ -75,7 +83,7 @@ namespace TrekVRApplication {
             Browser = gameObject.AddComponent<Browser>();
             Browser.onLoad += OnBrowserLoad;
             Browser.Url = DefaultUrl;
-            Browser.Resize(GetWidth(), GetHeight());
+            Browser.Resize(Width, Height);
         }
 
         protected virtual Mesh ProcessMeshData(MeshData meshData) {

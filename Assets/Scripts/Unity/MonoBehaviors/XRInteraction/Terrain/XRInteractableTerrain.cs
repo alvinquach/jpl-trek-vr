@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -30,7 +30,6 @@ namespace TrekVRApplication {
             if (BBoxSelectionController.CancelSelection(cancelAll)) {
                 CurrentActivity = nextMode;
                 BBoxSelectionController.SetEnabled(false);
-                UserInterfaceManager.Instance.MainModal.Visible = true;
             }
         }
 

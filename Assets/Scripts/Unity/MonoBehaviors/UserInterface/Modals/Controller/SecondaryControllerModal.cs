@@ -61,6 +61,9 @@ namespace TrekVRApplication {
                 case ControllerModalActivity.BBoxSelection:
                     XRInteractableGlobe globe = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobe>();
                     globe.CancelSelection();
+                    if (globe.CurrentActivity != XRInteractableTerrainActivity.BBoxSelection) {
+                        mainModal.Visible = true;
+                    }
                     break;
                 case ControllerModalActivity.BookmarkResults:
                 case ControllerModalActivity.ProductResults:

@@ -14,15 +14,60 @@ namespace TrekVRApplication {
         }
 
         [RegisterToBrowser]
+        public void ShowGlobeModel() {
+            TerrainModelManager.Instance.ShowGlobeModel();
+        }
+
+        [RegisterToBrowser]
         public void NavigateToCoordinate(string bbox) {
-            Transform planetTransform = TerrainModelManager.Instance.GetGlobeModelTransform();
-            XRInteractableGlobe globe = planetTransform.GetComponent<XRInteractableGlobe>();
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            XRInteractableGlobe globe = (XRInteractableGlobe)terrainModelManager.GlobeModel.InteractionController;
             if (globe) {
                 BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(bbox);
                 Vector2 latLon = BoundingBoxUtils.MedianLatLon(boundingBox);
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
                 globe.NavigateTo(latLon, eye.transform.position);
             }
+        }
+
+        [RegisterToBrowser]
+        public void GetCurrentViewSettings(string requestId) {
+            // TODO Un-hardcode this data
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            XRInteractableGlobe globe = (XRInteractableGlobe)terrainModelManager.GlobeModel.InteractionController;
+            TerrainModel currentTerrainModel = terrainModelManager.CurrentVisibleModel;
+            IDictionary<string, object> settings = new Dictionary<string, object>() {
+                { "terrainType", currentTerrainModel is GlobeTerrainModel ? "globe" : "section" },
+                { "heightExaggeration", 0.69 },
+                { "textures", true },
+                { "coordinates", globe.EnableCoordinateLines },
+                { "locationNames", true },
+            };
+            ZFBrowserUtils.SendDataResponse(_browser, requestId, settings);
+        }
+
+        [RegisterToBrowser]
+        public void SetHeightExaggeration(double value) {
+            Debug.Log($"Terrain height exaggeration set to {value}.");
+        }
+
+        [RegisterToBrowser]
+        public void SetTexturesVisiblity(bool visible) {
+            Debug.Log($"Terrain textures visiblity set to {visible}.");
+        }
+
+        [RegisterToBrowser]
+        public void SetCoordinateIndicatorsVisibility(bool visible) {
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            if (terrainModelManager.GlobeModelIsVisible()) {
+                XRInteractableGlobe globe = (XRInteractableGlobe)terrainModelManager.GlobeModel.InteractionController;
+                globe.EnableCoordinateLines = visible;
+            }
+        }
+
+        [RegisterToBrowser]
+        public void SetLocationNamesVisibility(bool visible) {
+            Debug.Log($"Terrain location names visiblity set to {visible}.");
         }
 
         // Temporary

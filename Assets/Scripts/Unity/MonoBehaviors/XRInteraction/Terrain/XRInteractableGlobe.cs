@@ -12,6 +12,11 @@ namespace TrekVRApplication {
         private GlobeTerrainModel _terrainModel;
         public override TerrainModel TerrainModel => _terrainModel;
 
+        public bool EnableCoordinateLines {
+            get => _coordinateLinesController.Visible;
+            set => _coordinateLinesController.Visible = value;
+        }
+
         #region Grab variables
 
         [SerializeField]
@@ -113,8 +118,6 @@ namespace TrekVRApplication {
             };
             coordinateLines.transform.SetParent(transform, false);
             _coordinateLinesController = coordinateLines.AddComponent<GlobeCoordinateLinesController>();
-            _coordinateLinesController.SetVisible(false);
-
         }
 
         protected override void Start() {
@@ -123,7 +126,8 @@ namespace TrekVRApplication {
             // There is no way to unsubscribe from this...but unsubscribing
             // is not really necessary in this case.
             _terrainModel.OnInitComplete += () => {
-                SetCoordinateLinesVisiblity(true);
+                _coordinateLinesController.ForceHidden = false;
+                _coordinateLinesController.Visible = true;
             };
 
             base.Start();
@@ -198,7 +202,7 @@ namespace TrekVRApplication {
                     if (collider) {
                         collider.enabled = true;
                     }
-                    SetCoordinateLinesVisiblity(true);
+                    _coordinateLinesController.ForceHidden = false;
                     break;
             }
 
@@ -212,7 +216,7 @@ namespace TrekVRApplication {
                     if (collider) {
                         collider.enabled = false;
                     }
-                    SetCoordinateLinesVisiblity(false);
+                    _coordinateLinesController.ForceHidden = true;
                     break;
             }
 
@@ -291,10 +295,6 @@ namespace TrekVRApplication {
         }
 
         #endregion
-
-        public void SetCoordinateLinesVisiblity(bool visible) {
-            _coordinateLinesController.SetVisible(visible);
-        }
 
         /// <summary>
         /// This function uses the law of cosines formula to find the distance

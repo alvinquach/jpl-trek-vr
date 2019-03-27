@@ -10,9 +10,26 @@ namespace TrekVRApplication {
         private const float YOffset = 0;
         private const float ZOffset = 0.05f;
 
-        public const float Width = 0.25f;
-        public const float Height = 0.25f;
-        public const int Resolution = 1024;
+        /// <summary>
+        ///     Width of the modal in world units.
+        /// </summary>
+        private const float WorldWidth = 0.25f;
+
+        /// <summary>
+        ///     Height of the modal in world units.
+        /// </summary>
+        private const float WorldHeight = 0.25f;
+
+        /// <summary>
+        ///     Vertical resolution of the modal in pixels.
+        /// </summary>
+        private const int Resolution = 1024;
+
+        protected override int Width => Mathf.RoundToInt(WorldWidth / WorldHeight * Resolution);
+
+        protected override int Height => Resolution;
+
+        protected override bool RegisterToUserInterfaceManager => false;
 
         protected XRController _controller;
 
@@ -29,11 +46,9 @@ namespace TrekVRApplication {
         }
 
         private GeneratePlanarMenuMeshTask _generateMenuMeshTask;
-        protected override GenerateMenuMeshTask GenerateMenuMeshTask {
-            get => _generateMenuMeshTask;
-        }
+        protected override GenerateMenuMeshTask GenerateMenuMeshTask => _generateMenuMeshTask;
 
-        protected override string DefaultUrl { get; } = $"{BaseUrl}#{ControllerModalUrl}";
+        protected override string DefaultUrl => $"{BaseUrl}#{ControllerModalUrl}";
 
         public ControllerModalInput Input { get; private set; }
 
@@ -46,7 +61,7 @@ namespace TrekVRApplication {
             transform.localPosition = new Vector3((IsPrimary ? -1 : 1) * XOffset, YOffset, ZOffset);
             transform.localEulerAngles = new Vector3(-90, -180, 0);
 
-            _generateMenuMeshTask = new GeneratePlanarMenuMeshTask(Width, Height,
+            _generateMenuMeshTask = new GeneratePlanarMenuMeshTask(WorldWidth, WorldHeight,
                 IsPrimary ? RelativePosition.Right : RelativePosition.Left);
 
             base.Awake();
@@ -55,14 +70,6 @@ namespace TrekVRApplication {
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
             Input = Browser.gameObject.AddComponent<ControllerModalInput>();
-        }
-
-        protected override int GetHeight() {
-            return Resolution;
-        }
-
-        protected override int GetWidth() {
-            return Mathf.RoundToInt(Width / Height * Resolution);
         }
 
         public virtual void StartActivity(ControllerModalActivity activity) {

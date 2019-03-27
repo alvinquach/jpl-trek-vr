@@ -35,10 +35,39 @@ namespace TrekVRApplication {
 
         private Material _verticalAxisMaterial;
 
+        private bool _visible = false;
+        public bool Visible {
+            get => _visible;
+            set {
+                _visible = value;
+                if (!_forceHidden) {
+                    UpdateVisiblity();
+                }
+            }
+        }
+
+        private bool _forceHidden;
+        /// <summary>
+        ///     Whether to force hide the coordinate lines such that
+        ///     the Visible setter has no immediate effect. Used for
+        ///     keeping the coordinate lines hidden while the globe 
+        ///     is still being generated or if the globe is disabled.
+        /// </summary>
+        public bool ForceHidden {
+            get => _forceHidden;
+            set {
+                if (_forceHidden != value) {
+                    _forceHidden = value;
+                    UpdateVisiblity();
+                }
+            }
+        }
+
         #region Unity lifecycle methods
 
         private void Awake() {
             GenerateCoordinateLinesAndLabels();
+            ForceHidden = true;
         }
 
         private void Update() {
@@ -51,11 +80,13 @@ namespace TrekVRApplication {
 
         #endregion
 
-        public void SetVisible(bool visible) {
+        private void UpdateVisiblity() {
+            bool visible = !_forceHidden && _visible;
+
             gameObject.SetActive(visible);
-            
+
             // Disable script if not visible so that it doesn't need to update.
-            enabled = visible; 
+            enabled = visible;
 
             if (visible) {
                 Camera eye = UserInterfaceManager.Instance.XRCamera;

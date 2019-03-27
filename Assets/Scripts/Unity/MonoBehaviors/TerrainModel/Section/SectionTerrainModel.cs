@@ -175,7 +175,7 @@ namespace TrekVRApplication {
 
                 // Initially position the mesh to match its visual position on the globe.
                 Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(BoundingBox);
-                Quaternion rotation = TerrainModelManager.Instance.GetGlobeModelTransform().rotation;
+                Quaternion rotation = TerrainModelManager.Instance.GlobeModel.transform.rotation;
                 rotation *= Quaternion.Euler(0, -latLongOffset.y - 90, 0);
                 rotation *= Quaternion.Euler(0, 0, latLongOffset.x);
                 transform.rotation = rotation;

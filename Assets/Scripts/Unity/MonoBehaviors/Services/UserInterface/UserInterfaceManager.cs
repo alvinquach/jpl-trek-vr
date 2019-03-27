@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 
 namespace TrekVRApplication {
@@ -44,6 +45,8 @@ namespace TrekVRApplication {
 
         public ControllerModal SecondaryControllerModal { get; private set; }
 
+        private readonly ISet<BrowserUserInterface> _browserUserInterfaces = new HashSet<BrowserUserInterface>();
+
         #endregion
 
         private void Awake() {
@@ -57,24 +60,28 @@ namespace TrekVRApplication {
                 // TODO Throw exception
             }
 
-            GameObject gameObject = new GameObject();
-            gameObject.name = typeof(MainModal).Name;
+            GameObject gameObject = new GameObject(typeof(MainModal).Name);
             MainModal = gameObject.AddComponent<MainModal>();
 
             if (_primaryController) {
-                gameObject = new GameObject();
-                gameObject.name = typeof(ControllerModal).Name;
+                gameObject = new GameObject(typeof(ControllerModal).Name);
                 gameObject.transform.parent = _primaryController.transform;
                 PrimaryControllerModal = gameObject.AddComponent<PrimaryControllerModal>();
             }
 
             if (_secondaryController) {
-                gameObject = new GameObject();
-                gameObject.name = typeof(ControllerModal).Name;
+                gameObject = new GameObject(typeof(ControllerModal).Name);
                 gameObject.transform.parent = _secondaryController.transform;
                 SecondaryControllerModal = gameObject.AddComponent<SecondaryControllerModal>();
             }
 
+        }
+
+        public void RegisterBrowserUserInterface(BrowserUserInterface ui) {
+            if (_browserUserInterfaces.Contains(ui)) {
+                Debug.LogError($"BrowserUserInterface instance already registered ({ui.GetType().Name})");
+            }
+            _browserUserInterfaces.Add(ui);
         }
 
         public void HideControllerModals() {

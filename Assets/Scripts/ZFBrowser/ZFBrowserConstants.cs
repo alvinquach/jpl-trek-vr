@@ -6,6 +6,7 @@ namespace TrekVRApplication {
         public const string BaseUrl = "localGame://index.html";
         public const string MainModalUrl = "/main-modal";
         public const string ControllerModalUrl = "/controller-modal";
+        public const string TerrainControlPanelUrl = "/terrain-control-panel";
 
         public const string AngularGlobalObjectName = "AngularGlobalVariables";
         public const string BoundingBoxSelectionModalName = "ControllerModalBoundingBoxSelectionComponent";
