@@ -173,7 +173,7 @@ namespace TrekVRApplication {
 
         protected virtual void OnDestroy() {
             Destroy(_material);
-            // TODO Destroy more thisngs
+            // TODO Destroy more things
         }
 
         #endregion
