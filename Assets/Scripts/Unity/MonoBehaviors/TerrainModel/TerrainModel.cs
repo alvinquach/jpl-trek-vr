@@ -379,12 +379,15 @@ namespace TrekVRApplication {
         }
 
         private void RequestTerrainHeightRescale(float scale) {
+            if (float.IsNaN(scale)) {
+                return;
+            }
             if (!CanRescaleTerrainHeight()) {
                 _pendingHeightScale = scale;
                 return;
             }
-            if (_pendingHeightScale != _heightScale) {
-                _heightScale = _pendingHeightScale;
+            if (scale != _heightScale) {
+                _heightScale = scale;
                 RescaleTerrainHeight(_heightScale);
             }
             _pendingHeightScale = float.NaN;
