@@ -5,10 +5,7 @@
         protected MeshData[] _meshData;
 
         protected float _progress = 0.0f;
-
-        public override float GetProgress() {
-            return _progress;
-        }
+        public override float Progress => _progress;
 
         protected sealed override MeshData[] Task() {
             Generate();

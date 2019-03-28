@@ -9,6 +9,7 @@ namespace TrekVRApplication {
         private string _filepath;
 
         private float _progress = 0.0f;
+        public override float Progress => _progress;
 
         public int TextureWidth { get; private set; }
 
@@ -16,10 +17,6 @@ namespace TrekVRApplication {
 
         public LoadImageFromFileTask(string filepath) {
             _filepath = filepath;
-        }
-
-        public override float GetProgress() {
-            return _progress;
         }
 
         protected sealed override T Task() {

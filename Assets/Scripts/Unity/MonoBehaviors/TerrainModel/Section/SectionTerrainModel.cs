@@ -35,6 +35,8 @@ namespace TrekVRApplication {
 
         public BoundingBox SquareBoundingBox { get; private set; }
 
+        private TaskStatus _generateDetailedMeshTaskStatus = TaskStatus.NotStarted;
+
         private TaskStatus _viewTransitionTaskStatus = TaskStatus.NotStarted;
         private float _viewTransitionProgress = 0.0f;
 
@@ -53,7 +55,7 @@ namespace TrekVRApplication {
 
         protected override void Update() {
             base.Update();
-            if (_viewTransitionTaskStatus == TaskStatus.Started) {
+            if (_viewTransitionTaskStatus == TaskStatus.InProgress) {
                 TransitionView();
             }
         }
@@ -80,6 +82,7 @@ namespace TrekVRApplication {
             // Generate a base mesh first to be displayed temporarily
             // while the DEM data is being loaded.
             generateBaseMeshTask.Execute(meshData => {
+                _referenceMeshData = meshData;
                 QueueTask(() => {
                     ProcessMeshData(meshData);
                     PostProcessPlaceholderMeshData();
@@ -95,17 +98,46 @@ namespace TrekVRApplication {
                     new GenerateSectionTerrainMeshFromDigitalElevationModeTask(metadata, BoundingBox, uvBounds);
 
                 // Generate the high detailed mesh using the DEM.
-                generateMeshTask.Execute((meshData) => {
+                _generateDetailedMeshTaskStatus = TaskStatus.InProgress; // TODO Move this before DEM retraval?
+                generateMeshTask.Execute(meshData => {
+                    _referenceMeshData = meshData;
                     QueueTask(() => {
                         if (_lodGroupContainer) {
                             Destroy(_lodGroupContainer);
                         }
                         ProcessMeshData(meshData);
                         PostProcessDetailedMeshData(meshData, metadata);
+                        _generateDetailedMeshTaskStatus = TaskStatus.Completed;
                     });
                 });
             });
 
+        }
+
+        protected override bool CanRescaleTerrainHeight() {
+            return isActiveAndEnabled
+                && _generateDetailedMeshTaskStatus == TaskStatus.Completed 
+                && _heightRescaleTaskStatus != TaskStatus.InProgress;
+        }
+
+        protected override void RescaleTerrainHeight(float scale) {
+            TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
+            RescaleTerrainMeshHeightTask rescaleMeshHeightTask = new RescaleSectionTerrainMeshHeightTask(_referenceMeshData, metadata);
+            _heightRescaleTaskStatus = TaskStatus.InProgress;
+            rescaleMeshHeightTask.Execute(rescaledMeshData => {
+                QueueTask(() => {
+                    ApplyRescaledMeshData(rescaledMeshData);
+
+                    // Update the physics mesh if applicable.
+                    int physicsMeshIndex = metadata.PhyiscsLodMeshIndex;
+                    MeshCollider collider = GetComponent<MeshCollider>();
+                    if (physicsMeshIndex >= 0 && collider) {
+                        UpdateMesh(collider.sharedMesh, rescaledMeshData[physicsMeshIndex], false);
+                    }
+
+                    _heightRescaleTaskStatus = TaskStatus.Completed;
+                });
+            });
         }
 
         /// <summary>
@@ -183,7 +215,7 @@ namespace TrekVRApplication {
 
                 _startPosition = transform.position;
                 _startRotation = transform.rotation;
-                _viewTransitionTaskStatus = TaskStatus.Started;
+                _viewTransitionTaskStatus = TaskStatus.InProgress;
             }
             else {
 
@@ -206,7 +238,7 @@ namespace TrekVRApplication {
             // Do the heavy processing in the next update (does this help with the stutter?).
             QueueTask(() => {
                 MeshCollider collider = gameObject.AddComponent<MeshCollider>();
-                Mesh physicsMesh = ConvertToMesh(meshData[physicsMeshIndex]);
+                Mesh physicsMesh = ConvertToMesh(meshData[physicsMeshIndex], false);
                 collider.sharedMesh = physicsMesh;
             });
         }

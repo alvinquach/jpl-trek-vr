@@ -3,7 +3,7 @@
     public enum TaskStatus {
 
         NotStarted,
-        Started,
+        InProgress,
         Completed
 
     }

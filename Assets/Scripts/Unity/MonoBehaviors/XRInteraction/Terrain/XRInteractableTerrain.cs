@@ -11,7 +11,9 @@ namespace TrekVRApplication {
         public abstract TerrainModel TerrainModel { get; }
 
         protected virtual void Awake() {
-            TerrainModelManager.Instance.OnInteractionStatusChange += EnableTerrainInteraction;
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            terrainModelManager.OnEnableTerrainInteractionChange += EnableTerrainInteraction;
+            terrainModelManager.OnHeightExagerrationChange += SetHeightExagerration;
         }
 
         protected virtual void Start() {
@@ -19,7 +21,9 @@ namespace TrekVRApplication {
         }
 
         protected virtual void OnDestroy() {
-            TerrainModelManager.Instance.OnInteractionStatusChange -= EnableTerrainInteraction;
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            terrainModelManager.OnEnableTerrainInteractionChange -= EnableTerrainInteraction;
+            terrainModelManager.OnHeightExagerrationChange -= SetHeightExagerration;
         }
 
         /** For bounding box selection. */
@@ -42,6 +46,10 @@ namespace TrekVRApplication {
             } else {
                 // TODO ...
             }
+        }
+
+        private void SetHeightExagerration(float scale) {
+            TerrainModel.HeightScale = scale;
         }
 
         public abstract void SwitchToActivity(XRInteractableTerrainActivity activity);

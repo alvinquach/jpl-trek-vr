@@ -3,25 +3,32 @@ using System.Threading;
 
 namespace TrekVRApplication {
 
-    public abstract class ThreadedTask<Progress, Result> {
+    public abstract class ThreadedTask<PROGRESS, RESULT> {
 
-        protected Action<Progress> _progressCallback;
+        /// <summary>
+        ///     Registers a callback function that is called when progress is updated.
+        ///     It is up to the implementing classes to manually call the callback
+        ///     function when it updates the progress.
+        /// </summary>
+        public event Action<PROGRESS> OnProgressChange = progress => { };
 
         public TaskStatus Status { get; private set; } = TaskStatus.NotStarted;
+
+        public abstract PROGRESS Progress { get; }
 
         /// <summary>
         ///     Execute the task asynchronously in a new thread.
         /// </summary>
-        public void Execute(Action<Result> callback = null) {
-            if (Status >= TaskStatus.Started) {
+        public void Execute(Action<RESULT> callback = null) {
+            if (Status >= TaskStatus.InProgress) {
                 // TODO Throw exception.
                 return;
             }
 
-            Status = TaskStatus.Started;
+            Status = TaskStatus.InProgress;
 
             ThreadPool.QueueUserWorkItem((state) => {
-                Result result = Task();
+                RESULT result = Task();
                 callback?.Invoke(result);
                 Status = TaskStatus.Completed;
             });
@@ -30,32 +37,21 @@ namespace TrekVRApplication {
         /// <summary>
         ///     Execute the task synchronously in the current thread.
         /// </summary>
-        public Result ExecuteInSameThread() {
+        public RESULT ExecuteInSameThread() {
             return Task();
         }
 
-        public abstract Progress GetProgress();
+        protected abstract RESULT Task();
 
-        /// <summary>
-        ///     Registers a callback function that is called when progress is updated.
-        ///     It is up to the implementing classes to manually call the callback
-        ///     function when it updates the progress.
-        /// </summary>
-        public void OnProgressChange(Action<Progress> callback) {
-            _progressCallback = callback;
-        }
-
-        protected abstract Result Task();
-
-        public static bool operator true(ThreadedTask<Progress, Result> o) {
+        public static bool operator true(ThreadedTask<PROGRESS, RESULT> o) {
             return o != null;
         }
 
-        public static bool operator false(ThreadedTask<Progress, Result> o) {
+        public static bool operator false(ThreadedTask<PROGRESS, RESULT> o) {
             return o == null;
         }
 
-        public static bool operator !(ThreadedTask<Progress, Result> o) {
+        public static bool operator !(ThreadedTask<PROGRESS, RESULT> o) {
             return o ? false : true;
         }
 

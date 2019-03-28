@@ -69,7 +69,7 @@ namespace TrekVRApplication {
                 return;
             }
 
-            _initStatus = TaskStatus.Started;
+            _initStatus = TaskStatus.InProgress;
 
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;

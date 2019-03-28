@@ -48,7 +48,8 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void SetHeightExaggeration(double value) {
-            Debug.Log($"Terrain height exaggeration set to {value}.");
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            terrainModelManager.HeightExagerration = (float)value;
         }
 
         [RegisterToBrowser]

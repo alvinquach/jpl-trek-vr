@@ -56,13 +56,36 @@ namespace TrekVRApplication {
 
         public TerrainModel CurrentVisibleModel { get; private set; }
 
+        private bool _terrainInteractionEnabled = true;
         /// <summary>
         ///     Whether the terrain models are set to render in opaque (enabled) mode
         ///     or semi-transparent (disabled) mode.
         /// </summary>
-        public bool TerrainInteractionEnabled { get; private set; } = true;
+        public bool TerrainInteractionEnabled {
+            get => _terrainInteractionEnabled;
+            set {
+                if (_terrainInteractionEnabled != value) {
+                    _terrainInteractionEnabled = value;
+                    OnEnableTerrainInteractionChange.Invoke(value);
+                }
+            }
+        }
 
-        public event Action<bool> OnInteractionStatusChange = enabled => { };
+        private float _heightExagerration = 1.0f;
+        public float HeightExagerration {
+            get => _heightExagerration;
+            set {
+                if (_heightExagerration != value) {
+                    _heightExagerration = value;
+                    Debug.Log($"Terrain height exaggeration set to {value}.");
+                    OnHeightExagerrationChange.Invoke(value);
+                }
+            }
+        }
+
+        public event Action<bool> OnEnableTerrainInteractionChange = enabled => { };
+
+        public event Action<float> OnHeightExagerrationChange = scale => { };
 
         private void Awake() {
 
@@ -188,13 +211,6 @@ namespace TrekVRApplication {
 
         public Transform GetGlobeModelTransform() {
             return GlobeModel.transform;
-        }
-
-        public void EnableTerrainInteraction(bool mode) {
-            if (TerrainInteractionEnabled != mode) {
-                TerrainInteractionEnabled = mode;
-                OnInteractionStatusChange.Invoke(mode);
-            }
         }
 
         private TerrainModel AddTerrainModel(TerrainModel terrainModel) {

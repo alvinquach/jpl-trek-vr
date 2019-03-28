@@ -9,6 +9,7 @@ namespace TrekVRApplication {
     public abstract class TerrainModel : MonoBehaviourWithTaskQueue {
 
         protected GameObject _lodGroupContainer;
+
         public abstract XRInteractableTerrain InteractionController { get; }
 
         [SerializeField]
@@ -23,14 +24,6 @@ namespace TrekVRApplication {
         public float Radius {
             get => _radius;
             set { if (_initTaskStatus == TaskStatus.NotStarted) _radius = value; }
-        }
-
-        [SerializeField]
-        protected float _heightScale = 1.0f;
-        public float HeightScale {
-            get => _heightScale;
-            // TODO Allow height scale to be changed after mesh is already generated.
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _heightScale = value; }
         }
 
         // TODO Add option to use linear LOD downsampling.
@@ -97,6 +90,24 @@ namespace TrekVRApplication {
             }
         }
 
+        /// <summary>
+        ///     Copy of the mesh data with 1.0x height scale.
+        /// </summary>
+        protected MeshData[] _referenceMeshData;
+
+        protected float _pendingHeightScale = float.NaN;
+
+        protected TaskStatus _heightRescaleTaskStatus = TaskStatus.NotStarted;
+
+        [SerializeField]
+        protected float _heightScale = 1.0f;
+        public float HeightScale {
+            get => _heightScale;
+            set {
+                RequestTerrainHeightRescale(value);
+            }
+        }
+
         private Material _material;
         public Material Material {
             get => _material;
@@ -153,6 +164,13 @@ namespace TrekVRApplication {
             InitModel();
         }
 
+        protected override void Update() {
+            base.Update();
+            if (!float.IsNaN(_pendingHeightScale)) {
+                RequestTerrainHeightRescale(_pendingHeightScale);
+            }
+        }
+
         protected virtual void OnDestroy() {
             Destroy(_material);
             // TODO Destroy more thisngs
@@ -165,7 +183,7 @@ namespace TrekVRApplication {
             if (_initTaskStatus > TaskStatus.NotStarted) {
                 return;
             }
-            _initTaskStatus = TaskStatus.Started;
+            _initTaskStatus = TaskStatus.InProgress;
 
             GenerateMaterial();
             GenerateMesh();
@@ -241,7 +259,7 @@ namespace TrekVRApplication {
                 }
 
                 // Create a Mesh from the mesh data and add the mesh to a MeshFilter.
-                Mesh mesh = ConvertToMesh(meshData[i], child.name);
+                Mesh mesh = ConvertToMesh(meshData[i]);
                 child.AddComponent<MeshFilter>().mesh = mesh;
             }
 
@@ -259,8 +277,13 @@ namespace TrekVRApplication {
 
         }
 
-        protected Mesh ConvertToMesh(MeshData meshData, string label = "ProcessMeshData()") {
+        protected Mesh ConvertToMesh(MeshData meshData, bool recaculateNormals = true) {
             Mesh mesh = new Mesh();
+            UpdateMesh(mesh, meshData, recaculateNormals);
+            return mesh;
+        }
+
+        protected void UpdateMesh(Mesh mesh, MeshData meshData, bool recaculateNormals = true) {
 
             // If needed, set the index format of the mesh to 32-bits,
             // so that the mesh can have more than 65k vertices.
@@ -268,26 +291,48 @@ namespace TrekVRApplication {
                 mesh.indexFormat = IndexFormat.UInt32;
             }
 
-            float start = Time.realtimeSinceStartup;
-            mesh.vertices = meshData.Vertices;
-            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to assign vertices.");
+            if (meshData.Vertices != null) {
+                float start = Time.realtimeSinceStartup;
+                mesh.vertices = meshData.Vertices;
+                Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to assign vertices.");
+            }
 
-            start = Time.realtimeSinceStartup;
-            mesh.uv = meshData.TexCoords;
-            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to assign UVs.");
+            if (meshData.TexCoords != null) {
+                float start = Time.realtimeSinceStartup;
+                mesh.uv = meshData.TexCoords;
+                Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to assign UVs.");
+            }
 
+            if (meshData.Triangles != null) {
+                float start = Time.realtimeSinceStartup;
+                mesh.triangles = meshData.Triangles;
+                Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to assign triangles.");
+            }
 
-            start = Time.realtimeSinceStartup;
-            mesh.triangles = meshData.Triangles;
-            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to assign triangles.");
+            if (recaculateNormals) {
+                float start = Time.realtimeSinceStartup;
 
-            // This is a time consuming operation, and may cause the app to pause
-            // for a couple of miliseconds since it runs on the main thread.
-            start = Time.realtimeSinceStartup;
-            mesh.RecalculateNormals();
-            Debug.Log($"{label} took {Time.realtimeSinceStartup - start} seconds to recalculate normals.");
+                // This is a time consuming operation, and may cause the app to pause
+                // for a couple of miliseconds since it runs on the main thread.
+                mesh.RecalculateNormals();
+                Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to recalculate normals.");
+            }
 
-            return mesh;
+            // TODO Try using mesh.UploadMeshData(true) to save system memory.
+            // TODO Try using mesh.MarkDynamic() to see if there is an improvement when continuously updating the mesh.
+
+        }
+
+        protected virtual void ApplyRescaledMeshData(MeshData[] rescaledMeshData) {
+            for (int i = 0; i <= _lodLevels; i++) {
+
+                // TODO Add null checks.
+                Transform child = _lodGroupContainer.transform.Find($"LOD_{i}");
+                MeshFilter meshFilter = child.GetComponent<MeshFilter>();
+                Mesh mesh = meshFilter.mesh;
+
+                UpdateMesh(mesh, rescaledMeshData[i], true);
+            }
         }
 
         /** Helper method for added a shadow casting mesh to the terrain. */
@@ -333,6 +378,22 @@ namespace TrekVRApplication {
             Material.SetFloat("_OverlayOpacity", EnableOverlay && !UseDisabledMaterial ? 1 : 0); 
         }
 
+        private void RequestTerrainHeightRescale(float scale) {
+            if (!CanRescaleTerrainHeight()) {
+                _pendingHeightScale = scale;
+                return;
+            }
+            if (_pendingHeightScale != _heightScale) {
+                _heightScale = _pendingHeightScale;
+                RescaleTerrainHeight(_heightScale);
+            }
+            _pendingHeightScale = float.NaN;
+        }
+
+        protected abstract bool CanRescaleTerrainHeight();
+
+        protected abstract void RescaleTerrainHeight(float scale);
+
         private void SwitchToShader(string shaderName) {
             Shader shader = Shader.Find(shaderName);
             if (shader) {
@@ -349,7 +410,6 @@ namespace TrekVRApplication {
 
             MeshRenderer[] meshRenderers = _lodGroupContainer.GetComponentsInChildren<MeshRenderer>();
             foreach (MeshRenderer meshRenderer in meshRenderers) {
-                //meshRenderer.materials = materials;
                 meshRenderer.material = Material;
             }
         }

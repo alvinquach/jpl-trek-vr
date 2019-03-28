@@ -23,9 +23,10 @@ namespace TrekVRApplication {
         protected override void GenerateMesh() {
             TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
             GenerateTerrainMeshTask generateMeshTask = new GenerateGlobeTerrainMeshFromDigitalElevationModelTask(metadata);
-            generateMeshTask.Execute((meshData) => {
+            generateMeshTask.Execute(meshData => {
+                _referenceMeshData = meshData;
                 QueueTask(() => {
-                    ProcessMeshData(meshData);
+                    ProcessMeshData(_referenceMeshData);
                     _initTaskStatus = TaskStatus.Completed;
                     OnInitComplete.Invoke();
                 });
@@ -47,6 +48,24 @@ namespace TrekVRApplication {
             GameObject shadowCaster = AddShadowCaster(mesh);
             shadowCaster.transform.localScale = 2 * radius * Vector3.one;
             Destroy(sphere);
+        }
+
+        protected override bool CanRescaleTerrainHeight() {
+            return isActiveAndEnabled
+                && _initTaskStatus == TaskStatus.Completed 
+                && _heightRescaleTaskStatus != TaskStatus.InProgress;
+        }
+
+        protected override void RescaleTerrainHeight(float scale) {
+            RescaleTerrainMeshHeightTask rescaleMeshHeightTask = 
+                new RescaleGlobeTerrainMeshHeightTask(_referenceMeshData, GenerateMeshMetadata());
+            _heightRescaleTaskStatus = TaskStatus.InProgress;
+            rescaleMeshHeightTask.Execute(rescaledMeshData => {
+                QueueTask(() => {
+                    ApplyRescaledMeshData(rescaledMeshData);
+                    _heightRescaleTaskStatus = TaskStatus.Completed;
+                });
+            });
         }
 
         private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int width, int height) {
