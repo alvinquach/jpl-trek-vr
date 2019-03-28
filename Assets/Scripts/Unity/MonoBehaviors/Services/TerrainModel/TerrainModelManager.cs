@@ -72,6 +72,9 @@ namespace TrekVRApplication {
         }
 
         private float _heightExagerration = 1.0f;
+        /// <summary>
+        ///     Terrain height exaggeration.
+        /// </summary>
         public float HeightExagerration {
             get => _heightExagerration;
             set {

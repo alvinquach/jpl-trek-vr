@@ -101,6 +101,9 @@ namespace TrekVRApplication {
 
         [SerializeField]
         protected float _heightScale = 1.0f;
+        /// <summary>
+        ///     Terrain height exaggeration.
+        /// </summary>
         public float HeightScale {
             get => _heightScale;
             set {
@@ -161,6 +164,15 @@ namespace TrekVRApplication {
         // Start is used instead of Awake so that property values can 
         // be assigned before the model intialization starts.
         protected virtual void Start() {
+
+            // If the global height scale is not 1.0x, then height
+            // scaling need to be applied after mesh is generated.
+            float globalHeightScale = TerrainModelManager.Instance.HeightExagerration;
+            if (_heightScale != globalHeightScale) {
+                RequestTerrainHeightRescale(globalHeightScale);
+            }
+
+            // Initialize the mesh/model.
             InitModel();
         }
 
