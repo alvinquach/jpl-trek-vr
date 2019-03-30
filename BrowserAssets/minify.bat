@@ -1,6 +1,7 @@
 set src=./
 set dest=./
 call uglifyjs "%src%main.js" -o "%dest%main.js"
+call uglifyjs "%src%common.js" -o "%dest%common.js"
 call uglifyjs "%src%0.js" -o "%dest%0.js"
 call uglifyjs "%src%1.js" -o "%dest%1.js"
 call uglifyjs "%src%2.js" -o "%dest%2.js"
