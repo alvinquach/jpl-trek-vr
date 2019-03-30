@@ -72,6 +72,17 @@ namespace TrekVRApplication {
             Debug.Log($"Terrain location names visiblity set to {visible}.");
         }
 
+        // TODO Move this somewhere else?
+        [RegisterToBrowser]
+        public void HideControlPanel() {
+            Scenes.MainRoom.MainRoomTerrainControlPanelGroup controlPanelGroup =
+                 Scenes.MainRoom.MainRoomTerrainControlPanelGroup.Instance;
+            if (!controlPanelGroup) {
+                return;
+            }
+            controlPanelGroup.ActiveControlPanel.MoveDown();
+        }
+
         // Temporary
         [RegisterToBrowser]
         public void AdjustLayer(double layer, double value) {

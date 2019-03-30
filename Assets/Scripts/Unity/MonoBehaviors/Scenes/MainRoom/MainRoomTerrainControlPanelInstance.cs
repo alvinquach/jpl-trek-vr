@@ -107,7 +107,7 @@ namespace TrekVRApplication.Scenes.MainRoom {
             }
         }
 
-        private void MoveUp() {
+        public void MoveUp() {
             Position = true;
             Vector3 position = transform.localPosition;
             _verticalAnimationProgress = position.y / VerticalMovementDistance;
@@ -115,7 +115,7 @@ namespace TrekVRApplication.Scenes.MainRoom {
             _screenAssembly.GetComponent<Collider>().enabled = false;
         }
 
-        private void MoveDown() {
+        public void MoveDown() {
             Position = false;
             Vector3 position = transform.localPosition;
             _verticalAnimationProgress = 1 - position.y / VerticalMovementDistance;
