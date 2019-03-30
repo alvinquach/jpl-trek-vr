@@ -269,7 +269,7 @@ namespace TrekVRApplication {
 
                 // Add MeshRenderer to child, and to the LOD group.
                 MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
-                lods[i] = new LOD(i == 0 ? 1 : Mathf.Pow(1 - (float)i / _lodLevels, 2), new Renderer[] { meshRenderer });
+                lods[i] = new LOD(Mathf.Pow(GlobeModelLODCoefficient, i + 1), new Renderer[] { meshRenderer });
 
                 // Add material to the MeshRenderer.
                 if (_material != null) {
