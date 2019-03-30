@@ -400,6 +400,9 @@ namespace TrekVRApplication {
             // TODO Define the opacity as a constant.
             Material.SetFloat("_DiffuseOpacity", UseDisabledMaterial ? 0.5f : 1); 
 
+            Material.SetFloat("_Glossiness", DisableTextures ? NoTextureShaderSmoothness : ShaderSmoothness); 
+            Material.SetFloat("_Metallic", DisableTextures ? NoTextureShaderMetallic : ShaderMetallic); 
+
             // This is redundant, since the overlay shader is not used unless
             // the overlay is enabled and the interaction is not disabled.
             Material.SetFloat("_OverlayOpacity", EnableOverlay && !UseDisabledMaterial ? 1 : 0); 

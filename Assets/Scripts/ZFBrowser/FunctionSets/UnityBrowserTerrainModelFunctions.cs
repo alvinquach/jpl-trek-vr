@@ -39,7 +39,7 @@ namespace TrekVRApplication {
             IDictionary<string, object> settings = new Dictionary<string, object>() {
                 { "terrainType", currentTerrainModel is GlobeTerrainModel ? "globe" : "section" },
                 { "heightExaggeration", terrainModelManager.HeightExagerration },
-                { "textures", true },
+                { "textures", terrainModelManager.TerrainTexturesEnabled },
                 { "coordinates", globe.EnableCoordinateLines },
                 { "locationNames", true },
             };
