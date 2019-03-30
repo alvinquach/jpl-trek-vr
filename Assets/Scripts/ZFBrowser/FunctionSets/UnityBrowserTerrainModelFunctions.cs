@@ -54,7 +54,8 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void SetTexturesVisiblity(bool visible) {
-            Debug.Log($"Terrain textures visiblity set to {visible}.");
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            terrainModelManager.TerrainTexturesEnabled = visible;
         }
 
         [RegisterToBrowser]

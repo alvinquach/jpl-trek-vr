@@ -71,6 +71,17 @@ namespace TrekVRApplication {
             }
         }
 
+        private bool _terrainTexturesEnabled = true;
+        public bool TerrainTexturesEnabled {
+            get => _terrainTexturesEnabled;
+            set {
+                if (_terrainTexturesEnabled != value) {
+                    _terrainTexturesEnabled = value;
+                    OnEnableTerrainTexturesChange.Invoke(value);
+                }
+            }
+        }
+
         private float _heightExagerration = 1.0f;
         /// <summary>
         ///     Terrain height exaggeration.
@@ -87,6 +98,8 @@ namespace TrekVRApplication {
         }
 
         public event Action<bool> OnEnableTerrainInteractionChange = enabled => { };
+
+        public event Action<bool> OnEnableTerrainTexturesChange = enabled => { };
 
         public event Action<float> OnHeightExagerrationChange = scale => { };
 

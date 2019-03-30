@@ -13,6 +13,7 @@ namespace TrekVRApplication {
         protected virtual void Awake() {
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
             terrainModelManager.OnEnableTerrainInteractionChange += EnableTerrainInteraction;
+            terrainModelManager.OnEnableTerrainTexturesChange += EnableTerrainTextures;
             terrainModelManager.OnHeightExagerrationChange += SetHeightExagerration;
         }
 
@@ -23,6 +24,7 @@ namespace TrekVRApplication {
         protected virtual void OnDestroy() {
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
             terrainModelManager.OnEnableTerrainInteractionChange -= EnableTerrainInteraction;
+            terrainModelManager.OnEnableTerrainTexturesChange -= EnableTerrainTextures;
             terrainModelManager.OnHeightExagerrationChange -= SetHeightExagerration;
         }
 
@@ -45,6 +47,12 @@ namespace TrekVRApplication {
                 SwitchToActivity(XRInteractableTerrainActivity.Disabled);
             } else {
                 // TODO ...
+            }
+        }
+
+        protected virtual void EnableTerrainTextures(bool enabled) {
+            if (TerrainModel) {
+                TerrainModel.DisableTextures = !enabled;
             }
         }
 

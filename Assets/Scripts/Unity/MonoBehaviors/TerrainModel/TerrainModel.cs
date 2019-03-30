@@ -125,6 +125,11 @@ namespace TrekVRApplication {
             set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Overlay, value);
         }
 
+        public bool DisableTextures {
+            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.NoTextures);
+            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.NoTextures, value);
+        }
+
         public bool UseDisabledMaterial {
             get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled);
             set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled, value);
@@ -213,7 +218,8 @@ namespace TrekVRApplication {
                 _material.SetTexture("_Overlay", terrainModelOverlayController.RenderTexture);
             }
 
-            UseDisabledMaterial = !TerrainModelManager.Instance.TerrainInteractionEnabled;
+            UseDisabledMaterial = !terrainModelManager.TerrainInteractionEnabled;
+            DisableTextures = !terrainModelManager.TerrainTexturesEnabled;
             // Population of the material's texture slots is up to the implementing class.
         }
 
@@ -377,8 +383,17 @@ namespace TrekVRApplication {
         ///     Update the material properties to reflect current render mode.
         /// </summary>
         private void UpdateMaterialProperties() {
-            string shaderName = UseDisabledMaterial ? "MultiDiffuseTransparent" :
-                EnableOverlay ? "MultiDiffuseOverlayMultipass" : "MultiDiffuse";
+
+            Debug.Log($"DisableTextures={DisableTextures}, UseDisabledMaterial ={UseDisabledMaterial}, EnableOverlay={EnableOverlay}");
+
+            string shaderName;
+            if (DisableTextures) {
+                shaderName = UseDisabledMaterial ? "NoTexturesTransparent" :
+                    EnableOverlay ? "NoTexturesOverlayMultipass" : "NoTextures";
+            } else {
+                shaderName = UseDisabledMaterial ? "MultiDiffuseTransparent" :
+                    EnableOverlay ? "MultiDiffuseOverlayMultipass" : "MultiDiffuse";
+            }
 
             SwitchToShader($"Custom/Terrain/{shaderName}");
 
