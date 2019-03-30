@@ -5,7 +5,6 @@ namespace TrekVRApplication {
     public abstract class XRInteractableObject : MonoBehaviour {
 
         // TODO Refactor these...
-        public bool triggerClick = true;
         public bool triggerDoubleClick = true;
         public bool triggerDown = true;
         public bool triggerUp = true;

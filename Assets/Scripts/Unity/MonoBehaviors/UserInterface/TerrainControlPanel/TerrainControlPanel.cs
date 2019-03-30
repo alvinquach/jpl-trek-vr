@@ -9,12 +9,12 @@ namespace TrekVRApplication {
         /// <summary>
         ///     Width of the modal in world units.
         /// </summary>
-        private const float WorldWidth = 1.0f;
+        private const float WorldWidth = 0.9f;
 
         /// <summary>
         ///     Height of the modal in world units.
         /// </summary>
-        private const float WorldHeight = 0.5f;
+        private const float WorldHeight = 0.45f;
 
         /// <summary>
         ///     Vertical resolution of the screen in pixels.
@@ -30,7 +30,7 @@ namespace TrekVRApplication {
         private UnityBrowserTerrainModelFunctions _terrainModelFunctions;
 
         private readonly GeneratePlanarMenuMeshTask _generateMenuMeshTask =
-            new GeneratePlanarMenuMeshTask(WorldWidth, WorldHeight, RelativePosition.Top);
+            new GeneratePlanarMenuMeshTask(WorldWidth, WorldHeight, RelativePosition.Center);
         protected override GenerateMenuMeshTask GenerateMenuMeshTask => _generateMenuMeshTask;
 
         protected override string DefaultUrl => $"{BaseUrl}#{TerrainControlPanelUrl}";
