@@ -4,8 +4,9 @@ using static TrekVRApplication.TerrainModelConstants;
 namespace TrekVRApplication {
 
     [RequireComponent(typeof(XRInteractableTerrainSection))]
-    public class SectionTerrainModel : TerrainModel {
+    public sealed class SectionTerrainModel : TerrainModel {
 
+        // TODO Make this a const.
         private const float ViewTransitionDuration = 1.6f;
 
         private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;

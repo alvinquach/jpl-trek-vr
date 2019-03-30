@@ -5,7 +5,7 @@ using static TrekVRApplication.TerrainModelConstants;
 namespace TrekVRApplication {
 
     [RequireComponent(typeof(XRInteractableGlobe))]
-    public class GlobeTerrainModel : TerrainModel {
+    public sealed class GlobeTerrainModel : TerrainModel {
 
         public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableGlobe>();
 

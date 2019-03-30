@@ -82,9 +82,9 @@ namespace TrekVRApplication {
             if (CurrentActivity == ControllerModalActivity.Default) {
                 SecondaryXRController controller = (SecondaryXRController)_controller;
                 if (e.padY > 0) {
-                    controller.RoomLights?.Brighten();
+                    controller.WorldLights?.Brighten();
                 } else {
-                    controller.RoomLights?.Dim();
+                    controller.WorldLights?.Dim();
                 }
             }
             else {

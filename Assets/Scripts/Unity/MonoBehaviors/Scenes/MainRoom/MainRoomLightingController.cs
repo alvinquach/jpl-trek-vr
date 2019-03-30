@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
-namespace TrekVRApplication {
+namespace TrekVRApplication.Scenes.MainRoom {
 
-    public class RoomLightingController : MonoBehaviour {
+    [DisallowMultipleComponent]
+    public class MainRoomLightingController : WorldLightingController {
 
         private const float DirectionalLightMaxIntensity = 0.5f;
 
@@ -16,7 +17,7 @@ namespace TrekVRApplication {
 
         private float _dimAmount = 1;
 
-        public void Dim() {
+        public override void Dim() {
             _dimAmount -= DimIncrement;
             if (_dimAmount < 0) {
                 _dimAmount = 0;
@@ -24,7 +25,7 @@ namespace TrekVRApplication {
             AdjustLighting(_dimAmount);
         }
 
-        public void Brighten() {
+        public override void Brighten() {
             _dimAmount += DimIncrement;
             if (_dimAmount > 1) {
                 _dimAmount = 1;

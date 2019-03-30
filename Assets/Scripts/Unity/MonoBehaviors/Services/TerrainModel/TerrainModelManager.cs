@@ -30,10 +30,8 @@ namespace TrekVRApplication {
         /// <summary>
         ///     The material that is used as a base for new terrain models.
         /// </summary>
-        public Material BaseMaterial {
-            get => _baseMaterial;
-        }
-
+        public Material BaseMaterial => _baseMaterial;
+        
         #region Globe model fields/properties.
 
         [SerializeField]
@@ -54,7 +52,16 @@ namespace TrekVRApplication {
 
         private GameObject _terrainModelsContainer;
 
-        public TerrainModel CurrentVisibleModel { get; private set; }
+        private TerrainModel _currentVisibleModel;
+        public TerrainModel CurrentVisibleModel {
+            get => _currentVisibleModel;
+            set {
+                if (_currentVisibleModel != value) {
+                    _currentVisibleModel = value;
+                    OnCurrentTerrainModelChange.Invoke(value);
+                }
+            }
+        }
 
         private bool _terrainInteractionEnabled = true;
         /// <summary>
@@ -97,11 +104,17 @@ namespace TrekVRApplication {
             }
         }
 
-        public event Action<bool> OnEnableTerrainInteractionChange = enabled => { };
+        #region Event emitters
 
-        public event Action<bool> OnEnableTerrainTexturesChange = enabled => { };
+        public event Action<bool> OnEnableTerrainInteractionChange = e => { };
 
-        public event Action<float> OnHeightExagerrationChange = scale => { };
+        public event Action<bool> OnEnableTerrainTexturesChange = e => { };
+
+        public event Action<float> OnHeightExagerrationChange = e => { };
+
+        public event Action<TerrainModel> OnCurrentTerrainModelChange = e => { };
+
+        #endregion
 
         private void Awake() {
 
@@ -180,9 +193,11 @@ namespace TrekVRApplication {
         ///     managed by this controller.
         /// </summary>
         public void ShowGlobeModel() {
-            _terrainModels.ForEach(t => t.Visible = false);
-            CurrentVisibleModel = GlobeModel;
-            GlobeModel.Visible = true;
+            if (CurrentVisibleModel != GlobeModel) {
+                _terrainModels.ForEach(t => t.Visible = false);
+                CurrentVisibleModel = GlobeModel;
+                GlobeModel.Visible = true;
+            }
         }
 
         /// <summary>
