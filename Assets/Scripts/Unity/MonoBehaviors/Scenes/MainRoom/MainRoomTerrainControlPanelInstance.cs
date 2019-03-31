@@ -127,7 +127,7 @@ namespace TrekVRApplication.Scenes.MainRoom {
             this.enabled = enabled;
 
             _supports.GetComponent<Collider>().enabled = enabled;
-            _screenAssembly.GetComponent<Collider>().enabled = enabled;
+            _screenAssembly.GetComponent<Collider>().enabled = enabled && !Position;
 
             // Move the screen assembly without animations.
             // This is temporary; the final implementation should
