@@ -123,7 +123,35 @@ namespace TrekVRApplication.Scenes.MainRoom {
             _screenAssembly.GetComponent<Collider>().enabled = true;
         }
 
+        public void SetEnabled(bool enabled) {
+            this.enabled = enabled;
+
+            _supports.GetComponent<Collider>().enabled = enabled;
+            _screenAssembly.GetComponent<Collider>().enabled = enabled;
+
+            // Move the screen assembly without animations.
+            // This is temporary; the final implementation should
+            // make the screen assembly semi-transparent instead. 
+            Vector3 position = transform.localPosition;
+            Vector3 rotation = _screenAssembly.transform.localEulerAngles;
+            if (enabled) {
+                if (Active) {
+                    position.y = Position ? VerticalMovementDistance : 0;
+                    rotation.z = Position ? 315 : 359.9f;
+                }
+            }
+            else {
+                position.y = 0;
+                rotation.z = 180;
+            }
+            transform.localPosition = position;
+            _screenAssembly.transform.localEulerAngles = rotation;
+        }
+
         private void ColliderClickedHandler() {
+            if (!enabled) {
+                return;
+            }
             if (Active) {
                 if (Position) {
                     MoveDown();

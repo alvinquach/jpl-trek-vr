@@ -51,10 +51,30 @@ namespace TrekVRApplication.Scenes.MainRoom {
 
         private void Start() {
             ActiveControlPanel = _controlPanel1;
+            TerrainModelManager.Instance.OnEnableTerrainInteractionChange += EnableControlPanels;
+        }
+
+        private void OnDestroy() {
+            TerrainModelManager.Instance.OnEnableTerrainInteractionChange -= EnableControlPanels;
         }
 
         public void ActivateControlPanel(MainRoomTerrainControlPanelInstance instance) {
             ActiveControlPanel = instance;
+        }
+
+        private void EnableControlPanels(bool enabled) {
+            if (_controlPanel1) {
+                _controlPanel1.SetEnabled(enabled);
+            }
+            if (_controlPanel2) {
+                _controlPanel2.SetEnabled(enabled);
+            }
+            if (_controlPanel3) {
+                _controlPanel3.SetEnabled(enabled);
+            }
+            if (_controlPanel4) {
+                _controlPanel4.SetEnabled(enabled);
+            }
         }
 
     }
