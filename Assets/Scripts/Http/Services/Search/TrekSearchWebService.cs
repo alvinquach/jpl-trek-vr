@@ -51,6 +51,7 @@ namespace TrekVRApplication {
             });
         }
 
+        [Obsolete("Use the dedicated bookmarks service to retrieve the VR specific bookmarks.")]
         public void GetBookmarks(Action<SearchResult> callback, bool forceRefresh = false) {
             if (forceRefresh) {
                 _bookmarks = null;

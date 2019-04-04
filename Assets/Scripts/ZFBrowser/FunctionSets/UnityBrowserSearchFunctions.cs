@@ -10,6 +10,8 @@ namespace TrekVRApplication {
 
         private IRasterSubsetWebService _rasterService = TrekRasterSubsetWebService.Instance;
 
+        private IBookmarkWebService _bookmarkService = MockBookmarkWebService.Instance;
+
         protected override string FunctionsReadyVariable { get; } = "searchFunctionsReady";
 
         public UnityBrowserSearchFunctions(Browser browser) : base(browser) {
@@ -25,7 +27,7 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void GetBookmarks(string requestId) {
-            _searchService.GetBookmarks(res => {
+            _bookmarkService.GetBookmarks(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
@@ -66,7 +68,7 @@ namespace TrekVRApplication {
             });
         }
 
-        public static void SendResponse(Browser browser, string requestId, SearchResult data) {
+        public static void SendResponse(Browser browser, string requestId, object data) {
             string response = JsonConvert.SerializeObject(data, JsonConfig.SerializerSettings);
             response = response.Replace(@"\", @"\\"); // Need to replace single backslash with double when evaluating JS.
             browser.EvalJS($"{AngularInjectableContainerPath}.{SearchServiceName}.fulfillRequest(`{requestId}`, `{response}`);");

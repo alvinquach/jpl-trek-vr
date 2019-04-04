@@ -9,6 +9,7 @@ namespace TrekVRApplication {
 
         void GetFacetInfo(Action<SearchResult> callback, bool forceRefresh = false);
 
+        [Obsolete("Use the dedicated bookmarks service to retrieve the VR specific bookmarks.")]
         void GetBookmarks(Action<SearchResult> callback, bool forceRefresh = false);
 
         void GetDatasets(Action<SearchResult> callback, bool forceRefresh = false);

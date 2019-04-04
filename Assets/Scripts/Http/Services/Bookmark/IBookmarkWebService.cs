@@ -7,7 +7,7 @@ namespace TrekVRApplication {
 
         void ClearCache();
 
-        //void GetBookmarks(Action<IList<Bookmark>> callback);
+        void GetBookmarks(Action<IList<Bookmark>> callback, bool forceRefresh = false);
 
     }
 
