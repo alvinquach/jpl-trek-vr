@@ -83,13 +83,13 @@ namespace TrekVRApplication {
                 case RelativePosition.TopLeft:
                 case RelativePosition.Left:
                 case RelativePosition.BottomLeft:
-                    return _angleSweep / 2;
+                    return -_angleSweep;
                 case RelativePosition.TopRight:
                 case RelativePosition.Right:
                 case RelativePosition.BottomRight:
-                    return -_angleSweep / 2;
-                default:
                     return 0;
+                default:
+                    return -_angleSweep / 2;
             }
         }
 

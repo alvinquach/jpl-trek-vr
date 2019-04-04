@@ -9,6 +9,7 @@ namespace TrekVRApplication {
         private const float AngleSweep = 135;
         private const float Radius = 1.0f;
         private const float WorldHeight = 0.69f;
+        private const float SpawnDistanceMultiplier = 1.6f;
 
         /// <summary>
         ///     Vertical resolution of the modal in pixels.
@@ -82,15 +83,14 @@ namespace TrekVRApplication {
 
         private void OpenModal() {
             Camera eye = UserInterfaceManager.Instance.XRCamera;
-            Ray forward = new Ray(eye.transform.position, Vector3.Scale(eye.transform.forward, new Vector3(1, 0, 1)));
-
-            Vector3 menuPosition = eye.transform.position;
-            menuPosition.y -= Mathf.Clamp(WorldHeight / 2, 0, float.PositiveInfinity); // TODO Max value
-            transform.position = menuPosition;
 
             Vector3 menuOrientation = eye.transform.forward;
             menuOrientation.y = 0;
-            transform.forward = menuOrientation;
+            transform.right = menuOrientation;
+
+            Vector3 menuPosition = eye.transform.position + (SpawnDistanceMultiplier - 1) * Radius * menuOrientation;
+            menuPosition.y -= Mathf.Clamp(WorldHeight / 2, 0, float.PositiveInfinity); // TODO Max value
+            transform.position = menuPosition;
         }
 
     }
