@@ -37,7 +37,7 @@ namespace TrekVRApplication {
         /// <summary>
         ///     Execute the task synchronously in the current thread.
         /// </summary>
-        public RESULT ExecuteInSameThread() {
+        public RESULT ExecuteInCurrentThread() {
             return Task();
         }
 

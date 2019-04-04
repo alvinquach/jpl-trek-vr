@@ -41,7 +41,11 @@ namespace TrekVRApplication {
             if (_selectionIndex == 4) {
                 Debug.Log("Selection Complete: " + _selectionBoundingBox);
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                TerrainModel terrainModel = terrainModelManager.CreateSectionModel(_selectionBoundingBox, false);
+                TerrainModel terrainModel = terrainModelManager.CreateSectionModel(
+                    _selectionBoundingBox,
+                    terrainModelManager.CurrentVisibleModel.DemUUID,
+                    false
+                );
                 terrainModelManager.ShowTerrainModel(terrainModel, false);
                 ExitSelectionMode();
             }

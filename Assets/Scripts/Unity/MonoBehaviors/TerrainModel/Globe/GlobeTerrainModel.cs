@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 using static TrekVRApplication.TerrainModelConstants;
 
@@ -6,6 +7,11 @@ namespace TrekVRApplication {
 
     [RequireComponent(typeof(XRInteractableGlobe))]
     public sealed class GlobeTerrainModel : TerrainModel {
+
+        public override string DemUUID {
+            get => GlobalDigitalElevationModelUUID;
+            set { /* Do nothing */ }
+        }
 
         public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableGlobe>();
 
@@ -22,7 +28,18 @@ namespace TrekVRApplication {
 
         protected override void GenerateMesh() {
             TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
-            GenerateTerrainMeshTask generateMeshTask = new GenerateGlobeTerrainMeshFromDigitalElevationModelTask(metadata);
+
+            // TEMPORARY -- DO THIS PROPERLY
+            string demFilePath = Path.Combine(
+                FilePath.StreamingAssetsRoot,
+                FilePath.JetPropulsionLaboratory,
+                FilePath.DigitalElevationModel,
+                TerrainModelManager.Instance.GlobalDEMFilepath
+            );
+
+            GenerateTerrainMeshTask generateMeshTask = 
+                new GenerateGlobeTerrainMeshFromDigitalElevationModelTask(demFilePath, metadata);
+
             generateMeshTask.Execute(meshData => {
                 _referenceMeshData = meshData;
                 QueueTask(() => {

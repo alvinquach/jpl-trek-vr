@@ -2,7 +2,7 @@
 
     public struct TerrainModelMeshMetadata {
 
-        public string DemFilePath { get; set; }
+        public string DemUUID { get; set; }
 
         public float Radius { get; set; }
 

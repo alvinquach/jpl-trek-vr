@@ -9,7 +9,7 @@ namespace TrekVRApplication {
         // TODO Make this a const.
         private const float ViewTransitionDuration = 1.6f;
 
-        private IDigitalElevationModelWebService _dataElevationModelWebService = TrekDigitalElevationModelWebService.Instance;
+        private IRasterSubsetWebService _rasterSubsetService = TrekRasterSubsetWebService.Instance;
 
         public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableTerrainSection>();
 
@@ -21,6 +21,13 @@ namespace TrekVRApplication {
                     _animateOnInitialization = value;
                 }
             }
+        }
+
+        [SerializeField]
+        private string _demUUID;
+        public override string DemUUID {
+            get => _demUUID;
+            set { if (_initTaskStatus == TaskStatus.NotStarted) _demUUID = value; }
         }
 
         private BoundingBox _boundingBox;
@@ -91,12 +98,13 @@ namespace TrekVRApplication {
                 });
             });
 
+            TerrainModelProductMetadata demMetadata = 
+                new TerrainModelProductMetadata(DemUUID, SquareBoundingBox, TerrainSectionDemTargetSize, ImageFileFormat.Tiff);
+
             // Load the DEM data, and then generate another mesh after using the data.
-            _dataElevationModelWebService.GetDEM(SquareBoundingBox, TerrainSectionDemTargetSize, demFilePath => {
-                //_demFilePath = demFilePath; // Should this be allowed?
-                metadata.DemFilePath = demFilePath; // Temporary fix
+            _rasterSubsetService.SubsetProduct(demMetadata, filepath => {
                 GenerateTerrainMeshTask generateMeshTask = 
-                    new GenerateSectionTerrainMeshFromDigitalElevationModeTask(metadata, BoundingBox, uvBounds);
+                    new GenerateSectionTerrainMeshFromDigitalElevationModeTask(filepath, metadata, BoundingBox, uvBounds);
 
                 // Generate the high detailed mesh using the DEM.
                 _generateDetailedMeshTaskStatus = TaskStatus.InProgress; // TODO Move this before DEM retraval?

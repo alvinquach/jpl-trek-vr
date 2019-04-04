@@ -2,8 +2,10 @@
 
     public abstract class GenerateTerrainMeshFromDigitalElevationModelTask : GenerateTerrainMeshTask {
 
-        public GenerateTerrainMeshFromDigitalElevationModelTask(TerrainModelMeshMetadata metadata) : base(metadata) {
+        private string _demFilePath;
 
+        public GenerateTerrainMeshFromDigitalElevationModelTask(string demFilePath, TerrainModelMeshMetadata metadata) : base(metadata) {
+            _demFilePath = demFilePath;
         }
 
         // TODO Use a struct or class to pass DEM metadata (ie. scale) to the GenerateMesh methods.
@@ -16,7 +18,7 @@
             // TODO Add support other image types if necessary.
 
             // Use TIFF as source for DEM data.
-            IntensityImage image = new LoadIntensityImageFromFileTask(_metadata.DemFilePath).ExecuteInSameThread();
+            IntensityImage image = new LoadIntensityImageFromFileTask(_demFilePath).ExecuteInCurrentThread();
 
             MeshData[] meshData = new MeshData[_metadata.TotalLodLevels];
 

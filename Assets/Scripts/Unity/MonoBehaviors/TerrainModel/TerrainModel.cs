@@ -12,12 +12,7 @@ namespace TrekVRApplication {
 
         public abstract XRInteractableTerrain InteractionController { get; }
 
-        [SerializeField]
-        protected string _demFilePath;
-        public string DemFilePath {
-            get => _demFilePath;
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _demFilePath = value; }
-        }
+        public abstract string DemUUID { get; set; }
 
         [SerializeField]
         protected float _radius;
@@ -370,7 +365,7 @@ namespace TrekVRApplication {
 
         protected virtual TerrainModelMeshMetadata GenerateMeshMetadata() {
             return new TerrainModelMeshMetadata() {
-                DemFilePath = DemFilePath,
+                DemUUID = DemUUID,
                 Radius = Radius * TerrainModelScale,
                 HeightScale = HeightScale * TerrainModelScale,
                 LodLevels = LodLevels,

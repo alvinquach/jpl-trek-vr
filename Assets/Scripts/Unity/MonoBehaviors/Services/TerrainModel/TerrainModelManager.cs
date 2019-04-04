@@ -36,6 +36,7 @@ namespace TrekVRApplication {
 
         [SerializeField]
         private string _globalDEMFilepath;
+        public string GlobalDEMFilepath => _globalDEMFilepath;
 
         [SerializeField]
         private int _globeModelBaseDownsampleLevel = 1;
@@ -133,15 +134,6 @@ namespace TrekVRApplication {
             };
             globeModelGameObject.transform.parent = _terrainModelsContainer.transform;
             GlobeModel = globeModelGameObject.AddComponent<GlobeTerrainModel>();
-
-            // TEMPORARY -- DO THIS PROPERLY
-            GlobeModel.DemFilePath = Path.Combine(
-                FilePath.StreamingAssetsRoot,
-                FilePath.JetPropulsionLaboratory,
-                FilePath.DigitalElevationModel,
-                _globalDEMFilepath
-            );
-
             GlobeModel.Radius = Mars.Radius;
             GlobeModel.BaseDownsampleLevel = _globeModelBaseDownsampleLevel;
             GlobeModel.LodLevels = _globeModelLODLevels;
@@ -156,7 +148,9 @@ namespace TrekVRApplication {
         // TEMPORARY
         private int _counter = 0;
 
-        public TerrainModel CreateSectionModel(BoundingBox boundingBox, bool initWithAnimations = true) {
+        public TerrainModel CreateSectionModel(BoundingBox boundingBox, 
+            string demUUID = GlobalDigitalElevationModelUUID, bool initWithAnimations = true) {
+
             GameObject terrainModelContainer = new GameObject($"Model {++_counter}") {
                 layer = (int)CullingLayer.Terrain
             };
@@ -166,6 +160,7 @@ namespace TrekVRApplication {
             SectionTerrainModel terrainModel = terrainModelContainer.AddComponent<SectionTerrainModel>();
             try {
                 terrainModel.Radius = Mars.Radius;
+                terrainModel.DemUUID = demUUID;
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
                 terrainModel.PhysicsDownsampleLevel = TerrainSectionPhysicsTargetDownsample;

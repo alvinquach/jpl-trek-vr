@@ -5,7 +5,8 @@ namespace TrekVRApplication {
 
     public class GenerateGlobeTerrainMeshFromDigitalElevationModelTask : GenerateTerrainMeshFromDigitalElevationModelTask {
 
-        public GenerateGlobeTerrainMeshFromDigitalElevationModelTask(TerrainModelMeshMetadata metadata) : base(metadata) {
+        public GenerateGlobeTerrainMeshFromDigitalElevationModelTask(string demFilePath, TerrainModelMeshMetadata metadata) :
+            base(demFilePath, metadata) {
 
         }
 
