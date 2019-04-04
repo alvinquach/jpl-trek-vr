@@ -4,6 +4,8 @@ namespace TrekVRApplication {
 
     public interface IRasterSubsetWebService {
 
+        void ClearCache();
+
         void GetRasters(Action<SearchResult> callback, bool forceRefresh = false);
 
         void SubsetProduct(TerrainModelProductMetadata productInfo, Action<string> callback);

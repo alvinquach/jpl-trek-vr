@@ -25,6 +25,14 @@ namespace TrekVRApplication {
 
         private SearchResult _rasters;
 
+        private TrekRasterSubsetWebService() {
+
+        }
+
+        public void ClearCache() {
+            _rasters = null;
+        }
+
         public void GetRasters(Action<SearchResult> callback, bool forceRefresh = false) {
             if (forceRefresh) {
                 _rasters = null;
