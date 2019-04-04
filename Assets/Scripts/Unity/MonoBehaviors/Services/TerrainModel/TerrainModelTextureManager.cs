@@ -184,7 +184,7 @@ namespace TrekVRApplication {
 
         private TerrainModelProductMetadata CleanMetadata(TerrainModelProductMetadata texInfo) {
             return new TerrainModelProductMetadata(
-                texInfo.ProductId,
+                texInfo.ProductUUID,
                 texInfo.BoundingBox,
                 texInfo.Width,
                 texInfo.Height
@@ -226,7 +226,7 @@ namespace TrekVRApplication {
         }
 
         private bool IsGlobalMosaic(TerrainModelProductMetadata texInfo) {
-            return texInfo.ProductId == GlobalMosaicUUID && texInfo.BoundingBox == UnrestrictedBoundingBox.Global;
+            return texInfo.ProductUUID == GlobalMosaicUUID && texInfo.BoundingBox == UnrestrictedBoundingBox.Global;
         }
 
         private int ClearExcessTextures() {

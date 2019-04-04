@@ -4,6 +4,8 @@
 
         public string Name { get; }
 
+        public string UUID { get; }
+
         public SearchItemType ItemType { get; }
 
         public string ThumbnailUrl { get; }
@@ -20,6 +22,7 @@
 
         public SearchResultItem(SearchResponse.Document doc) {
             Name = doc.title;
+            UUID = doc.item_UUID;
             ItemType = SearchItemTypeEnumExtensions.FromSearchQueryTerm(doc.itemType);
             ThumbnailUrl = doc.thumbnailURLDir;
             ProductLabel = doc.productLabel;

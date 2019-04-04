@@ -37,7 +37,7 @@ namespace TrekVRApplication {
                 { "productType", "*" },
             };
             string searchUrl = HttpRequestUtils.AppendParams($"{BaseUrl}{SearchUrl}", paramsMap);
-            HttpClient.Instance.Get(searchUrl, (res) => {
+            _httpClient.Get(searchUrl, (res) => {
                 string responseBody = HttpClient.GetReponseBody(res);
                 _rasters = DeserializeResults(responseBody);
                 callback?.Invoke(_rasters);
@@ -83,7 +83,7 @@ namespace TrekVRApplication {
             string baseUrlWithFormat = $"{BaseUrl}{SubsetUrl}/{productInfo.Format.FileExtension()}/subset";
 
             IDictionary<string, string> paramsMap = new Dictionary<string, string>() {
-                { "itemUUID", productInfo.ProductId },
+                { "itemUUID", productInfo.ProductUUID },
                 { "bbox", productInfo.BoundingBox.ToString(",") },
                 { "width", $"{productInfo.Width}" },
                 { "height", $"{productInfo.Height}" }
@@ -92,12 +92,26 @@ namespace TrekVRApplication {
             string resourceUrl = HttpRequestUtils.AppendParams(baseUrlWithFormat, paramsMap, true);
             Debug.Log(resourceUrl);
 
-            _httpClient.DownloadFile(resourceUrl, filepath, callback);
+            VerifyProductExists(productInfo, exists => {
+                if (exists) {
+                    _httpClient.DownloadFile(resourceUrl, filepath, callback);
+                } else {
+                    Debug.LogError($"Product UUID {productInfo.ProductUUID} is not a raster or does not exist.");
+                }
+            });
 
         }
 
         private void VerifyProductExists(TerrainModelProductMetadata productInfo, Action<bool> callback) {
-
+            GetRasters(res => {
+                foreach (SearchResultItem item in res.Items) {
+                    if (item.UUID == productInfo.ProductUUID) {
+                        callback.Invoke(true);
+                        return;
+                    }
+                }
+                callback.Invoke(false);
+            });
         }
 
         private SearchResult DeserializeResults(string json) {

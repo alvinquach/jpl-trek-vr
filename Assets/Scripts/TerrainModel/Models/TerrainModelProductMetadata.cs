@@ -5,7 +5,7 @@ namespace TrekVRApplication {
 
     public struct TerrainModelProductMetadata : IEquatable<TerrainModelProductMetadata> {
 
-        public string ProductId { get; }
+        public string ProductUUID { get; }
 
         public IBoundingBox BoundingBox { get; }
 
@@ -15,13 +15,13 @@ namespace TrekVRApplication {
 
         public ImageFileFormat Format { get; set; }
 
-        public TerrainModelProductMetadata(string productId, IBoundingBox boundingBox, int size, ImageFileFormat format = 0) :
-            this(productId, boundingBox, size, size, format) {
+        public TerrainModelProductMetadata(string productUUID, IBoundingBox boundingBox, int size, ImageFileFormat format = 0) :
+            this(productUUID, boundingBox, size, size, format) {
 
         }
 
-        public TerrainModelProductMetadata(string productId, IBoundingBox boundingBox, int width, int height, ImageFileFormat format = 0) {
-            ProductId = productId;
+        public TerrainModelProductMetadata(string productUUID, IBoundingBox boundingBox, int width, int height, ImageFileFormat format = 0) {
+            ProductUUID = productUUID;
             BoundingBox = boundingBox;
             Width = width;
             Height = height;
@@ -43,7 +43,7 @@ namespace TrekVRApplication {
         }
 
         public string ToString(string delimiter) {
-            return ProductId + delimiter +
+            return ProductUUID + delimiter +
                 BoundingBox.ToString(",") + delimiter +
                 $"{Width}x{Height}" + delimiter +
                 Format.ToString();
@@ -54,7 +54,7 @@ namespace TrekVRApplication {
         }
 
         public bool Equals(TerrainModelProductMetadata other) {
-            return ProductId == other.ProductId &&
+            return ProductUUID == other.ProductUUID &&
                    BoundingBox == other.BoundingBox &&
                    Width == other.Width &&
                    Height == other.Height &&
