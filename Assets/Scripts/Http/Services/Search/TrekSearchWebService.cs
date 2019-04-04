@@ -46,7 +46,7 @@ namespace TrekVRApplication {
             string searchUrl = HttpRequestUtils.AppendParams(BaseUrl, paramsMap);
             HttpClient.Instance.Get(searchUrl, (res) => {
                 string responseBody = HttpClient.GetReponseBody(res);
-                _facetInfo = DeserializeReuslts(responseBody);
+                _facetInfo = DeserializeResults(responseBody);
                 callback?.Invoke(_facetInfo);
             });
         }
@@ -171,7 +171,7 @@ namespace TrekVRApplication {
 
                 HttpClient.Instance.Get(searchUrl, (res) => {
                     string responseBody = HttpClient.GetReponseBody(res);
-                    SearchResult searchResult = DeserializeReuslts(responseBody);
+                    SearchResult searchResult = DeserializeResults(responseBody);
                     callback?.Invoke(searchResult);
                 });
 
@@ -179,7 +179,7 @@ namespace TrekVRApplication {
 
         }
 
-        private SearchResult DeserializeReuslts(string json) {
+        private SearchResult DeserializeResults(string json) {
             Result result = JsonConvert.DeserializeObject<Result>(json, JsonConfig.SerializerSettings);
             return new SearchResult(result);
         }

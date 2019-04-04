@@ -8,6 +8,8 @@ namespace TrekVRApplication {
 
         private ISearchWebService _searchService = TrekSearchWebService.Instance;
 
+        private IRasterSubsetWebService _rasterService = TrekRasterSubsetWebService.Instance;
+
         protected override string FunctionsReadyVariable { get; } = "searchFunctionsReady";
 
         public UnityBrowserSearchFunctions(Browser browser) : base(browser) {
@@ -45,6 +47,13 @@ namespace TrekVRApplication {
         [RegisterToBrowser]
         public void GetProducts(string requestId) {
             _searchService.GetProducts(res => {
+                SendResponse(_browser, requestId, res);
+            });
+        }
+
+        [RegisterToBrowser]
+        public void GetRasters(string requestId) {
+            _rasterService.GetRasters(res => {
                 SendResponse(_browser, requestId, res);
             });
         }

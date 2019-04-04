@@ -53,7 +53,7 @@ namespace TrekVRApplication {
             }
         }
 
-        private readonly IProductWebService _productWebService = TrekProductWebService.Instance;
+        private readonly IRasterSubsetWebService _productWebService = TrekRasterSubsetWebService.Instance;
 
         private readonly IDictionary<TerrainModelProductMetadata, TextureWrapper> _textureDictionary =
             new Dictionary<TerrainModelProductMetadata, TextureWrapper>();
@@ -135,7 +135,7 @@ namespace TrekVRApplication {
                 _textureDictionary.Add(texInfo, wrapper = new TextureWrapper());
 
                 // Get product either from the file system (if available) or the web service.
-                _productWebService.GetProduct(productInfo, filepath => {
+                _productWebService.SubsetProduct(productInfo, filepath => {
                     LoadTextureFromImage(filepath, texture => {
                         wrapper.Texture = texture;
                         ClearExcessTextures();

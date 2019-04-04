@@ -19,7 +19,9 @@ namespace TrekVRApplication {
             foreach (SearchResponse.Document doc in res.response.docs) {
                 Items.Add(new SearchResultItem(doc));
             }
-            FacetInfo = new SearchFacetInfo(res.facet_counts.facet_fields);
+            if (res.facet_counts != null) {
+                FacetInfo = new SearchFacetInfo(res.facet_counts.facet_fields);
+            }
         }
 
         public static bool operator true(SearchResult o) {
