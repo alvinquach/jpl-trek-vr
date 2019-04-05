@@ -17,11 +17,15 @@ namespace TrekVRApplication {
 
         public event Action OnInitComplete = () => { };
 
+        public GlobeTerrainModel() {
+            BaseMosaicProduct = GenerateProductMetadata(GlobalMosaicUUID, 0, 0);
+        }
+
         protected override void GenerateMaterial() {
             base.GenerateMaterial();
 
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
-            textureManager.GetGlobalMosaicTexture(texture => {
+            textureManager.GetTexture(BaseMosaicProduct, texture => {
                 Material.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
             });
         }
@@ -85,7 +89,7 @@ namespace TrekVRApplication {
             });
         }
 
-        private TerrainModelProductMetadata GenerateTerrainModelProductMetadata(string productId, int width, int height) {
+        private TerrainModelProductMetadata GenerateProductMetadata(string productId, int width, int height) {
             return new TerrainModelProductMetadata(productId, UnrestrictedBoundingBox.Global, width, height);
         }
 

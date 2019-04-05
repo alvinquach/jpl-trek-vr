@@ -85,6 +85,16 @@ namespace TrekVRApplication {
             }
         }
 
+        protected TerrainModelProductMetadata _baseMosaicProduct;
+        public TerrainModelProductMetadata BaseMosaicProduct {
+            get => _baseMosaicProduct;
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    _baseMosaicProduct = value;
+                }
+            }
+        }
+
         /// <summary>
         ///     Copy of the mesh data with 1.0x height scale.
         /// </summary>

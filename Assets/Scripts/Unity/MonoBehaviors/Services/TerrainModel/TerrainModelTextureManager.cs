@@ -193,7 +193,7 @@ namespace TrekVRApplication {
 
         private void LoadTextureFromImage(string filepath, Action<Texture2D> callback) {
 
-            float start = Time.realtimeSinceStartup;
+            long start = DateTimeUtils.Now();
 
             // Create a task for loading texture data on a separate thread.
             LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(filepath);
@@ -208,17 +208,12 @@ namespace TrekVRApplication {
 
                 byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
                 image.CopyRawData(data);
+                Debug.Log($"Took {(DateTimeUtils.Now() - start) / 1000f} seconds to generate texture.");
 
                 QueueTask(() => {
-                    Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to generate texture.");
-                    start = Time.realtimeSinceStartup;
-
                     Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
                     texture.GetRawTextureData<byte>().CopyFrom(data);
                     texture.Apply(true, true);
-
-                    Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to apply texture.");
-
                     callback?.Invoke(texture);
                 });
 

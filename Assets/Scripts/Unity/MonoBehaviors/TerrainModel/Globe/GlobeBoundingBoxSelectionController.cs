@@ -51,7 +51,10 @@ namespace TrekVRApplication {
             if (_selectionIndex == 4) {
                 Debug.Log("Selection Complete: " + _selectionBoundingBox);
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                TerrainModel terrainModel = terrainModelManager.CreateSectionModel(_selectionBoundingBox);
+                TerrainModel terrainModel = terrainModelManager.CreateSubsetSectionModel(
+                    terrainModelManager.CurrentVisibleModel,
+                    _selectionBoundingBox
+                );
                 terrainModelManager.ShowTerrainModel(terrainModel, false);
                 terrainModelManager.GlobeModel.InteractionController.SwitchToActivity(XRInteractableTerrainActivity.Default);
             }

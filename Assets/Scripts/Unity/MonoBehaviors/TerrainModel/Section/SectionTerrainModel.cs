@@ -27,7 +27,11 @@ namespace TrekVRApplication {
         private string _demUUID;
         public override string DemUUID {
             get => _demUUID;
-            set { if (_initTaskStatus == TaskStatus.NotStarted) _demUUID = value; }
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    _demUUID = value;
+                }
+            }
         }
 
         private BoundingBox _boundingBox;
@@ -154,33 +158,42 @@ namespace TrekVRApplication {
         ///     the more detailed local textures can be loaded.
         /// </summary>
         private void ApplyTemporaryTextures() {
-            // TODO Inherit layers from globe terrain model.
-            TerrainModelTextureManager.Instance.GetGlobalMosaicTexture(texture => {
+            TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
+
+            textureManager.GetTexture(BaseMosaicProduct, texture => {
                 int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
                 Material.SetTexture(diffuseBaseId, texture);
 
-                UVScaleOffset uvScaleOffset = BoundingBoxUtils.CalculateUVScaleOffset(UnrestrictedBoundingBox.Global, SquareBoundingBox);
+                UVScaleOffset uvScaleOffset = BoundingBoxUtils.CalculateUVScaleOffset(BaseMosaicProduct.BoundingBox, SquareBoundingBox);
                 Material.SetTextureScale(diffuseBaseId, uvScaleOffset.Scale);
                 Material.SetTextureOffset(diffuseBaseId, uvScaleOffset.Offset);
             });
+
+            // TODO Inherit layers from globe terrain model.
         }
 
         /// <summary>
         ///     Loads the local textures and replaces the placeholder textures.
         /// </summary>
         private void LoadDetailedTextures() {
-            // TODO Inherit layers from globe terrain model.
-
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
-            TerrainModelProductMetadata texInfo = GenerateProductMetadata(GlobalMosaicUUID);
-            textureManager.GetTexture(texInfo, texture => {
+
+            // Store this locally for now so that the original struct can be accessed.
+            TerrainModelProductMetadata baseMosaicProduct = GenerateProductMetadata(BaseMosaicProduct.ProductUUID);
+
+            // Load and apply base texture
+            textureManager.GetTexture(baseMosaicProduct, texture => {
                 int diffuseBaseId = Shader.PropertyToID("_DiffuseBase");
                 Material.SetTexture(diffuseBaseId, texture);
                 Material.SetTextureScale(diffuseBaseId, Vector2.one);
                 Material.SetTextureOffset(diffuseBaseId, Vector2.zero);
-                textureManager.RegisterUsage(texInfo, true);
+                textureManager.RegisterUsage(baseMosaicProduct, true);
+
+                // Update the base mosaic product info.
+                _baseMosaicProduct = baseMosaicProduct;
             });
 
+            // TODO Inherit layers from globe terrain model.
         }
 
         /// <summary>

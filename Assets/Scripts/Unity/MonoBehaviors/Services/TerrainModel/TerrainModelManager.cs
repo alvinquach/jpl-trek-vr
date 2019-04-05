@@ -24,6 +24,8 @@ namespace TrekVRApplication {
         /// </summary>
         public static TerrainModelManager Instance { get; private set; }
 
+        private int _modelCounter = 0;
+
         [SerializeField]
         [Tooltip("The material that is used as a base for new terrain models.")]
         private Material _baseMaterial;
@@ -145,13 +147,15 @@ namespace TrekVRApplication {
 
         }
 
-        // TEMPORARY
-        private int _counter = 0;
+        public TerrainModel CreateSubsetSectionModel(TerrainModel parent, BoundingBox boundingBox) {
+            bool initWithAnimations = parent is GlobeTerrainModel;
+            return CreateSectionModel(boundingBox, parent.DemUUID, parent.BaseMosaicProduct, initWithAnimations);
+        }
 
-        public TerrainModel CreateSectionModel(BoundingBox boundingBox, 
-            string demUUID = GlobalDigitalElevationModelUUID, bool initWithAnimations = true) {
+        public TerrainModel CreateSectionModel(BoundingBox boundingBox, string demUUID, 
+            TerrainModelProductMetadata baseMosaicProduct, bool initWithAnimations = true) {
 
-            GameObject terrainModelContainer = new GameObject($"Model {++_counter}") {
+            GameObject terrainModelContainer = new GameObject($"Model {++_modelCounter}") {
                 layer = (int)CullingLayer.Terrain
             };
             terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform, false);
@@ -161,6 +165,7 @@ namespace TrekVRApplication {
             try {
                 terrainModel.Radius = Mars.Radius;
                 terrainModel.DemUUID = demUUID;
+                terrainModel.BaseMosaicProduct = baseMosaicProduct;
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
                 terrainModel.PhysicsDownsampleLevel = TerrainSectionPhysicsTargetDownsample;
@@ -177,7 +182,7 @@ namespace TrekVRApplication {
         }
 
         /// <summary>
-        ///     Whether the globe model is currently visible as per this controller.
+        ///     Whether the globe model is currently visible as per this controller. 
         /// </summary>
         public bool GlobeModelIsVisible() {
             return GlobeModel.Visible;
