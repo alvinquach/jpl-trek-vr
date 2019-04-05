@@ -56,7 +56,8 @@ namespace TrekVRApplication {
         public void PrintInfo(string header = "TIFF Info:") {
             Debug.Log(
                 $"{header}\n" +
-                $"Resolution: {Metadata.Width}x{Metadata.Height}@{Metadata.BPP}{Metadata.SampleFormat}, " +
+                $"Resolution: {Metadata.Width}x{Metadata.Height}@{Metadata.BitsPerSample}bits*{Metadata.SamplesPerPixel}spp, " +
+                $"Sample Format: {Metadata.SampleFormat}, " +
                 $"Compression: {Metadata.Compression}, " +
                 $"Tiled: {(Metadata.Tiled ? $"{_tiff.TileRowSize()}x{Metadata.TileSize / _tiff.TileRowSize()}" : "NO")}"
             );

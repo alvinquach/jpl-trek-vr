@@ -10,7 +10,7 @@ namespace TrekVRApplication {
             TiffMetadata metadata = tiff.Metadata;
 
             // Check image format.
-            if (metadata.SampleFormat != SampleFormat.INT.ToString()) {
+            if (metadata.SamplesPerPixel != 1) {
                 throw new Exception("Color source cannot be converted into intensity image. Use ToRGBAImage() instead.");
             }
 
@@ -93,9 +93,9 @@ namespace TrekVRApplication {
             TiffMetadata metadata = tiff.Metadata;
 
             // Check image format.
-            if (metadata.SampleFormat == SampleFormat.INT.ToString()) {
-                // TODO Add ability to convert grayscale to color image.
-                throw new Exception("Grayscale source cannot be converted into color image. Use ToIntensityImage() instead.");
+            if (metadata.BitsPerSample != 8) {
+                // TODO Add support for sample rates other than 8 bits per sample.
+                throw new Exception($"Conversion from {metadata.BitsPerSample} bits per sample to color image is currently not supported");
             }
 
             // Create an Image object to store the result.
@@ -129,7 +129,7 @@ namespace TrekVRApplication {
                         // Read bytes from tile and convert them to pixel values.
                         tiff.ReadTile(tileBytes, 0, x, y, 0, 0);
 
-                        TiffUtils.BytesToColor32(tileBytes, values);
+                        TiffUtils.BytesToColor32(metadata, tileBytes, values);
 
                         // Iterate through the intensity values in the tile.
                         for (int i = 0; i < values.Length; i++) {
@@ -159,7 +159,7 @@ namespace TrekVRApplication {
 
                     // Read bytes from scanline and convert them to pixel values.
                     tiff.ReadScanline(scanlineBytes, y);
-                    TiffUtils.BytesToColor32(scanlineBytes, values);
+                    TiffUtils.BytesToColor32(metadata, scanlineBytes, values);
 
                     // Iterate through all the pixel values in the scanline.
                     for (int x = 0; x < metadata.Width; x++) {

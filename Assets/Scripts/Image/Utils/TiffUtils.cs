@@ -58,6 +58,7 @@ namespace TrekVRApplication {
         /// <param name="buf">The buffer to write to.</param>
         /// <param name="tileWidth">The expected witdh of the tile in pixels (or number of float values).</param>
         /// <param name="offset">The start pixel of the buffer where the tile will be written to.</param>
+        [Obsolete]
         public static void IntensityTileToFloat(byte[] bytes, TiffSampleFormat format, float[,] buf, int tileWidth, Vector2Int offset) {
 
             int bytesPerSample = format.BitsPerSample / 8;
@@ -179,21 +180,39 @@ namespace TrekVRApplication {
         /// <summary>
         ///     Takes an array of bytes representing RGB pixels and outputs the data into a Color32 array.
         /// </summary>
-        public static void BytesToColor32(byte[] bytes, Color32[] buf) {
-            if (bytes.Length % 3 != 0) {
+        public static void BytesToColor32(TiffMetadata metadata, byte[] bytes, Color32[] buf) {
+            short samplesPerPixel = metadata.SamplesPerPixel;
+            if (bytes.Length % samplesPerPixel != 0) {
                 // TODO Throw exception
                 return;
             }
-            int length = bytes.Length / 3;
+            int length = bytes.Length / samplesPerPixel;
             if (buf.Length != length) {
                 // TODO Throw exception
                 return;
             }
-            for (int i = 0; i < length; i++) {
-                int j = i * 3;
-                Color32 color = new Color32(bytes[j], bytes[j + 1], bytes[j + 2], 255);
-                buf[i] = color;
+
+            // 8 bits per color sample, this will include blank and UNIT formats.
+            if (metadata.BitsPerSample == 8) {
+                Color32 color;
+
+                for (int i = 0; i < length; i++) {
+
+                    // Greyscale image (1 sample per pixel).
+                    if (samplesPerPixel == 1) {
+                        color = new Color32(bytes[i], bytes[i], bytes[i], 255);
+                    }
+
+                    // Color image, either with alpha (4 samples per pixel) or no alpha (3 samples per pixel).
+                    else {
+                        int j = i * samplesPerPixel;
+                        color = new Color32(bytes[j], bytes[j + 1], bytes[j + 2], (samplesPerPixel == 4) ? bytes[j + 3] : (byte)255);
+                    }
+                    buf[i] = color;
+                }
             }
+
+            // TODO Add support for sample rates other than 8 bits per sample.
         }
 
         #endregion

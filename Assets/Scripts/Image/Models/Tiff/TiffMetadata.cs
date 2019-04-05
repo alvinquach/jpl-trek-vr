@@ -13,11 +13,11 @@ namespace TrekVRApplication {
         /// <summary> height of the TIFF image in pixels. </summary>
         public int Height { get; }
 
-        /// <summary> Number of bits per pixel. </summary>
-        public short BPP { get; }
+        /// <summary> Number of bits per color sample. </summary>
+        public short BitsPerSample { get; }
 
-        /// <summary> Number of samples (color channels) per pixel. </summary>
-        public short SPP { get; }
+        /// <summary> Number of color samples (channels) per pixel. </summary>
+        public short SamplesPerPixel { get; }
 
         /// <summary> Sample data type (ie. float; int; etc.). </summary>
         public string SampleFormat { get; }
@@ -47,8 +47,8 @@ namespace TrekVRApplication {
 
             Width = tiff.GetField(TiffTag.IMAGEWIDTH)[0].ToInt();
             Height = tiff.GetField(TiffTag.IMAGELENGTH)[0].ToInt();
-            BPP = tiff.GetField(TiffTag.BITSPERSAMPLE)[0].ToShort();
-            SPP = tiff.GetField(TiffTag.SAMPLESPERPIXEL)[0].ToShort();
+            BitsPerSample = tiff.GetField(TiffTag.BITSPERSAMPLE)[0].ToShort();
+            SamplesPerPixel = tiff.GetField(TiffTag.SAMPLESPERPIXEL)[0].ToShort();
             
             // FIXME Handle null field properly (field can be null when TIFF is saved from Photoshop).
             SampleFormat = tiff.GetField(TiffTag.SAMPLEFORMAT)?[0].ToString();
