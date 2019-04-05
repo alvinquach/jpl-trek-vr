@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
@@ -28,6 +29,19 @@ namespace TrekVRApplication {
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
                 globe.NavigateTo(latLon, eye.transform.position);
             }
+        }
+
+        [RegisterToBrowser]
+        public void SelectBookmarkTerrainSection(string bookmarkJson) {
+            Bookmark bookmark = JsonConvert.DeserializeObject<Bookmark>(bookmarkJson, JsonConfig.SerializerSettings);
+            BoundingBox bbox = BoundingBoxUtils.ParseBoundingBox(bookmark.BoundingBox);
+            TerrainModelProductMetadata baseProductMetadata = new TerrainModelProductMetadata(bookmark.TexturesUUID[0], bbox, 0);
+            // TODO Add additional product layers if present.
+
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            SectionTerrainModel terrainModel = 
+                terrainModelManager.CreateSectionModel(bbox, bookmark.DemUUID, baseProductMetadata, false, false);
+            terrainModelManager.ShowTerrainModel(terrainModel);
         }
 
         [RegisterToBrowser]

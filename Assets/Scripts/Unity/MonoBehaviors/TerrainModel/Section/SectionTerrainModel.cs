@@ -23,6 +23,16 @@ namespace TrekVRApplication {
             }
         }
 
+        private bool _useTemporaryBaseTextures = true;
+        public bool UseTemporaryBaseTextures {
+            get => _useTemporaryBaseTextures;
+            set {
+                if (_initTaskStatus == TaskStatus.NotStarted) {
+                    _useTemporaryBaseTextures = value;
+                }
+            }
+        }
+
         [SerializeField]
         private string _demUUID;
         public override string DemUUID {
@@ -33,6 +43,8 @@ namespace TrekVRApplication {
                 }
             }
         }
+
+        // TODO Add property to include other product layers.
 
         private BoundingBox _boundingBox;
         public BoundingBox BoundingBox {
@@ -82,7 +94,9 @@ namespace TrekVRApplication {
 
         protected override void GenerateMaterial() {
             base.GenerateMaterial();
-            ApplyTemporaryTextures();
+            if (_useTemporaryBaseTextures) {
+                ApplyTemporaryTextures();
+            }
             LoadDetailedTextures();
         }
 

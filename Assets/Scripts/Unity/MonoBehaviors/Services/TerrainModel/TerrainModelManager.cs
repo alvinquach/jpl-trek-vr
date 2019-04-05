@@ -147,13 +147,13 @@ namespace TrekVRApplication {
 
         }
 
-        public TerrainModel CreateSubsetSectionModel(TerrainModel parent, BoundingBox boundingBox) {
+        public SectionTerrainModel CreateSubsetSectionModel(TerrainModel parent, BoundingBox boundingBox) {
             bool initWithAnimations = parent is GlobeTerrainModel;
             return CreateSectionModel(boundingBox, parent.DemUUID, parent.BaseMosaicProduct, initWithAnimations);
         }
 
-        public TerrainModel CreateSectionModel(BoundingBox boundingBox, string demUUID, 
-            TerrainModelProductMetadata baseMosaicProduct, bool initWithAnimations = true) {
+        public SectionTerrainModel CreateSectionModel(BoundingBox boundingBox, string demUUID, 
+            TerrainModelProductMetadata baseMosaicProduct, bool initWithAnimations = true, bool useTemporaryBaseTextures = true) {
 
             GameObject terrainModelContainer = new GameObject($"Model {++_modelCounter}") {
                 layer = (int)CullingLayer.Terrain
@@ -166,6 +166,7 @@ namespace TrekVRApplication {
                 terrainModel.Radius = Mars.Radius;
                 terrainModel.DemUUID = demUUID;
                 terrainModel.BaseMosaicProduct = baseMosaicProduct;
+                terrainModel.UseTemporaryBaseTextures = useTemporaryBaseTextures;
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
                 terrainModel.PhysicsDownsampleLevel = TerrainSectionPhysicsTargetDownsample;
@@ -178,7 +179,7 @@ namespace TrekVRApplication {
                 return null;
             }
 
-            return AddTerrainModel(terrainModel);
+            return (SectionTerrainModel)AddTerrainModel(terrainModel);
         }
 
         /// <summary>

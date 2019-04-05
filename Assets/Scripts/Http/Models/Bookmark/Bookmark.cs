@@ -4,19 +4,24 @@ namespace TrekVRApplication {
 
     public class Bookmark {
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string UUID { get; }
+        public string UUID { get; set; }
 
-        public string ThumbnailUrl { get; }
+        public string ThumbnailUrl { get; set; }
 
-        public string Description { get; }
+        public string Description { get; set; }
 
-        public string BoundingBox { get; }
+        public string BoundingBox { get; set; }
 
-        public string DemUUID { get; }
+        public string DemUUID { get; set; }
 
-        public IList<string> TexturesUUID { get; }
+        public IList<string> TexturesUUID { get; set; }
+
+        // For JSON deserialization
+        public Bookmark() {
+
+        }
 
         public Bookmark(BookmarkResponse.Document doc) {
             Name = doc.title;
