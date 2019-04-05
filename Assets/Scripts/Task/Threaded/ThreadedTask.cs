@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -28,9 +29,13 @@ namespace TrekVRApplication {
             Status = TaskStatus.InProgress;
 
             ThreadPool.QueueUserWorkItem((state) => {
-                RESULT result = Task();
-                callback?.Invoke(result);
-                Status = TaskStatus.Completed;
+                try {
+                    RESULT result = Task();
+                    callback?.Invoke(result);
+                    Status = TaskStatus.Completed;
+                } catch (Exception e) {
+                    Debug.LogError(e.Message);
+                }
             });
         }
 
