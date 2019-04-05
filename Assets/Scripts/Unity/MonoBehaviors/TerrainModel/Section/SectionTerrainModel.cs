@@ -6,8 +6,11 @@ namespace TrekVRApplication {
     [RequireComponent(typeof(XRInteractableTerrainSection))]
     public sealed class SectionTerrainModel : TerrainModel {
 
-        // TODO Make this a const.
+        // TODO Move these to constants file.
         private const float ViewTransitionDuration = 1.6f;
+        private const float TableWidth = 2.0f;
+        private const float TableHeight = 0.5f;
+        private const float TableTopGap = 0.01f;
 
         private IRasterSubsetWebService _rasterSubsetService = TrekRasterSubsetWebService.Instance;
 
@@ -111,7 +114,7 @@ namespace TrekVRApplication {
                 _referenceMeshData = meshData;
                 QueueTask(() => {
                     ProcessMeshData(meshData);
-                    PostProcessPlaceholderMeshData();
+                    PostProcessPlaceholderMeshData(meshData);
                     _initTaskStatus = TaskStatus.Completed;
                 });
             });
@@ -161,6 +164,9 @@ namespace TrekVRApplication {
                     if (physicsMeshIndex >= 0 && collider) {
                         UpdateMesh(collider.sharedMesh, rescaledMeshData[physicsMeshIndex], false);
                     }
+
+                    // Use the last LOD to recalculate position since it contains the least vertices.
+                    RepositionModel(rescaledMeshData[LodLevels]);
 
                     _heightRescaleTaskStatus = TaskStatus.Completed;
                 });
@@ -214,29 +220,23 @@ namespace TrekVRApplication {
         ///     Positions the model after the basic placeholder mesh is generated,
         ///     and starts the view transition process.
         /// </summary>
-        private void PostProcessPlaceholderMeshData() {
+        private void PostProcessPlaceholderMeshData(MeshData[] meshData) {
 
             GameObject meshContainer = _lodGroupContainer.transform.GetChild(0).gameObject;
 
             // Copy the placeholder mesh to use as a shadow caster.
             MeshFilter meshFilter = meshContainer.GetComponent<MeshFilter>();
-            AddShadowCaster(meshFilter.mesh);
+            Mesh mesh = meshFilter.mesh;
+            AddShadowCaster(mesh);
 
-            // Calculate the dimensions of the mesh in world space.
-            MeshRenderer meshRenderer = meshContainer.GetComponent<MeshRenderer>();
-            Bounds bounds = meshRenderer.bounds;
-            float meshDepth = bounds.size.x;
+            // Calculate the mesh boundaries.
+            float meshOffset = CalculateMeshOffset(meshData[0]);
+            Bounds bounds = mesh.bounds;
             float meshWidth = Mathf.Max(bounds.size.y, bounds.size.z);
-            VectorUtils.Print(bounds.size);
-
-            // TODO Move these to constants file.
-            float tableWidth = 2.0f;
-            float tableHeight = 0.5f;
-            float tableTopGap = 0.05f;
 
             // Compute the target transformations.
-            _targetScale = tableWidth / meshWidth;
-            _targetPosition = (_targetScale * meshDepth + tableHeight + tableTopGap) * Vector3.up;
+            _targetScale = TableWidth / meshWidth;
+            _targetPosition = (_targetScale * -meshOffset + TableHeight + TableTopGap) * Vector3.up;
             _targetRotation = Quaternion.Euler(0, 0, 90);
 
             if (AnimateOnInitialization) {
@@ -277,6 +277,20 @@ namespace TrekVRApplication {
                 Mesh physicsMesh = ConvertToMesh(meshData[physicsMeshIndex], false);
                 collider.sharedMesh = physicsMesh;
             });
+
+            // Use the last LOD to recalculate position since it contains the least vertices.
+            RepositionModel(meshData[LodLevels]);
+        }
+
+        private void RepositionModel(MeshData referenceMeshData) {
+            float meshOffset = CalculateMeshOffset(referenceMeshData);
+            Vector3 newPosition = (_targetScale * -meshOffset + TableHeight + TableTopGap) * Vector3.up;
+            if (_viewTransitionTaskStatus == TaskStatus.InProgress) {
+                _targetPosition = newPosition;
+            }
+            else {
+                transform.position = newPosition;
+            }
         }
 
         private void TransitionView() {
@@ -291,6 +305,19 @@ namespace TrekVRApplication {
             if (_viewTransitionProgress >= 1.0f) {
                 _viewTransitionTaskStatus = TaskStatus.Completed;
             }
+        }
+
+        private float CalculateMeshOffset(MeshData meshData) {
+            if (meshData.Vertices == null) {
+                return default;
+            }
+            float min = float.MaxValue;
+            foreach (Vector3 vertex in meshData.Vertices) {
+                if (vertex.x < min) {
+                    min = vertex.x;
+                }
+            }
+            return min;
         }
 
         private TerrainModelProductMetadata GenerateProductMetadata(string productId, int size = TerrainSectionTextureTargetSize) {
