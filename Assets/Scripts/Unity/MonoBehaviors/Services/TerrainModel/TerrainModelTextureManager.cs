@@ -67,13 +67,16 @@ namespace TrekVRApplication {
 
         #region Unity lifecycle methods
 
-        private void Awake() {
-
-            if (Instance == null) {
+        public TerrainModelTextureManager() {
+            if (!Instance) {
                 Instance = this;
             } else if (Instance != this) {
-                // TODO Throw exception
+                Destroy(this);
+                throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }
+        }
+
+        private void Awake() {
 
             // Load the global mosaic texture.
             string fullMosaicFilepath = Path.Combine(

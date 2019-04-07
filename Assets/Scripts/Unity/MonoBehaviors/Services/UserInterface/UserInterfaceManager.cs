@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
 
@@ -49,14 +50,16 @@ namespace TrekVRApplication {
 
         #endregion
 
-        private void Awake() {
-
+        public UserInterfaceManager() {
             if (!Instance) {
                 Instance = this;
+            } else if (Instance != this) {
+                Destroy(this);
+                throw new Exception($"Only one instace of {GetType().Name} is allowed!");
             }
-            else if (Instance != this) {
-                // TODO Throw exception
-            }
+        }
+
+        private void Awake() {
 
             GameObject gameObject = new GameObject(typeof(MainModal).Name);
             MainModal = gameObject.AddComponent<MainModal>();

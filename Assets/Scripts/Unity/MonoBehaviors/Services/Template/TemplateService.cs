@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace TrekVRApplication {
 
@@ -10,13 +11,12 @@ namespace TrekVRApplication {
 
         private Dictionary<string, GameObject> _templates = new Dictionary<string, GameObject>();
 
-        void Awake() {
+        public TemplateService() {
             if (!Instance) {
                 Instance = this;
-            }
-            else if (Instance != this) {
-                Destroy(gameObject);
-                return;
+            } else if (Instance != this) {
+                Destroy(this);
+                throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }
         }
 

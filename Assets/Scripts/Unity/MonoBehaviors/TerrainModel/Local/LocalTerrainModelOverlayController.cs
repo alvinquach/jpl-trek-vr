@@ -18,10 +18,11 @@ namespace TrekVRApplication {
         }
 
         public LocalTerrainModelOverlayController() {
-            if (Instance == null) {
+            if (!Instance) {
                 Instance = this;
             }  else if (Instance != this) {
-                throw new Exception("Only one instace of TerrainModelOverlayController is allowed!");
+                Destroy(this);
+                throw new Exception($"Only one instace of {GetType().Name} is allowed!");
             }
         }
 

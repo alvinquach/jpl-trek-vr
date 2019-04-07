@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -11,12 +12,13 @@ namespace TrekVRApplication {
         /// </summary>
         public static FileServiceManager Instance { get; private set; }
 
-        void Awake() {
-
-            if (Instance == null) {
+        public FileServiceManager() {
+            if (!Instance) {
                 Instance = this;
+            } else if (Instance != this) {
+                Destroy(this);
+                throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }
-
         }
 
     }

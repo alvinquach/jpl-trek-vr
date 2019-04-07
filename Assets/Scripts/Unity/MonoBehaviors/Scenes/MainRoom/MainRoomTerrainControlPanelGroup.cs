@@ -40,10 +40,9 @@ namespace TrekVRApplication.Scenes.MainRoom {
         }
 
         public MainRoomTerrainControlPanelGroup() {
-            if (Instance == null) {
+            if (!Instance) {
                 Instance = this;
-            }
-            else if (Instance != this) {
+            } else if (Instance != this) {
                 Destroy(this);
                 throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }

@@ -119,11 +119,16 @@ namespace TrekVRApplication {
 
         #endregion
 
-        private void Awake() {
-
-            if (Instance == null) {
+        public TerrainModelManager() {
+            if (!Instance) {
                 Instance = this;
+            } else if (Instance != this) {
+                Destroy(this);
+                throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }
+        }
+
+        private void Awake() {
 
             // Create a game object that will contain all the terrain model game objects.
             _terrainModelsContainer = new GameObject(GameObjectName.TerrainModelsContainer) {
