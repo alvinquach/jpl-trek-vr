@@ -219,7 +219,7 @@ namespace TrekVRApplication {
             _material = new Material(terrainModelManager.BaseMaterial);
 
             // TODO Do this in the implementing classes.
-            TerrainModelOverlayController terrainModelOverlayController = LocalTerrainModelOverlayController.Instance;
+            TerrainOverlayController terrainModelOverlayController = LocalTerrainOverlayController.Instance;
             if (terrainModelOverlayController) {
                 _material.SetTexture("_Overlay", terrainModelOverlayController.RenderTexture);
             }

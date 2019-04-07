@@ -1,17 +1,17 @@
 ﻿using System;
 using UnityEngine;
 using static TrekVRApplication.GlobeTerrainConstants;
-using static TrekVRApplication.TerrainModelOverlayUtils;
+using static TrekVRApplication.TerrainOverlayUtils;
 
 namespace TrekVRApplication {
 
     public class LocalTerrainBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
 
-        private LocalTerrainModelOverlayController _overlayController;
+        private LocalTerrainOverlayController _overlayController;
 
         protected override void Awake() {
             base.Awake();
-            _overlayController = (LocalTerrainModelOverlayController)LocalTerrainModelOverlayController.Instance;
+            _overlayController = LocalTerrainOverlayController.Instance;
         }
 
         public override void MakeBoundarySelection(RaycastHit hit) {

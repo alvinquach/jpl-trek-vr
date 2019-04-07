@@ -4,7 +4,7 @@ using static TrekVRApplication.GlobeTerrainConstants;
 
 namespace TrekVRApplication {
 
-    public static class TerrainModelOverlayUtils {
+    public static class TerrainOverlayUtils {
 
         /// <summary>
         ///     Generates the points for a longitude indicator that is

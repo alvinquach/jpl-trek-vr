@@ -2,7 +2,7 @@
 
 namespace TrekVRApplication {
 
-    public abstract class TerrainModelOverlayController : MonoBehaviour {
+    public abstract class TerrainOverlayController : MonoBehaviour {
 
         public const float CameraVerticalSize = 0.5f;
 

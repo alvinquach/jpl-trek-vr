@@ -4,20 +4,26 @@ using UnityEngine;
 namespace TrekVRApplication {
 
     [DisallowMultipleComponent]
-    public class GlobeTerrainModelOverlayController : TerrainModelOverlayController {
+    public class LocalTerrainOverlayController : TerrainOverlayController {
 
-        public static GlobeTerrainModelOverlayController Instance { get; private set; }
+        public static LocalTerrainOverlayController Instance { get; private set; }
 
-        public GlobeTerrainModelOverlayController() {
+        private BoundingBox _currentBoundingBox;
+        public BoundingBox CurrentBoundingBox {
+            get => _currentBoundingBox;
+            set {
+                _currentBoundingBox = value;
+                // TODO Clear all lines
+            }
+        }
+
+        public LocalTerrainOverlayController() {
             if (!Instance) {
                 Instance = this;
             }
             else if (Instance != this) {
                 throw new Exception($"Only one instace of {GetType().Name} is allowed!");
             }
-
-            _renderTextureResolution = 1024;
-            _renderTextureAspectRatio = 2.0f;
         }
 
         protected override void Awake() {
