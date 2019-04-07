@@ -1,4 +1,4 @@
-﻿Shader "Custom/Terrain/MultiDiffuseOverlayMultipass" {
+﻿Shader "Custom/Terrain/MultiDiffuseOverlayTransparent" {
 
     Properties {
         _Overlay ("Overlay", 2D) = "black" {}
@@ -112,10 +112,9 @@
         void surf(Input IN, inout SurfaceOutputStandard o) {
             fixed4 c = calculateAlbedo(IN.uv_DiffuseBase);
             o.Albedo = c.rgb;
-
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Alpha = _DiffuseOpacity;
+            o.Alpha = c.a * _DiffuseOpacity;
         }
 
         ENDCG

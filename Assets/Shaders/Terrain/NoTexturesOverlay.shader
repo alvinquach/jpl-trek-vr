@@ -1,21 +1,20 @@
-﻿Shader "Custom/Terrain/NoTexturesOverlayMultipass" {
+﻿Shader "Custom/Terrain/NoTexturesOverlay" {
 
     Properties {
         _Overlay ("Overlay", 2D) = "black" {}
         _OverlayOpacity ("Overlay Opacity", Range(0, 1)) = 0.0
         _Color ("Diffuse Color", Color) = (0.5, 0.5, 0.5, 1)
-        _DiffuseOpacity ("Diffuse Opacity", Range(0, 1)) = 1.0
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
     }
 
     SubShader  {
-        Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
+        Tags { "Queue" = "Opaque" }
         LOD 200
 
         CGPROGRAM
         // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard fullforwardshadows alpha:fade
+        #pragma surface surf Standard fullforwardshadows
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
@@ -24,7 +23,6 @@
             float2 uv_MainTex;
         };
 
-        half _DiffuseOpacity;
         half _Glossiness;
         half _Metallic;
         fixed4 _Color;
@@ -42,7 +40,6 @@
 
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Alpha = _DiffuseOpacity;
         }
         ENDCG
 

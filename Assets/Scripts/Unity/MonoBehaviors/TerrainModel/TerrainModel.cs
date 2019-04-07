@@ -394,24 +394,21 @@ namespace TrekVRApplication {
 
             string shaderName;
             if (DisableTextures) {
-                shaderName = UseDisabledMaterial ? "NoTexturesTransparent" :
-                    EnableOverlay ? "NoTexturesOverlayMultipass" : "NoTextures";
+                shaderName = UseDisabledMaterial ? "NoTexturesOverlayTransparent" : "NoTexturesOverlay";
             } else {
-                shaderName = UseDisabledMaterial ? "MultiDiffuseTransparent" :
-                    EnableOverlay ? "MultiDiffuseOverlayMultipass" : "MultiDiffuse";
+                shaderName = UseDisabledMaterial ? "MultiDiffuseOverlayTransparent" : "MultiDiffuseOverlay";
             }
 
             SwitchToShader($"Custom/Terrain/{shaderName}");
 
-            // TODO Define the opacity as a constant.
-            Material.SetFloat("_DiffuseOpacity", UseDisabledMaterial ? 0.5f : 1); 
+            // This is redundant, since if UseDisabledMaterial is false, the shader
+            // is not used and the _DiffuseOpacity parameter has no effect.
+            Material.SetFloat("_DiffuseOpacity", UseDisabledMaterial ? 0.5f : 1);   // TODO Define the opacity as a constant.
 
             Material.SetFloat("_Glossiness", DisableTextures ? NoTextureShaderSmoothness : ShaderSmoothness); 
             Material.SetFloat("_Metallic", DisableTextures ? NoTextureShaderMetallic : ShaderMetallic); 
 
-            // This is redundant, since the overlay shader is not used unless
-            // the overlay is enabled and the interaction is not disabled.
-            Material.SetFloat("_OverlayOpacity", EnableOverlay && !UseDisabledMaterial ? 1 : 0); 
+            Material.SetFloat("_OverlayOpacity", EnableOverlay ? 1 : 0); 
         }
 
         private void RequestTerrainHeightRescale(float scale) {
