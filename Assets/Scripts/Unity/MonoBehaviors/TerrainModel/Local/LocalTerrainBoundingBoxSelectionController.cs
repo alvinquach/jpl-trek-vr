@@ -7,10 +7,10 @@ namespace TrekVRApplication {
 
     public class LocalTerrainBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
 
-        private TerrainModelOverlayController _overlayController;
+        private LocalTerrainModelOverlayController _overlayController;
 
         private void Start() {
-            _overlayController = TerrainModelOverlayController.Instance;
+            _overlayController = LocalTerrainModelOverlayController.Instance;
         }
 
         public override void MakeBoundarySelection(RaycastHit hit) {

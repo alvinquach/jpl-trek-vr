@@ -18,7 +18,7 @@ namespace TrekVRApplication {
 
         protected override void Start() {
             _terrainModel = GetComponent<LocalTerrainModel>();
-            _bboxSelectionController = TerrainModelOverlayController.Instance.BBoxSelectionController;
+            _bboxSelectionController = LocalTerrainModelOverlayController.Instance.BBoxSelectionController;
             base.Start();
         }
 
