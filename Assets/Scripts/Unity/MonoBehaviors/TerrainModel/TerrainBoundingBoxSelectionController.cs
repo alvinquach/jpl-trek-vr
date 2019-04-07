@@ -34,7 +34,6 @@ namespace TrekVRApplication {
         }
 
         protected virtual void OnEnable() {
-            Debug.Log("ENABLED");
             ActivateCurrentIndicator();
         }
 

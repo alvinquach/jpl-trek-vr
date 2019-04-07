@@ -158,7 +158,6 @@ namespace TrekVRApplication {
         }
 
         public static bool operator ==(BoundingBox bbox1, IBoundingBox bbox2) {
-            Debug.Log("== OPERATOR USED");
             return bbox1.Equals(bbox2);
         }
 
@@ -167,7 +166,6 @@ namespace TrekVRApplication {
         }
 
         public static bool operator ==(IBoundingBox bbox1, BoundingBox bbox2) {
-            Debug.Log("== OPERATOR USED");
             return bbox1.Equals(bbox2);
         }
 

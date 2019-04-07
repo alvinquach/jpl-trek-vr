@@ -49,8 +49,6 @@ namespace TrekVRApplication {
 
         private void Awake() {
 
-            Debug.Log("XRBrowser awake");
-
             // BrowserCursor cannot be instantiated in constructor,
             // so it has to be done in the Awake() function instead.
             BrowserCursor = new BrowserCursor();

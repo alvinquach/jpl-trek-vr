@@ -51,8 +51,6 @@ namespace TrekVRApplication {
 
         private void Awake() {
 
-            Debug.Log("UserInterfaceManager Awake");
-
             if (!Instance) {
                 Instance = this;
             }
