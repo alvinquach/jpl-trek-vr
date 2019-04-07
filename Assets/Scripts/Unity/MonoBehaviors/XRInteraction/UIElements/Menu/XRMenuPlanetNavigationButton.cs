@@ -7,7 +7,7 @@ namespace TrekVRApplication {
     public class XRMenuPlanetNavigationButton : XRMenuElement {
 
         [SerializeField]
-        private XRInteractableGlobe _globe;
+        private XRInteractableGlobeTerrain _globe;
 
         public float latitude;
 

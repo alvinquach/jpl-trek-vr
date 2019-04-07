@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
-using static TrekVRApplication.SectionTerrainMeshGenerationUtils;
+using static TrekVRApplication.LocalTerrainMeshGenerationUtils;
 
 namespace TrekVRApplication {
 
     /// <summary>
-    ///     Generates the mesh for a partial section of the planet defined
+    ///     Generates the mesh for a localized section of the planet defined
     ///     by bounding box coordinates. Does not use any height data;
     ///     as such, the resulting mesh will be a smooth surface.
     /// </summary>
-    public class GenerateBaseSectionTerrainMeshTask : GenerateTerrainMeshTask {
+    public class GenerateBaseLocalTerrainMeshTask : GenerateTerrainMeshTask {
 
         // TEMPORARY
         private static readonly int LatLongVertCount = 50;
@@ -16,7 +16,7 @@ namespace TrekVRApplication {
         protected BoundingBox _boundingBox;
         protected UVBounds _uvBounds;
 
-        public GenerateBaseSectionTerrainMeshTask(TerrainModelMeshMetadata metadata,
+        public GenerateBaseLocalTerrainMeshTask(TerrainModelMeshMetadata metadata,
             BoundingBox boundingBox, UVBounds uvBounds) : base(metadata) {
 
             _boundingBox = boundingBox;

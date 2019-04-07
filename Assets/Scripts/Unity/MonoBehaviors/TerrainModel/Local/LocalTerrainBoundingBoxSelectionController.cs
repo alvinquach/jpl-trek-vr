@@ -5,7 +5,7 @@ using static TrekVRApplication.TerrainModelOverlayUtils;
 
 namespace TrekVRApplication {
 
-    public class SectionTerrainBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
+    public class LocalTerrainBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
 
         private TerrainModelOverlayController _overlayController;
 
@@ -41,7 +41,7 @@ namespace TrekVRApplication {
             if (_selectionIndex == 4) {
                 Debug.Log("Selection Complete: " + _selectionBoundingBox);
                 TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                TerrainModel terrainModel = terrainModelManager.CreateSubsetSectionModel(
+                TerrainModel terrainModel = terrainModelManager.CreateSubsetLocalModel(
                     terrainModelManager.CurrentVisibleModel,
                     _selectionBoundingBox
                 );
@@ -159,18 +159,18 @@ namespace TrekVRApplication {
             _overlayController.UpdateTexture();
         }
 
-        private SectionTerrainModel GetActiveTerrainModel() {
+        private LocalTerrainModel GetActiveTerrainModel() {
             TerrainModel terrainModel = TerrainModelManager.Instance.CurrentVisibleModel;
-            if (terrainModel is SectionTerrainModel) {
-                return (SectionTerrainModel)terrainModel;
+            if (terrainModel is LocalTerrainModel) {
+                return (LocalTerrainModel)terrainModel;
             }
             return null;
         }
 
         private Vector2 GetCoordFromHit(RaycastHit hit) {
-            SectionTerrainModel terrainModel = GetActiveTerrainModel();
+            LocalTerrainModel terrainModel = GetActiveTerrainModel();
             if (!terrainModel) {
-                throw new Exception("Active terrain section model not found.");
+                throw new Exception("Active localized terrain model not found.");
             }
             return BoundingBoxUtils.UVToCoordinates(terrainModel.SquareBoundingBox, hit.textureCoord);
         }

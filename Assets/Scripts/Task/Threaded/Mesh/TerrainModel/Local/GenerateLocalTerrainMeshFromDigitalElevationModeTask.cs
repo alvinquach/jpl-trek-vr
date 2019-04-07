@@ -1,20 +1,20 @@
 ﻿using System;
 using UnityEngine;
-using static TrekVRApplication.SectionTerrainMeshGenerationUtils;
+using static TrekVRApplication.LocalTerrainMeshGenerationUtils;
 
 namespace TrekVRApplication {
 
     /// <summary>
-    ///     Generates the mesh for a partial section of the planet defined
+    ///     Generates the mesh for a localized section of the planet defined
     ///     by bounding box coordinates. Uses TIFF DEM files as a source of
     ///     height data.
     /// </summary>
-    public class GenerateSectionTerrainMeshFromDigitalElevationModeTask : GenerateTerrainMeshFromDigitalElevationModelTask {
+    public class GenerateLocalTerrainMeshFromDigitalElevationModeTask : GenerateTerrainMeshFromDigitalElevationModelTask {
 
         protected BoundingBox _boundingBox;
         protected UVBounds _uvBounds;
 
-        public GenerateSectionTerrainMeshFromDigitalElevationModeTask(string demFilePath, TerrainModelMeshMetadata metadata,
+        public GenerateLocalTerrainMeshFromDigitalElevationModeTask(string demFilePath, TerrainModelMeshMetadata metadata,
             BoundingBox boundingBox, UVBounds uvBounds) : base(demFilePath, metadata) {
 
             _boundingBox = boundingBox;

@@ -59,7 +59,7 @@ namespace TrekVRApplication {
                     controller.Flashlight?.CycleNextColor();
                     break;
                 case ControllerModalActivity.BBoxSelection:
-                    XRInteractableGlobe globe = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobe>();
+                    XRInteractableGlobeTerrain globe = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
                     globe.CancelSelection();
                     if (globe.CurrentActivity != XRInteractableTerrainActivity.BBoxSelection) {
                         mainModal.Visible = true;

@@ -22,7 +22,7 @@ namespace TrekVRApplication {
         [RegisterToBrowser]
         public void NavigateToCoordinate(string bbox) {
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            XRInteractableGlobe globe = (XRInteractableGlobe)terrainModelManager.GlobeModel.InteractionController;
+            XRInteractableGlobeTerrain globe = (XRInteractableGlobeTerrain)terrainModelManager.GlobeModel.InteractionController;
             if (globe) {
                 BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(bbox);
                 Vector2 latLon = BoundingBoxUtils.MedianLatLon(boundingBox);
@@ -32,15 +32,15 @@ namespace TrekVRApplication {
         }
 
         [RegisterToBrowser]
-        public void SelectBookmarkTerrainSection(string bookmarkJson) {
+        public void ViewLocalTerrainBookmark(string bookmarkJson) {
             Bookmark bookmark = JsonConvert.DeserializeObject<Bookmark>(bookmarkJson, JsonConfig.SerializerSettings);
             BoundingBox bbox = BoundingBoxUtils.ParseBoundingBox(bookmark.BoundingBox);
             TerrainModelProductMetadata baseProductMetadata = new TerrainModelProductMetadata(bookmark.TexturesUUID[0], bbox, 0);
             // TODO Add additional product layers if present.
 
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            SectionTerrainModel terrainModel = 
-                terrainModelManager.CreateSectionModel(bbox, bookmark.DemUUID, baseProductMetadata, false, false);
+            LocalTerrainModel terrainModel = 
+                terrainModelManager.CreateLocalModel(bbox, bookmark.DemUUID, baseProductMetadata, false, false);
             terrainModelManager.ShowTerrainModel(terrainModel);
         }
 
@@ -48,10 +48,10 @@ namespace TrekVRApplication {
         public void GetCurrentViewSettings(string requestId) {
             // TODO Un-hardcode this data
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            XRInteractableGlobe globe = (XRInteractableGlobe)terrainModelManager.GlobeModel.InteractionController;
+            XRInteractableGlobeTerrain globe = (XRInteractableGlobeTerrain)terrainModelManager.GlobeModel.InteractionController;
             TerrainModel currentTerrainModel = terrainModelManager.CurrentVisibleModel;
             IDictionary<string, object> settings = new Dictionary<string, object>() {
-                { "terrainType", currentTerrainModel is GlobeTerrainModel ? "globe" : "section" },
+                { "terrainType", currentTerrainModel is GlobeTerrainModel ? "globe" : "local" },
                 { "heightExaggeration", terrainModelManager.HeightExagerration },
                 { "textures", terrainModelManager.TerrainTexturesEnabled },
                 { "coordinates", globe.EnableCoordinateLines },
@@ -76,7 +76,7 @@ namespace TrekVRApplication {
         public void SetCoordinateIndicatorsVisibility(bool visible) {
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
             if (terrainModelManager.GlobeModelIsVisible()) {
-                XRInteractableGlobe globe = (XRInteractableGlobe)terrainModelManager.GlobeModel.InteractionController;
+                XRInteractableGlobeTerrain globe = (XRInteractableGlobeTerrain)terrainModelManager.GlobeModel.InteractionController;
                 globe.EnableCoordinateLines = visible;
             }
         }

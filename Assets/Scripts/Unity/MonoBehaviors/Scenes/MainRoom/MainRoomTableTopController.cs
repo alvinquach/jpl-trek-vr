@@ -5,7 +5,7 @@ namespace TrekVRApplication.Scenes.MainRoom {
 
     public class MainRoomTableTopController : MonoBehaviour {
 
-        // TODO Make this a const (combine with SectionTerrainModel.ViewTransitionDuration).
+        // TODO Make this a const (combine with LocalTerrainModel.ViewTransitionDuration).
         private const float UpAnimationDuration = 1.6f;
 
         private const float DownAnimationDuration = 0.2f;
@@ -29,7 +29,7 @@ namespace TrekVRApplication.Scenes.MainRoom {
             if (_currentTerrainModelType != null && _animationProgress < 1f) {
                 float delta;
                 Vector3 targetPosition;
-                if (_currentTerrainModelType == typeof(SectionTerrainModel)) {
+                if (_currentTerrainModelType == typeof(LocalTerrainModel)) {
                     delta = Time.deltaTime / UpAnimationDuration;
                     targetPosition = UpPosition;
                 }

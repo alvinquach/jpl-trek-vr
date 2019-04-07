@@ -3,8 +3,8 @@ using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
-    [RequireComponent(typeof(XRInteractableTerrainSection))]
-    public sealed class SectionTerrainModel : TerrainModel {
+    [RequireComponent(typeof(XRInteractableLocalTerrain))]
+    public sealed class LocalTerrainModel : TerrainModel {
 
         // TODO Move these to constants file.
         private const float ViewTransitionDuration = 1.6f;
@@ -14,7 +14,7 @@ namespace TrekVRApplication {
 
         private IRasterSubsetWebService _rasterSubsetService = TrekRasterSubsetWebService.Instance;
 
-        public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableTerrainSection>();
+        public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableLocalTerrain>();
 
         private bool _animateOnInitialization;
         public bool AnimateOnInitialization {
@@ -106,7 +106,7 @@ namespace TrekVRApplication {
         protected override void GenerateMesh() {
             TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
             UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(SquareBoundingBox, BoundingBox);
-            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseSectionTerrainMeshTask(metadata, BoundingBox, uvBounds);
+            GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseLocalTerrainMeshTask(metadata, BoundingBox, uvBounds);
 
             // Generate a base mesh first to be displayed temporarily
             // while the DEM data is being loaded.
@@ -120,12 +120,12 @@ namespace TrekVRApplication {
             });
 
             TerrainModelProductMetadata demMetadata = 
-                new TerrainModelProductMetadata(DemUUID, SquareBoundingBox, TerrainSectionDemTargetSize, ImageFileFormat.Tiff);
+                new TerrainModelProductMetadata(DemUUID, SquareBoundingBox, LocalTerrainDemTargetSize, ImageFileFormat.Tiff);
 
             // Load the DEM data, and then generate another mesh after using the data.
             _rasterSubsetService.SubsetProduct(demMetadata, filepath => {
                 GenerateTerrainMeshTask generateMeshTask = 
-                    new GenerateSectionTerrainMeshFromDigitalElevationModeTask(filepath, metadata, BoundingBox, uvBounds);
+                    new GenerateLocalTerrainMeshFromDigitalElevationModeTask(filepath, metadata, BoundingBox, uvBounds);
 
                 // Generate the high detailed mesh using the DEM.
                 _generateDetailedMeshTaskStatus = TaskStatus.InProgress; // TODO Move this before DEM retraval?
@@ -152,7 +152,7 @@ namespace TrekVRApplication {
 
         protected override void RescaleTerrainHeight(float scale) {
             TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
-            RescaleTerrainMeshHeightTask rescaleMeshHeightTask = new RescaleSectionTerrainMeshHeightTask(_referenceMeshData, metadata);
+            RescaleTerrainMeshHeightTask rescaleMeshHeightTask = new RescaleLocalTerrainMeshHeightTask(_referenceMeshData, metadata);
             _heightRescaleTaskStatus = TaskStatus.InProgress;
             rescaleMeshHeightTask.Execute(rescaledMeshData => {
                 QueueTask(() => {
@@ -320,7 +320,7 @@ namespace TrekVRApplication {
             return min;
         }
 
-        private TerrainModelProductMetadata GenerateProductMetadata(string productId, int size = TerrainSectionTextureTargetSize) {
+        private TerrainModelProductMetadata GenerateProductMetadata(string productId, int size = LocalTerrainTextureTargetSize) {
             return new TerrainModelProductMetadata(productId, SquareBoundingBox, size);
         }
 

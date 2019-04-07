@@ -12,7 +12,7 @@ namespace TrekVRApplication {
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
             if (terrainModelController.GlobeModelIsVisible()) {
-                XRInteractableGlobe globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobe>();
+                XRInteractableGlobeTerrain globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
                 if (globe.CurrentActivity == XRInteractableTerrainActivity.Default) {
                     globe.SwitchToActivity(XRInteractableTerrainActivity.BBoxSelection);
                 }

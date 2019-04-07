@@ -4,9 +4,9 @@ using System.Collections;
 namespace TrekVRApplication {
 
     /// <summary>
-    ///     Common helper methods for generating section terrain meshes.
+    ///     Common helper methods for generating localized terrain meshes.
     /// </summary>
-    public static class SectionTerrainMeshGenerationUtils {
+    public static class LocalTerrainMeshGenerationUtils {
 
         public static Vector2 GenerateUVCoord(int x, int y, int lonVertCount, int latVertCount, UVBounds uvBounds) {
             Vector2 uvScale = new Vector2(uvBounds.U2 - uvBounds.U1, uvBounds.V2 - uvBounds.V1);

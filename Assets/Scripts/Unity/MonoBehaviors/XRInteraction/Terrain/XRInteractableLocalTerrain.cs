@@ -2,12 +2,12 @@
 
 namespace TrekVRApplication {
 
-    public class XRInteractableTerrainSection : XRInteractableTerrain {
+    public class XRInteractableLocalTerrain : XRInteractableTerrain {
 
-        private SectionTerrainBoundingBoxSelectionController _bboxSelectionController;
+        private LocalTerrainBoundingBoxSelectionController _bboxSelectionController;
         protected override TerrainBoundingBoxSelectionController BBoxSelectionController => _bboxSelectionController;
 
-        private SectionTerrainModel _terrainModel;
+        private LocalTerrainModel _terrainModel;
         public override TerrainModel TerrainModel => _terrainModel;
 
         #region Unity lifecycle methods
@@ -17,7 +17,7 @@ namespace TrekVRApplication {
         }
 
         protected override void Start() {
-            _terrainModel = GetComponent<SectionTerrainModel>();
+            _terrainModel = GetComponent<LocalTerrainModel>();
             _bboxSelectionController = TerrainModelOverlayController.Instance.BBoxSelectionController;
             base.Start();
         }

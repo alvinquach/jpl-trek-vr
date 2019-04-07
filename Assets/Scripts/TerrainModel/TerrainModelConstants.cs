@@ -6,11 +6,11 @@ namespace TrekVRApplication {
 
         public const float TerrainModelScale = 2.5e-7f;
 
-        public const int TerrainSectionDemTargetSize = 512;
+        public const int LocalTerrainDemTargetSize = 512;
 
-        public const int TerrainSectionTextureTargetSize = 1024;
+        public const int LocalTerrainTextureTargetSize = 1024;
 
-        public const int TerrainSectionPhysicsTargetDownsample = 3;
+        public const int LocalTerrainPhysicsTargetDownsample = 3;
 
         public const float ShaderSmoothness = 0.31f;
 

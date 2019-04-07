@@ -3,9 +3,9 @@ using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
-    public class RescaleSectionTerrainMeshHeightTask : RescaleTerrainMeshHeightTask {
+    public class RescaleLocalTerrainMeshHeightTask : RescaleTerrainMeshHeightTask {
 
-        public RescaleSectionTerrainMeshHeightTask(MeshData[] refernceMeshData, TerrainModelMeshMetadata metadata) : 
+        public RescaleLocalTerrainMeshHeightTask(MeshData[] refernceMeshData, TerrainModelMeshMetadata metadata) : 
             base(refernceMeshData, metadata) {
 
         }

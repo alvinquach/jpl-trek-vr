@@ -18,7 +18,7 @@ namespace TrekVRApplication {
         [SerializeField]
         private GameObject _renderTextureObjectsContainer;
 
-        public SectionTerrainBoundingBoxSelectionController BBoxSelectionController { get; private set; }
+        public LocalTerrainBoundingBoxSelectionController BBoxSelectionController { get; private set; }
 
         private void Awake() {
 
@@ -43,7 +43,7 @@ namespace TrekVRApplication {
                 layer = (int)CullingLayer.RenderToTexture
             };
             selectionIndicatorsContainer.transform.SetParent(_renderTextureObjectsContainer.transform, false);
-            BBoxSelectionController = selectionIndicatorsContainer.AddComponent<SectionTerrainBoundingBoxSelectionController>();
+            BBoxSelectionController = selectionIndicatorsContainer.AddComponent<LocalTerrainBoundingBoxSelectionController>();
             BBoxSelectionController.SetEnabled(false);
 
         }

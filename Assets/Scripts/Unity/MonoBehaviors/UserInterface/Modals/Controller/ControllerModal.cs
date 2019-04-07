@@ -77,7 +77,7 @@ namespace TrekVRApplication {
             ZFBrowserUtils.NavigateTo(Browser, activity.GetModalUrl());
 
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-            XRInteractableGlobe globe;
+            XRInteractableGlobeTerrain globe;
 
             // Switch to new acivity.
             // TODO Convert this to switch case.
@@ -94,7 +94,7 @@ namespace TrekVRApplication {
                 case ControllerModalActivity.LayerManager:
 
                     // FIXME Need to set the mode for all the terrain models, not just the planet.
-                    globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobe>();
+                    globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
                     globe.SwitchToActivity(XRInteractableTerrainActivity.Default);
 
                     UserInterfaceManager.Instance.MainModal.Visible = false;

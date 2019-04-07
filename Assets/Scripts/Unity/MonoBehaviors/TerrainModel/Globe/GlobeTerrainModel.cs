@@ -5,7 +5,7 @@ using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
-    [RequireComponent(typeof(XRInteractableGlobe))]
+    [RequireComponent(typeof(XRInteractableGlobeTerrain))]
     public sealed class GlobeTerrainModel : TerrainModel {
 
         public override string DemUUID {
@@ -13,7 +13,7 @@ namespace TrekVRApplication {
             set { /* Do nothing */ }
         }
 
-        public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableGlobe>();
+        public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableGlobeTerrain>();
 
         public event Action OnInitComplete = () => { };
 

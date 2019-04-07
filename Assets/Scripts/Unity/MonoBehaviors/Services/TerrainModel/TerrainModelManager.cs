@@ -147,12 +147,12 @@ namespace TrekVRApplication {
 
         }
 
-        public SectionTerrainModel CreateSubsetSectionModel(TerrainModel parent, BoundingBox boundingBox) {
+        public LocalTerrainModel CreateSubsetLocalModel(TerrainModel parent, BoundingBox boundingBox) {
             bool initWithAnimations = parent is GlobeTerrainModel;
-            return CreateSectionModel(boundingBox, parent.DemUUID, parent.BaseMosaicProduct, initWithAnimations);
+            return CreateLocalModel(boundingBox, parent.DemUUID, parent.BaseMosaicProduct, initWithAnimations);
         }
 
-        public SectionTerrainModel CreateSectionModel(BoundingBox boundingBox, string demUUID, 
+        public LocalTerrainModel CreateLocalModel(BoundingBox boundingBox, string demUUID, 
             TerrainModelProductMetadata baseMosaicProduct, bool initWithAnimations = true, bool useTemporaryBaseTextures = true) {
 
             GameObject terrainModelContainer = new GameObject($"Model {++_modelCounter}") {
@@ -161,7 +161,7 @@ namespace TrekVRApplication {
             terrainModelContainer.transform.SetParent(_terrainModelsContainer.transform, false);
             terrainModelContainer.SetActive(false);
 
-            SectionTerrainModel terrainModel = terrainModelContainer.AddComponent<SectionTerrainModel>();
+            LocalTerrainModel terrainModel = terrainModelContainer.AddComponent<LocalTerrainModel>();
             try {
                 terrainModel.Radius = Mars.Radius;
                 terrainModel.DemUUID = demUUID;
@@ -169,7 +169,7 @@ namespace TrekVRApplication {
                 terrainModel.UseTemporaryBaseTextures = useTemporaryBaseTextures;
                 terrainModel.BoundingBox = boundingBox;
                 terrainModel.LodLevels = 0;
-                terrainModel.PhysicsDownsampleLevel = TerrainSectionPhysicsTargetDownsample;
+                terrainModel.PhysicsDownsampleLevel = LocalTerrainPhysicsTargetDownsample;
                 terrainModel.AnimateOnInitialization = initWithAnimations;
                 terrainModel.InitModel();
             }
@@ -179,7 +179,7 @@ namespace TrekVRApplication {
                 return null;
             }
 
-            return (SectionTerrainModel)AddTerrainModel(terrainModel);
+            return (LocalTerrainModel)AddTerrainModel(terrainModel);
         }
 
         /// <summary>

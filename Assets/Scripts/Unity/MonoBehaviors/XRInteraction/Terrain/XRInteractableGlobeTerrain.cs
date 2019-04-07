@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public class XRInteractableGlobe : XRInteractableTerrain {
+    public class XRInteractableGlobeTerrain : XRInteractableTerrain {
 
         private GlobeCoordinateLinesController _coordinateLinesController;
 
