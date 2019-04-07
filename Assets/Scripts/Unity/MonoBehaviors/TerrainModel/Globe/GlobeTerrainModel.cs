@@ -24,6 +24,11 @@ namespace TrekVRApplication {
         protected override void GenerateMaterial() {
             base.GenerateMaterial();
 
+            TerrainOverlayController terrainModelOverlayController = GlobeTerrainOverlayController.Instance;
+            if (terrainModelOverlayController) {
+                Material.SetTexture("_Overlay", terrainModelOverlayController.RenderTexture);
+            }
+
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
             textureManager.GetTexture(BaseMosaicProduct, texture => {
                 Material.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.

@@ -218,12 +218,6 @@ namespace TrekVRApplication {
             }
             _material = new Material(terrainModelManager.BaseMaterial);
 
-            // TODO Do this in the implementing classes.
-            TerrainOverlayController terrainModelOverlayController = LocalTerrainOverlayController.Instance;
-            if (terrainModelOverlayController) {
-                _material.SetTexture("_Overlay", terrainModelOverlayController.RenderTexture);
-            }
-
             UseDisabledMaterial = !terrainModelManager.TerrainInteractionEnabled;
             DisableTextures = !terrainModelManager.TerrainTexturesEnabled;
             // Population of the material's texture slots is up to the implementing class.

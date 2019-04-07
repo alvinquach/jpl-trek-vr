@@ -111,15 +111,33 @@ namespace TrekVRApplication {
             }
         }
 
-        public TerrainOverlayArea AddArea(string name = null) {
+
+        #region Add area methods
+
+        public TerrainOverlayArea AddArea(Color32 color, string name = null) {
+            Material material = new Material(Shader.Find("Custom/Unlit/TransparentColor"));
+            material.SetColor("_Color", color);
+            return AddArea(material, name);
+        }
+
+        public TerrainOverlayArea AddArea(Material material, string name = null) {
             TerrainOverlayArea overlayArea = AddObject<TerrainOverlayArea>(name);
+            overlayArea.Material = material;
+            _overlayObjects.Add(overlayArea);
             return overlayArea;
         }
 
+        #endregion
+
+        #region Add line methods
+
         public TerrainOverlayLine AddLine(string name = null) {
             TerrainOverlayLine overlayLine = AddObject<TerrainOverlayLine>(name);
+            _overlayObjects.Add(overlayLine);
             return overlayLine;
         }
+
+        #endregion
 
         private T AddObject<T>(string name) where T : TerrainOverlayObject {
             if (string.IsNullOrEmpty(name)) {

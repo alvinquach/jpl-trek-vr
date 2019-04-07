@@ -8,6 +8,17 @@ namespace TrekVRApplication {
 
         private Mesh _mesh;
 
+        public Material Material {
+            get {
+                MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+                return meshRenderer.material;
+            }
+            set {
+                MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+                meshRenderer.material = value;
+            }
+        }
+
         protected override void Awake() {
             base.Awake();
 

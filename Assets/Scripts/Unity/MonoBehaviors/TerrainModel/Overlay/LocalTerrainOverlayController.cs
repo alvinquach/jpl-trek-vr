@@ -43,7 +43,7 @@ namespace TrekVRApplication {
 
         private void OnTerrainModelChange(TerrainModel terrainModel) {
             if (terrainModel is LocalTerrainModel) {
-                _currentBoundingBox = ((LocalTerrainModel)terrainModel).BoundingBox;
+                _currentBoundingBox = ((LocalTerrainModel)terrainModel).SquareBoundingBox;
             }
             else {
                 _currentBoundingBox = BoundingBox.Zero;

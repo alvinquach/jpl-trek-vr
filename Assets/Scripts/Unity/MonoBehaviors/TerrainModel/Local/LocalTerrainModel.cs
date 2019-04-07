@@ -97,6 +97,12 @@ namespace TrekVRApplication {
 
         protected override void GenerateMaterial() {
             base.GenerateMaterial();
+
+            TerrainOverlayController terrainModelOverlayController = LocalTerrainOverlayController.Instance;
+            if (terrainModelOverlayController) {
+                Material.SetTexture("_Overlay", terrainModelOverlayController.RenderTexture);
+            }
+
             if (_useTemporaryBaseTextures) {
                 ApplyTemporaryTextures();
             }

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
@@ -28,6 +27,18 @@ namespace TrekVRApplication {
                 Vector2 latLon = BoundingBoxUtils.MedianLatLon(boundingBox);
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
                 globe.NavigateTo(latLon, eye.transform.position);
+            }
+        }
+
+        [RegisterToBrowser]
+        public void HighlightBoundingBoxOnGlobe(string bbox) {
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            if (string.IsNullOrEmpty(bbox)) {
+                terrainModelManager.ClearHighlightedAreaOnGlobe();
+            }
+            else {
+                BoundingBox boundingBox = BoundingBoxUtils.ParseBoundingBox(bbox);
+                terrainModelManager.HighlightAreaOnGlobe(boundingBox);
             }
         }
 

@@ -112,6 +112,8 @@ namespace TrekVRApplication {
 
         #endregion
 
+        #region Unity lifecycle methods
+
         protected override void Awake() {
             base.Awake();
 
@@ -136,6 +138,34 @@ namespace TrekVRApplication {
             _terrainModelsContainer.transform.position = Vector3.up;
 
         }
+
+        #endregion
+
+        #region Globe highlight area
+        // TODO Move the variables and methods in this region elsewhere.
+
+        private TerrainOverlayArea _highlightedArea;
+
+        public void HighlightAreaOnGlobe(BoundingBox bbox) {
+            if (!_highlightedArea) {
+                _highlightedArea = 
+                    GlobeTerrainOverlayController.Instance.AddArea(new Color(0.0f, 0.9f, 1.0f, 0.5f));
+            }
+            _highlightedArea.UpdateArea(bbox);
+
+            // In the future, overlay should always be enabled for globe.
+            GlobeModel.EnableOverlay = true;
+        }
+
+        public void ClearHighlightedAreaOnGlobe() {
+            GlobeTerrainOverlayController.Instance.RemoveObject(_highlightedArea);
+            _highlightedArea = null;
+
+            // In the future, overlay should always be enabled for globe.
+            GlobeModel.EnableOverlay = false;
+        }
+
+        #endregion
 
         public LocalTerrainModel CreateSubsetLocalModel(TerrainModel parent, BoundingBox boundingBox) {
             bool initWithAnimations = parent is GlobeTerrainModel;
