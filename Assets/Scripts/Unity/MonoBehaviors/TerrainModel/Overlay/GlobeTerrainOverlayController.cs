@@ -8,6 +8,10 @@ namespace TrekVRApplication {
 
         public static GlobeTerrainOverlayController Instance { get; private set; }
 
+        public override float RenderTextureAspectRatio => 2.0f;
+
+        public override IBoundingBox CurrentBoundingBox => UnrestrictedBoundingBox.Global;
+
         public GlobeTerrainOverlayController() {
             if (!Instance) {
                 Instance = this;
@@ -17,7 +21,6 @@ namespace TrekVRApplication {
             }
 
             _renderTextureResolution = 1024;
-            _renderTextureAspectRatio = 2.0f;
         }
 
         protected override void Awake() {
