@@ -35,6 +35,10 @@ namespace TrekVRApplication {
             }
         }
 
+        protected virtual void OnDestroy() {
+            Instance = null;
+        }
+
     }
 
 }
