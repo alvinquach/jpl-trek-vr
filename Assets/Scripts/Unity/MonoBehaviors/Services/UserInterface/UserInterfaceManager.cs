@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using ZenFulcrum.EmbeddedBrowser;
 
 namespace TrekVRApplication {
 
     [DisallowMultipleComponent]
-    public class UserInterfaceManager : MonoBehaviour {
-
-        /// <summary>
-        ///     The instance of the UserInterfaceManager that is present in the scene.
-        ///     There should only be one TerrainModelManager in the entire scene.
-        /// </summary>
-        public static UserInterfaceManager Instance { get; private set; }
+    public class UserInterfaceManager : SingletonMonoBehaviour<UserInterfaceManager> {
 
         [SerializeField]
         private Material _material;
@@ -49,17 +41,8 @@ namespace TrekVRApplication {
         private readonly ISet<BrowserUserInterface> _browserUserInterfaces = new HashSet<BrowserUserInterface>();
 
         #endregion
-
-        public UserInterfaceManager() {
-            if (!Instance) {
-                Instance = this;
-            } else if (Instance != this) {
-                Destroy(this);
-                throw new Exception($"Only one instace of {GetType().Name} is allowed!");
-            }
-        }
-
-        private void Awake() {
+        protected override void Awake() {
+            base.Awake();
 
             GameObject gameObject = new GameObject(typeof(MainModal).Name);
             MainModal = gameObject.AddComponent<MainModal>();

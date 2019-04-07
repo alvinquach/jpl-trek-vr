@@ -71,7 +71,6 @@ namespace TrekVRApplication {
             if (!Instance) {
                 Instance = this;
             } else if (Instance != this) {
-                Destroy(this);
                 throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }
         }

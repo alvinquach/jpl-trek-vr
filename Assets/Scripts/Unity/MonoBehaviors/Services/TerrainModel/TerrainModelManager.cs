@@ -1,14 +1,13 @@
-﻿using UnityEngine;
-using System;
-using System.IO;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
     [DisallowMultipleComponent]
-    public class TerrainModelManager : MonoBehaviour {
+    public class TerrainModelManager : SingletonMonoBehaviour<TerrainModelManager> {
 
         /// <summary>
         ///     The maximum number of models that this controller can manage,
@@ -17,12 +16,6 @@ namespace TrekVRApplication {
         ///     when a new one is created.
         /// </summary>
         private const int MaxModels = 5;
-
-        /// <summary>
-        ///     The instance of the TerrainModelManager that is present in the scene.
-        ///     There should only be one TerrainModelManager in the entire scene.
-        /// </summary>
-        public static TerrainModelManager Instance { get; private set; }
 
         private int _modelCounter = 0;
 
@@ -119,16 +112,8 @@ namespace TrekVRApplication {
 
         #endregion
 
-        public TerrainModelManager() {
-            if (!Instance) {
-                Instance = this;
-            } else if (Instance != this) {
-                Destroy(this);
-                throw new Exception($"Only one instance of {GetType().Name} is allowed.");
-            }
-        }
-
-        private void Awake() {
+        protected override void Awake() {
+            base.Awake();
 
             // Create a game object that will contain all the terrain model game objects.
             _terrainModelsContainer = new GameObject(GameObjectName.TerrainModelsContainer) {

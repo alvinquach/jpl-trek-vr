@@ -9,8 +9,9 @@ namespace TrekVRApplication {
 
         private LocalTerrainModelOverlayController _overlayController;
 
-        private void Start() {
-            _overlayController = LocalTerrainModelOverlayController.Instance;
+        protected override void Awake() {
+            base.Awake();
+            _overlayController = (LocalTerrainModelOverlayController)LocalTerrainModelOverlayController.Instance;
         }
 
         public override void MakeBoundarySelection(RaycastHit hit) {

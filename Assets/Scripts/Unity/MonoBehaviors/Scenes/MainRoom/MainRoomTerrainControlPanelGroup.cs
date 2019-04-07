@@ -1,12 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TrekVRApplication.Scenes.MainRoom {
 
     [DisallowMultipleComponent]
-    public class MainRoomTerrainControlPanelGroup : MonoBehaviour {
-
-        public static MainRoomTerrainControlPanelGroup Instance { get; private set; }
+    public class MainRoomTerrainControlPanelGroup : SingletonMonoBehaviour<MainRoomTerrainControlPanelGroup> {
 
         [SerializeField]
         private TerrainControlPanel _screen;
@@ -36,15 +33,6 @@ namespace TrekVRApplication.Scenes.MainRoom {
                         _activeControlPanel.Activate(_screen);
                     }
                 }
-            }
-        }
-
-        public MainRoomTerrainControlPanelGroup() {
-            if (!Instance) {
-                Instance = this;
-            } else if (Instance != this) {
-                Destroy(this);
-                throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }
         }
 

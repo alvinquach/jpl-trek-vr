@@ -21,9 +21,7 @@ namespace TrekVRApplication {
 
         protected byte _selectionIndex = 0;
 
-        protected LineRenderer CurrentSelectionIndicator {
-            get => GetSelectionIndicatorByIndex(_selectionIndex);
-        }
+        protected LineRenderer CurrentSelectionIndicator => GetSelectionIndicatorByIndex(_selectionIndex);
 
         protected int _framesSinceLastControllerModalUpdate = 0;
 
