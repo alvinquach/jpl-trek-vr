@@ -12,6 +12,17 @@ namespace TrekVRApplication {
 
         public static TrekSearchWebService Instance { get; } = new TrekSearchWebService();
 
+        private int _searchListActiveIndex = 0;
+        public int SearchListActiveIndex {
+            get => _searchListActiveIndex;
+            set {
+                _searchListActiveIndex = value;
+                OnSearchListActiveIndexChange.Invoke(value);
+            }
+        }
+
+        public event Action<int> OnSearchListActiveIndexChange = index => { };
+
         #region Cached results
 
         private SearchResult _facetInfo;

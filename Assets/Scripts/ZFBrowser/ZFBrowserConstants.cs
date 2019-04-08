@@ -15,6 +15,7 @@ namespace TrekVRApplication {
         public const string DataServiceName = "UnityDataService";
         public const string HttpServiceName = "UnityHttpService";
         public const string SearchServiceName = "UnitySearchService";
+        public const string TerrainModelServiceName = "TerrainModelService";
 
         public static readonly string AngularGlobalObjectPath = $"window.{AngularGlobalObjectName}";
         public static readonly string AngularComponentContainerPath = $"{AngularGlobalObjectPath}.componentsMap";

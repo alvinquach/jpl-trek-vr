@@ -35,6 +35,19 @@ namespace TrekVRApplication {
 
         protected override string DefaultUrl => $"{BaseUrl}#{TerrainControlPanelUrl}";
 
+        #region Unity lifecycle methods
+
+        protected override void Awake() {
+            base.Awake();
+            TerrainModelManager.Instance.OnCurrentTerrainModelChange += OnTerrainModelChange;
+        }
+
+        private void OnDestroy() {
+            TerrainModelManager.Instance.OnCurrentTerrainModelChange -= OnTerrainModelChange;
+        }
+
+        #endregion
+
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
             _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(Browser);

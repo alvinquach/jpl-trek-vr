@@ -5,6 +5,7 @@ namespace TrekVRApplication {
 
     public class SecondaryControllerModal : ControllerModal {
 
+        private UnityBrowserSearchFunctions _searchFunctions;
         private UnityBrowserTerrainModelFunctions _terrainModelFunctions;
 
         private KeyCode _padCurrentKey = 0;
@@ -35,10 +36,12 @@ namespace TrekVRApplication {
 
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
+            _searchFunctions = new UnityBrowserSearchFunctions(Browser);
             _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(Browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {
+            _searchFunctions.RegisterFunctions();
             _terrainModelFunctions.RegisterFunctions();
         }
 

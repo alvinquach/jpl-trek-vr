@@ -15,7 +15,18 @@ namespace TrekVRApplication {
         protected override string FunctionsReadyVariable { get; } = "searchFunctionsReady";
 
         public UnityBrowserSearchFunctions(Browser browser) : base(browser) {
+            // TODO Unsubscribe on destroy
+            _searchService.OnSearchListActiveIndexChange += SendSearchListActiveIndex;
+        }
 
+        public override void RegisterFunctions() {
+            SendSearchListActiveIndex(_searchService.SearchListActiveIndex);
+            base.RegisterFunctions();
+        }
+
+        [RegisterToBrowser]
+        public void UpdateSearchListActiveIndex(double index) {
+            _searchService.SearchListActiveIndex = (int)index;
         }
 
         [RegisterToBrowser]
@@ -66,6 +77,10 @@ namespace TrekVRApplication {
             _searchService.Search(searchParams, res => {
                 SendResponse(_browser, requestId, res);
             });
+        }
+
+        public void SendSearchListActiveIndex(int index) {
+            _browser.EvalJS($"{UnityGlobalObjectPath}.onSearchListActiveIndexChange.next({index});");
         }
 
         public static void SendResponse(Browser browser, string requestId, object data) {

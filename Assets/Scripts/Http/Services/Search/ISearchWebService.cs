@@ -5,6 +5,10 @@ namespace TrekVRApplication {
 
     public interface ISearchWebService {
 
+        int SearchListActiveIndex { get; set; }
+
+        event Action<int> OnSearchListActiveIndexChange;
+
         void ClearCache();
 
         void GetFacetInfo(Action<SearchResult> callback, bool forceRefresh = false);

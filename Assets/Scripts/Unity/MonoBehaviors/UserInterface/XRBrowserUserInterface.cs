@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
@@ -26,6 +27,15 @@ namespace TrekVRApplication {
             _meshCollider.sharedMesh = mesh;
 
             XRBrowser = gameObject.AddComponent<XRBrowser>();
+        }
+
+        /// <summary>
+        ///     Optional event handler that can be registered to the TerrainModelManager's
+        ///     OnCurrentTerrainModelChange event emitter by the implementing class.
+        /// </summary>
+        protected void OnTerrainModelChange(TerrainModel terrainModel) {
+            string terrainType = terrainModel is GlobeTerrainModel ? "globe" : "local";
+            Browser.EvalJS($"{AngularInjectableContainerPath}.{TerrainModelServiceName}.currentTerrainType = '{terrainType}';");
         }
 
     }

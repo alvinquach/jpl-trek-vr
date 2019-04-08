@@ -51,7 +51,7 @@ namespace TrekVRApplication {
         private TerrainModel _currentVisibleModel;
         public TerrainModel CurrentVisibleModel {
             get => _currentVisibleModel;
-            set {
+            private set {
                 if (_currentVisibleModel != value) {
                     _currentVisibleModel = value;
                     OnCurrentTerrainModelChange.Invoke(value);
