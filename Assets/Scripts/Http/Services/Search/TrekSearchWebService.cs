@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TrekVRApplication.SearchResponse;
+using UnityEngine;
 
 namespace TrekVRApplication {
 
@@ -12,16 +13,17 @@ namespace TrekVRApplication {
 
         public static TrekSearchWebService Instance { get; } = new TrekSearchWebService();
 
-        private int _searchListActiveIndex = 0;
-        public int SearchListActiveIndex {
+        private int? _searchListActiveIndex = null;
+        public int? SearchListActiveIndex {
             get => _searchListActiveIndex;
             set {
+                Debug.Log(value == null ? "null" : value.ToString());
                 _searchListActiveIndex = value;
                 OnSearchListActiveIndexChange.Invoke(value);
             }
         }
 
-        public event Action<int> OnSearchListActiveIndexChange = index => { };
+        public event Action<int?> OnSearchListActiveIndexChange = index => { };
 
         #region Cached results
 

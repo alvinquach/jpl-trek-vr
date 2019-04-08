@@ -74,13 +74,12 @@ namespace TrekVRApplication {
 
         public virtual void StartActivity(ControllerModalActivity activity) {
 
-            ZFBrowserUtils.NavigateTo(Browser, activity.GetModalUrl());
+            string modalUrl = activity.GetModalUrl();
 
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
             XRInteractableGlobeTerrain globe;
 
             // Switch to new acivity.
-            // TODO Convert this to switch case.
             switch (activity) {
                 case ControllerModalActivity.BBoxSelection:
                     TerrainModel terrainModel = terrainModelController.CurrentVisibleModel;
@@ -88,9 +87,14 @@ namespace TrekVRApplication {
                     interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.BBoxSelection);
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
-
                 case ControllerModalActivity.BookmarkResults:
                 case ControllerModalActivity.ProductResults:
+                    int? searchListActiveIndex = TrekSearchWebService.Instance.SearchListActiveIndex;
+                    Debug.Log(searchListActiveIndex == null ? "null" : searchListActiveIndex.ToString());
+                    if (searchListActiveIndex != null) {
+                        modalUrl += $"/{searchListActiveIndex}";
+                    }
+                    goto case ControllerModalActivity.LayerManager;
                 case ControllerModalActivity.LayerManager:
 
                     // FIXME Need to set the mode for all the terrain models, not just the planet.
@@ -100,6 +104,8 @@ namespace TrekVRApplication {
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
             }
+
+            ZFBrowserUtils.NavigateTo(Browser, modalUrl);
 
             Visible = activity != ControllerModalActivity.Default;
             CurrentActivity = activity;

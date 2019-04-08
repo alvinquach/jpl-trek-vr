@@ -5,9 +5,9 @@ namespace TrekVRApplication {
 
     public interface ISearchWebService {
 
-        int SearchListActiveIndex { get; set; }
+        int? SearchListActiveIndex { get; set; }
 
-        event Action<int> OnSearchListActiveIndexChange;
+        event Action<int?> OnSearchListActiveIndexChange;
 
         void ClearCache();
 

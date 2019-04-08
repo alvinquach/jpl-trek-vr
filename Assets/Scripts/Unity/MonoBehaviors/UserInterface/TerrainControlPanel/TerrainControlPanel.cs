@@ -39,11 +39,6 @@ namespace TrekVRApplication {
 
         protected override void Awake() {
             base.Awake();
-            TerrainModelManager.Instance.OnCurrentTerrainModelChange += OnTerrainModelChange;
-        }
-
-        private void OnDestroy() {
-            TerrainModelManager.Instance.OnCurrentTerrainModelChange -= OnTerrainModelChange;
         }
 
         #endregion

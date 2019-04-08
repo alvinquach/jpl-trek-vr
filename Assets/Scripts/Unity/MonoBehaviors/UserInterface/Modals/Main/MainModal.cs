@@ -62,11 +62,6 @@ namespace TrekVRApplication {
         protected override void Awake() {
             transform.localEulerAngles = new Vector3(0, 180);
             base.Awake();
-            TerrainModelManager.Instance.OnCurrentTerrainModelChange += OnTerrainModelChange;
-        }
-
-        private void OnDestroy() {
-            TerrainModelManager.Instance.OnCurrentTerrainModelChange -= OnTerrainModelChange;
         }
 
         #endregion

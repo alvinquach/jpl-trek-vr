@@ -25,8 +25,12 @@ namespace TrekVRApplication {
         }
 
         [RegisterToBrowser]
-        public void UpdateSearchListActiveIndex(double index) {
-            _searchService.SearchListActiveIndex = (int)index;
+        public void UpdateSearchListActiveIndex(double? index) {
+            if (index == null) {
+                _searchService.SearchListActiveIndex = null;
+            } else {
+                _searchService.SearchListActiveIndex = (int)index;
+            }
         }
 
         [RegisterToBrowser]
@@ -79,7 +83,7 @@ namespace TrekVRApplication {
             });
         }
 
-        public void SendSearchListActiveIndex(int index) {
+        public void SendSearchListActiveIndex(int? index) {
             _browser.EvalJS($"{UnityGlobalObjectPath}.onSearchListActiveIndexChange.next({index});");
         }
 

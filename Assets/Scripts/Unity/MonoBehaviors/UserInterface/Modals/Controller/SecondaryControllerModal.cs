@@ -5,7 +5,9 @@ namespace TrekVRApplication {
 
     public class SecondaryControllerModal : ControllerModal {
 
+        private UnityBrowserWebFunctions _webFunctions;
         private UnityBrowserSearchFunctions _searchFunctions;
+        private UnityBrowserUserInterfaceFunctions _userInterfaceFunctions;
         private UnityBrowserTerrainModelFunctions _terrainModelFunctions;
 
         private KeyCode _padCurrentKey = 0;
@@ -36,21 +38,31 @@ namespace TrekVRApplication {
 
         protected override void Init(Mesh mesh) {
             base.Init(mesh);
+            _webFunctions = new UnityBrowserWebFunctions(Browser);
             _searchFunctions = new UnityBrowserSearchFunctions(Browser);
+            _userInterfaceFunctions = new UnityBrowserUserInterfaceFunctions(Browser);
             _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(Browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {
+            _webFunctions.RegisterFunctions();
             _searchFunctions.RegisterFunctions();
+            _userInterfaceFunctions.RegisterFunctions();
             _terrainModelFunctions.RegisterFunctions();
         }
 
         #region Controller event handlers
 
         private void TriggerClickedHandler(object sender, ClickedEventArgs e) {
-            // TODO Only toggle flashlight when default activity is active.
-            SecondaryXRController controller = (SecondaryXRController)_controller;
-            controller.Flashlight?.Toggle();
+            switch (CurrentActivity) {
+                case ControllerModalActivity.Default:
+                    SecondaryXRController controller = (SecondaryXRController)_controller;
+                    controller.Flashlight?.Toggle();
+                    break;
+                default:
+                    Input.RegisterKeyPress(KeyCode.T);
+                    break;
+            }
         }
 
         private void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
@@ -62,6 +74,7 @@ namespace TrekVRApplication {
                     controller.Flashlight?.CycleNextColor();
                     break;
                 case ControllerModalActivity.BBoxSelection:
+                    // TODO This should also apply to localized terrain models.
                     XRInteractableGlobeTerrain globe = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
                     globe.CancelSelection();
                     if (globe.CurrentActivity != XRInteractableTerrainActivity.BBoxSelection) {
@@ -70,6 +83,8 @@ namespace TrekVRApplication {
                     break;
                 case ControllerModalActivity.BookmarkResults:
                 case ControllerModalActivity.ProductResults:
+                    Input.RegisterKeyPress(KeyCode.M);
+                    break;
                 case ControllerModalActivity.LayerManager:
                     mainModal.Visible = true;
                     StartActivity(ControllerModalActivity.Default);

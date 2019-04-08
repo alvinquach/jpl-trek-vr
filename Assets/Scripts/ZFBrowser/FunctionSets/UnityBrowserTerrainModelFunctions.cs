@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ZenFulcrum.EmbeddedBrowser;
+using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
@@ -10,7 +11,13 @@ namespace TrekVRApplication {
         protected override string FunctionsReadyVariable { get; } = "terrainFunctionsReady";
 
         public UnityBrowserTerrainModelFunctions(Browser browser) : base(browser) {
+            // TODO Unsubscribe on destroy
+            TerrainModelManager.Instance.OnCurrentTerrainModelChange += OnTerrainModelChange;
+        }
 
+        public override void RegisterFunctions() {
+            OnTerrainModelChange(TerrainModelManager.Instance.CurrentVisibleModel);
+            base.RegisterFunctions();
         }
 
         [RegisterToBrowser]
@@ -72,28 +79,40 @@ namespace TrekVRApplication {
         }
 
         [RegisterToBrowser]
-        public void SetHeightExaggeration(double value) {
+        public void SetHeightExaggeration(double? value) {
+            if (value == null) {
+                return;
+            }
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
             terrainModelManager.HeightExagerration = (float)value;
         }
 
         [RegisterToBrowser]
-        public void SetTexturesVisiblity(bool visible) {
+        public void SetTexturesVisiblity(bool? visible) {
+            if (visible == null) {
+                return;
+            }
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            terrainModelManager.TerrainTexturesEnabled = visible;
+            terrainModelManager.TerrainTexturesEnabled = (bool)visible;
         }
 
         [RegisterToBrowser]
-        public void SetCoordinateIndicatorsVisibility(bool visible) {
+        public void SetCoordinateIndicatorsVisibility(bool? visible) {
+            if (visible == null) {
+                return;
+            }
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
             if (terrainModelManager.GlobeModelIsVisible()) {
                 XRInteractableGlobeTerrain globe = (XRInteractableGlobeTerrain)terrainModelManager.GlobeModel.InteractionController;
-                globe.EnableCoordinateLines = visible;
+                globe.EnableCoordinateLines = (bool)visible;
             }
         }
 
         [RegisterToBrowser]
-        public void SetLocationNamesVisibility(bool visible) {
+        public void SetLocationNamesVisibility(bool? visible) {
+            if (visible == null) {
+                return;
+            }
             Debug.Log($"Terrain location names visiblity set to {visible}.");
         }
 
@@ -110,7 +129,10 @@ namespace TrekVRApplication {
 
         // Temporary
         [RegisterToBrowser]
-        public void AdjustLayer(double layer, double value) {
+        public void AdjustLayer(double? layer, double? value) {
+            if (layer == null || value == null) {
+                return;
+            }
             Material material = TerrainModelManager.Instance.CurrentVisibleModel.Material;
             if (material) {
                 material.SetFloat($"_Diffuse{(int)layer}Opacity", (float)(value / 100));
@@ -137,6 +159,11 @@ namespace TrekVRApplication {
                 }
             };
             ZFBrowserUtils.SendDataResponse(_browser, requestId, layers);
+        }
+
+        private void OnTerrainModelChange(TerrainModel terrainModel) {
+            string terrainType = terrainModel is GlobeTerrainModel ? "globe" : "local";
+            _browser.EvalJS($"{UnityGlobalObjectPath}.onTerrainTypeChange.next('{terrainType}');");
         }
 
     }
