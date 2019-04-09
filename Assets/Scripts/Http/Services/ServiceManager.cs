@@ -4,7 +4,7 @@
 
         // Not thread safe on initialization
 
-        public static IBookmarkWebService BookmarkWebService { get; } = MockBookmarkWebService.Instance;
+        public static IBookmarkWebService BookmarkWebService { get; } = TrekBookmarkWebService.Instance;
 
         public static IRasterSubsetWebService RasterSubsetWebService { get; } = TrekRasterSubsetWebService.Instance;
 
