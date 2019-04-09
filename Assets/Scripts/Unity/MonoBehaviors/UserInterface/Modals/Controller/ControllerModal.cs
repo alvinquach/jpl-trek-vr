@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static TrekVRApplication.ServiceManager;
 using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
@@ -89,7 +90,7 @@ namespace TrekVRApplication {
                     break;
                 case ControllerModalActivity.BookmarkResults:
                 case ControllerModalActivity.ProductResults:
-                    int? searchListActiveIndex = TrekSearchWebService.Instance.SearchListActiveIndex;
+                    int? searchListActiveIndex = SearchWebService.SearchListActiveIndex;
                     Debug.Log(searchListActiveIndex == null ? "null" : searchListActiveIndex.ToString());
                     if (searchListActiveIndex != null) {
                         modalUrl += $"/{searchListActiveIndex}";

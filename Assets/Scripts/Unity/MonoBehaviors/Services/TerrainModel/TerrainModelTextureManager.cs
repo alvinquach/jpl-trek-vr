@@ -1,9 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using UnityEngine;
-using static TrekVRApplication.TerrainModelConstants;
+using System.IO;
 using System.Linq;
+using UnityEngine;
+using static TrekVRApplication.ServiceManager;
+using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
 
@@ -52,8 +53,6 @@ namespace TrekVRApplication {
                 return o ? false : true;
             }
         }
-
-        private readonly IRasterSubsetWebService _productWebService = TrekRasterSubsetWebService.Instance;
 
         private readonly IDictionary<TerrainModelProductMetadata, TextureWrapper> _textureDictionary =
             new Dictionary<TerrainModelProductMetadata, TextureWrapper>();
@@ -137,7 +136,7 @@ namespace TrekVRApplication {
                 _textureDictionary.Add(texInfo, wrapper = new TextureWrapper());
 
                 // Get product either from the file system (if available) or the web service.
-                _productWebService.SubsetProduct(productInfo, filepath => {
+                RasterSubsetWebService.SubsetProduct(productInfo, filepath => {
                     LoadTextureFromImage(filepath, texture => {
                         wrapper.Texture = texture;
                         ClearExcessTextures();

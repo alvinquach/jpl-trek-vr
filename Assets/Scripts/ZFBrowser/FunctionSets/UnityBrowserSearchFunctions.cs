@@ -1,76 +1,71 @@
 ﻿using Newtonsoft.Json;
 using ZenFulcrum.EmbeddedBrowser;
+using static TrekVRApplication.ServiceManager;
 using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
     public class UnityBrowserSearchFunctions : UnityBrowserFunctionSet {
 
-        private ISearchWebService _searchService = TrekSearchWebService.Instance;
-
-        private IRasterSubsetWebService _rasterService = TrekRasterSubsetWebService.Instance;
-
-        private IBookmarkWebService _bookmarkService = MockBookmarkWebService.Instance;
-
         protected override string FunctionsReadyVariable { get; } = "searchFunctionsReady";
 
         public UnityBrowserSearchFunctions(Browser browser) : base(browser) {
             // TODO Unsubscribe on destroy
-            _searchService.OnSearchListActiveIndexChange += SendSearchListActiveIndex;
+            SearchWebService.OnSearchListActiveIndexChange += SendSearchListActiveIndex;
         }
 
         public override void RegisterFunctions() {
-            SendSearchListActiveIndex(_searchService.SearchListActiveIndex);
+            SendSearchListActiveIndex(SearchWebService.SearchListActiveIndex);
             base.RegisterFunctions();
         }
 
         [RegisterToBrowser]
         public void UpdateSearchListActiveIndex(double? index) {
             if (index == null) {
-                _searchService.SearchListActiveIndex = null;
+                SearchWebService.SearchListActiveIndex = null;
             } else {
-                _searchService.SearchListActiveIndex = (int)index;
+                SearchWebService.SearchListActiveIndex = (int)index;
             }
         }
 
         [RegisterToBrowser]
         public void GetFacetInfo(string requestId) {
-            _searchService.GetFacetInfo(res => {
+            SearchWebService.GetFacetInfo(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
 
         [RegisterToBrowser]
         public void GetBookmarks(string requestId) {
-            _bookmarkService.GetBookmarks(res => {
+            BookmarkWebService.GetBookmarks(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
 
         [RegisterToBrowser]
         public void GetDatasets(string requestId) {
-            _searchService.GetDatasets(res => {
+            SearchWebService.GetDatasets(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
 
         [RegisterToBrowser]
         public void GetNomenclatures(string requestId) {
-            _searchService.GetNomenclatures(res => {
+            SearchWebService.GetNomenclatures(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
 
         [RegisterToBrowser]
         public void GetProducts(string requestId) {
-            _searchService.GetProducts(res => {
+            SearchWebService.GetProducts(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
 
         [RegisterToBrowser]
         public void GetRasters(string requestId) {
-            _rasterService.GetRasters(res => {
+            RasterSubsetWebService.GetRasters(res => {
                 SendResponse(_browser, requestId, res);
             });
         }
@@ -78,7 +73,7 @@ namespace TrekVRApplication {
         [RegisterToBrowser]
         public void Search(JSONNode test, string requestId) {
             SearchParameters searchParams = JsonConvert.DeserializeObject<SearchParameters>(test.AsJSON, JsonConfig.SerializerSettings);
-            _searchService.Search(searchParams, res => {
+            SearchWebService.Search(searchParams, res => {
                 SendResponse(_browser, requestId, res);
             });
         }

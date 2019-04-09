@@ -1,4 +1,5 @@
 using UnityEngine;
+using static TrekVRApplication.ServiceManager;
 using static TrekVRApplication.TerrainModelConstants;
 
 namespace TrekVRApplication {
@@ -11,8 +12,6 @@ namespace TrekVRApplication {
         private const float TableWidth = 2.0f;
         private const float TableHeight = 0.5f;
         private const float TableTopGap = 0.01f;
-
-        private IRasterSubsetWebService _rasterSubsetService = TrekRasterSubsetWebService.Instance;
 
         public override XRInteractableTerrain InteractionController => GetComponent<XRInteractableLocalTerrain>();
 
@@ -129,7 +128,7 @@ namespace TrekVRApplication {
                 new TerrainModelProductMetadata(DemUUID, SquareBoundingBox, LocalTerrainDemTargetSize, ImageFileFormat.Tiff);
 
             // Load the DEM data, and then generate another mesh after using the data.
-            _rasterSubsetService.SubsetProduct(demMetadata, filepath => {
+            RasterSubsetWebService.SubsetProduct(demMetadata, filepath => {
                 GenerateTerrainMeshTask generateMeshTask = 
                     new GenerateLocalTerrainMeshFromDigitalElevationModeTask(filepath, metadata, BoundingBox, uvBounds);
 
