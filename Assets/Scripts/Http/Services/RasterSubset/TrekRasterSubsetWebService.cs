@@ -21,8 +21,6 @@ namespace TrekVRApplication {
 
         private const string SearchUrl = "/index/eq/searchRaster";
 
-        private HttpClient _httpClient = HttpClient.Instance;
-
         private SearchResult _rasters;
 
         private TrekRasterSubsetWebService() {
@@ -45,7 +43,7 @@ namespace TrekVRApplication {
                 { "productType", "*" },
             };
             string searchUrl = HttpRequestUtils.AppendParams($"{BaseUrl}{SearchUrl}", paramsMap);
-            _httpClient.Get(searchUrl, (res) => {
+            HttpClient.Get(searchUrl, (res) => {
                 string responseBody = HttpClient.GetReponseBody(res);
                 _rasters = DeserializeResults(responseBody);
                 callback?.Invoke(_rasters);
@@ -102,7 +100,7 @@ namespace TrekVRApplication {
 
             VerifyProductExists(productInfo, exists => {
                 if (exists) {
-                    _httpClient.DownloadFile(resourceUrl, filepath, callback);
+                    HttpClient.DownloadFile(resourceUrl, filepath, callback);
                 } else {
                     Debug.LogError($"Product UUID {productInfo.ProductUUID} is not a raster or does not exist.");
                 }

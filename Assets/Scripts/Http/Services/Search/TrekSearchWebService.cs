@@ -57,7 +57,7 @@ namespace TrekVRApplication {
                 { "rows", "0" } // Only get the facet data.
             };
             string searchUrl = HttpRequestUtils.AppendParams(BaseUrl, paramsMap);
-            HttpClient.Instance.Get(searchUrl, (res) => {
+            HttpClient.Get(searchUrl, (res) => {
                 string responseBody = HttpClient.GetReponseBody(res);
                 _facetInfo = DeserializeResults(responseBody);
                 callback?.Invoke(_facetInfo);
@@ -183,7 +183,7 @@ namespace TrekVRApplication {
 
                 string searchUrl = HttpRequestUtils.AppendParams(BaseUrl, paramsMap);
 
-                HttpClient.Instance.Get(searchUrl, (res) => {
+                HttpClient.Get(searchUrl, (res) => {
                     string responseBody = HttpClient.GetReponseBody(res);
                     SearchResult searchResult = DeserializeResults(responseBody);
                     callback?.Invoke(searchResult);

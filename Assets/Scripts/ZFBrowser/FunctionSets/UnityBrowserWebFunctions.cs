@@ -13,7 +13,7 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void GetRequest(string uri, string requestId) {
-            HttpClient.Instance.Get(uri, res => {
+            HttpClient.Get(uri, res => {
                 string responseBody = HttpClient.GetReponseBody(res);
                 SendResponse(_browser, requestId, responseBody);
             });
@@ -21,7 +21,7 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void PostRequest(string uri, JSONNode body, string requestId) {
-            HttpClient.Instance.Post(uri, body, res => {
+            HttpClient.Post(uri, body, res => {
                 string responseBody = HttpClient.GetReponseBody(res);
                 SendResponse(_browser, requestId, responseBody);
             });

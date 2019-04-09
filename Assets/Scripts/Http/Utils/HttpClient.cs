@@ -10,11 +10,7 @@ using ZenFulcrum.EmbeddedBrowser;
 
 namespace TrekVRApplication {
 
-    public class HttpClient {
-
-        public static HttpClient Instance { get; } = new HttpClient();
-
-        private HttpClient() { }
+    public static class HttpClient {
 
         public static string GetReponseBody(HttpWebResponse response) {
             Stream dataStream = response.GetResponseStream();
@@ -23,7 +19,7 @@ namespace TrekVRApplication {
             }
         }
 
-        public void Get(string uri, Action<HttpWebResponse> callback = null, Action<HttpWebResponse> errorCallback = null) {
+        public static void Get(string uri, Action<HttpWebResponse> callback = null, Action<HttpWebResponse> errorCallback = null) {
 
             ThreadPool.QueueUserWorkItem((state) => {
 
@@ -34,7 +30,7 @@ namespace TrekVRApplication {
 
         }
 
-        public void Post(string uri, object body, Action<HttpWebResponse> callback = null, Action<HttpWebResponse> errorCallback = null) {
+        public static void Post(string uri, object body, Action<HttpWebResponse> callback = null, Action<HttpWebResponse> errorCallback = null) {
 
             ThreadPool.QueueUserWorkItem((state) => {
 
@@ -48,7 +44,7 @@ namespace TrekVRApplication {
 
         }
 
-        public WebClient DownloadFile(string uri, string filepath, Action<string> callback = null, Action<DownloadProgressChangedEventArgs> progressCallback = null) {
+        public static WebClient DownloadFile(string uri, string filepath, Action<string> callback = null, Action<DownloadProgressChangedEventArgs> progressCallback = null) {
 
             WebClient client = new WebClient();
 
@@ -63,7 +59,7 @@ namespace TrekVRApplication {
             return client;
         }
 
-        private void SendRequest(HttpWebRequest request, Action<HttpWebResponse> callback, Action<HttpWebResponse> errorCallback) {
+        private static void SendRequest(HttpWebRequest request, Action<HttpWebResponse> callback, Action<HttpWebResponse> errorCallback) {
 
             try {
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
@@ -89,7 +85,7 @@ namespace TrekVRApplication {
         /// </summary>
         /// <param name="request">The HttpWebRequest object.</param>
         /// <param name="body">The request body data.</param>
-        private void SetContent(HttpWebRequest request, object body) {
+        private static void SetContent(HttpWebRequest request, object body) {
 
             // Convert body object into bytes
             string contentString = ToJsonString(body);
@@ -106,7 +102,7 @@ namespace TrekVRApplication {
 
         }
 
-        private string ToJsonString(object data) {
+        private static string ToJsonString(object data) {
             if (data is string) {
                 return (string)data;
             }
@@ -116,7 +112,7 @@ namespace TrekVRApplication {
             return JsonConvert.SerializeObject(data, JsonConfig.SerializerSettings);
         }
 
-        private string GetContentType(object data) {
+        private static string GetContentType(object data) {
             if (data is string) {
                 return "text/plain";
             }
