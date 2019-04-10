@@ -9,6 +9,7 @@ namespace TrekVRApplication {
         private UnityBrowserSearchFunctions _searchFunctions;
         private UnityBrowserUserInterfaceFunctions _userInterfaceFunctions;
         private UnityBrowserTerrainModelFunctions _terrainModelFunctions;
+        private UnityBrowserLayerManagerFunctions _layerManagerFunctions;
 
         private KeyCode _padCurrentKey = 0;
 
@@ -42,6 +43,7 @@ namespace TrekVRApplication {
             _searchFunctions = new UnityBrowserSearchFunctions(Browser);
             _userInterfaceFunctions = new UnityBrowserUserInterfaceFunctions(Browser);
             _terrainModelFunctions = new UnityBrowserTerrainModelFunctions(Browser);
+            _layerManagerFunctions = new UnityBrowserLayerManagerFunctions(Browser);
         }
 
         protected override void OnBrowserLoad(JSONNode loadData) {
@@ -49,6 +51,7 @@ namespace TrekVRApplication {
             _searchFunctions.RegisterFunctions();
             _userInterfaceFunctions.RegisterFunctions();
             _terrainModelFunctions.RegisterFunctions();
+            _layerManagerFunctions.RegisterFunctions();
         }
 
         #region Controller event handlers

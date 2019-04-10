@@ -96,16 +96,18 @@ namespace TrekVRApplication {
         #endregion
 
         public void AddLayer(string productUUID, Action callback) {
-            AddLayer(productUUID, callback, null);
+            AddLayer(productUUID, null, callback);
         }
 
-        public void AddLayer(string productUUID, int index) {
-            AddLayer(productUUID, null, index);
+        public void AddLayer(string productUUID, int? index) {
+            AddLayer(productUUID, index, null);
         }
 
-        public abstract void AddLayer(string productUUID, Action callback = null, int? index = null);
+        public abstract void AddLayer(string productUUID, int? index = null, Action callback = null);
 
         public abstract void UpdateLayer(TerrainModelLayerChange changes, Action callback = null);
+
+        public abstract void MoveLayer(int from, int to, Action callback = null);
 
         public abstract void RemoveLayer(int index, Action callback = null);
 
@@ -139,6 +141,9 @@ namespace TrekVRApplication {
                     int layerId = GetShaderTextureId(i);
                     if (Material.GetTexture(layerId)) {
                         Material.SetTexture(layerId, null);
+                        if (i > 0) {
+                            Material.SetFloat($"_Diffuse{i}Opacity", 0);
+                        }
                     }
                 }
             }
@@ -196,19 +201,27 @@ namespace TrekVRApplication {
 
         protected abstract Material GenerateMaterial();
 
-        protected void ReloadTextures(IList<TerrainModelLayer> layers) {
+        protected void ReloadTextures(IList<TerrainModelLayer> layers, bool reloadBase = true) {
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
-            for (int i = 0; i < MaxDiffuseLayers; i++) {
+            for (int i = reloadBase ? 0 : 1; i < MaxDiffuseLayers; i++) {
+                int _i = i; // Copy the index for the anonymous function.
                 int layerId = GetShaderTextureId(i);
                 if (i < layers.Count) {
-                    textureManager.GetTexture(GenerateProductMetadata(layers[i].ProductUUID), texture => {
+                    TerrainModelLayer layer = layers[i];
+                    textureManager.GetTexture(GenerateProductMetadata(layer.ProductUUID), texture => {
                         Material.SetTexture(layerId, texture);
                         Material.SetTextureScale(layerId, Vector2.one);
                         Material.SetTextureOffset(layerId, Vector2.zero);
+                        if (_i > 0) {
+                            Material.SetFloat($"_Diffuse{_i}Opacity", layer.Visible ? layer.Opacity : 0);
+                        }
                     });
                 }
                 else {
                     Material.SetTexture(layerId, null);
+                    if (i > 0) {
+                        Material.SetFloat($"_Diffuse{i}Opacity",0);
+                    }
                 }
             }
         }
@@ -218,7 +231,7 @@ namespace TrekVRApplication {
                 if (raster == null) {
                     throw new Exception("No result.");
                 }
-                callback(new TerrainModelLayer(raster.Name, uuid, true));
+                callback(new TerrainModelLayer(raster.Name, uuid, raster.ThumbnailUrl));
             });
         }
 
@@ -226,7 +239,7 @@ namespace TrekVRApplication {
             return new TerrainModelProductMetadata(uuid, BoundingBox, TargetTextureSize.x, TargetTextureSize.y);
         }
 
-        protected int GetShaderTextureId(int index) {
+        private int GetShaderTextureId(int index) {
             return Shader.PropertyToID(index == 0 ? "_DiffuseBase" : $"_Diffuse{index}");
         }
 

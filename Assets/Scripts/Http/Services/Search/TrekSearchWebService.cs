@@ -17,7 +17,6 @@ namespace TrekVRApplication {
         public int? SearchListActiveIndex {
             get => _searchListActiveIndex;
             set {
-                Debug.Log(value == null ? "null" : value.ToString());
                 _searchListActiveIndex = value;
                 OnSearchListActiveIndexChange.Invoke(value);
             }

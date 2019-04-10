@@ -193,10 +193,34 @@ namespace TrekVRApplication {
         }
 
         public bool UpdateGlobalLayer(TerrainModelLayerChange changes) {
+            int index = changes.Index;
+            if (index <= 0 || index >= _globalLayers.Count) {
+                return false;
+            }
             bool changed = false;
-            // TODO Update material here.
+            TerrainModelLayer layer = _globalLayers[index];
+            if (changes.Opacity != null && layer.Opacity != changes.Opacity) {
+                layer.Opacity = (float)changes.Opacity;
+                changed = true;
+            }
+            if (changes.Visible != null && layer.Visible != changes.Visible) {
+                layer.Visible = (bool)changes.Visible;
+                changed = true;
+            }
+            _globalLayers[index] = layer;
             OnGlobalLayersChanged.Invoke();
             return changed;
+        }
+
+        public bool MoveGlobalLayer(int from, int to) {
+            if (from < 0 || from >= _globalLayers.Count || from < 0 || from >= _globalLayers.Count || from == to) {
+                return false;
+            }
+            TerrainModelLayer temp = _globalLayers[from];
+            _globalLayers.RemoveAt(from);
+            _globalLayers.Insert(to, temp);
+            OnGlobalLayersChanged.Invoke();
+            return true;
         }
 
         public bool RemoveGlobalLayer(int index) {
@@ -223,8 +247,17 @@ namespace TrekVRApplication {
                 layerController = terrainModel.AddLayerController<TerrainModelGlobalLayerController>();
             } else {
                 layerController = terrainModel.AddLayerController<TerrainModelBookmarkLayerController>();
+                int index = 0;
                 foreach (TerrainModelLayer layer in parentLayerController.Layers) {
-                    layerController.AddLayer(layer.ProductUUID);
+                    TerrainModelLayerChange changes = new TerrainModelLayerChange() {
+                        Index = index,
+                        Opacity = layer.Opacity,
+                        Visible = layer.Visible
+                    };
+                    layerController.AddLayer(layer.ProductUUID, () => {
+                        layerController.UpdateLayer(changes);
+                    });
+                    index++;
                 }
             }
 
@@ -367,11 +400,13 @@ namespace TrekVRApplication {
             };
             globeModelGameObject.transform.SetParent(_terrainModelsContainer.transform, false);
             GlobeModel = globeModelGameObject.AddComponent<GlobeTerrainModel>();
-            GlobeModel.AddLayerController<TerrainModelGlobalLayerController>();
             GlobeModel.Radius = Mars.Radius;
             GlobeModel.BaseDownsampleLevel = _globeModelBaseDownsampleLevel;
             GlobeModel.LodLevels = _globeModelLODLevels;
             GlobeModel.Visible = true;
+
+            TerrainModelLayerController layerController = GlobeModel.AddLayerController<TerrainModelGlobalLayerController>();
+            layerController.TargetTextureSize = new Vector2Int(2048, 1024); // TODO Make these constants.
         }
 
         private void InitializeMaterial() {
@@ -388,7 +423,7 @@ namespace TrekVRApplication {
             );
 
             // Also add the base layer to the layer list.
-            _globalLayers.Add(new TerrainModelLayer("Base", GlobalMosaicUUID, false));
+            _globalLayers.Add(new TerrainModelLayer("Base", GlobalMosaicUUID));
         }
 
         #endregion

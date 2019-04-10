@@ -20,7 +20,7 @@ namespace TrekVRApplication {
 
         private void OnEnable() {
             if (_globalLayersChanged) {
-                ProcessGlobalLayerChange();
+                ReloadTextures(Layers); // TODO Compare changes properly
                 _globalLayersChanged = false;
             }
         }
@@ -32,7 +32,7 @@ namespace TrekVRApplication {
 
         #endregion
 
-        public override void AddLayer(string productUUID, Action callback = null, int ? index = null) {
+        public override void AddLayer(string productUUID, int ? index = null, Action callback = null) {
             IList<TerrainModelLayer> layers = Layers;
 
             // Check if the number of layers is already maxed out.
@@ -49,7 +49,7 @@ namespace TrekVRApplication {
 
             CreateLayer(productUUID, layer => {
                 if (_terrainModelManager.AddGlobalLayer(layer, index)) {
-                    ReloadTextures(Layers);
+                    ReloadTextures(Layers, false);
                 }
                 callback?.Invoke();
             });
@@ -57,14 +57,23 @@ namespace TrekVRApplication {
 
         public override void UpdateLayer(TerrainModelLayerChange changes, Action callback = null) {
             if (_terrainModelManager.UpdateGlobalLayer(changes)) {
-                // TODO Update material here
+                int index = changes.Index;
+                TerrainModelLayer layer = Layers[index];
+                Material.SetFloat($"_Diffuse{index}Opacity", layer.Visible ? layer.Opacity : 0);
+            }
+            callback?.Invoke();
+        }
+
+        public override void MoveLayer(int from, int to, Action callback = null) {
+            if (_terrainModelManager.MoveGlobalLayer(from, to)) {
+                ReloadTextures(Layers, false);
             }
             callback?.Invoke();
         }
 
         public override void RemoveLayer(int index, Action callback = null) {
             if (_terrainModelManager.RemoveGlobalLayer(index)) {
-                ReloadTextures(Layers);
+                ReloadTextures(Layers, false);
             }
             callback?.Invoke();
         }
@@ -81,10 +90,6 @@ namespace TrekVRApplication {
 
             // If the terrain model is visible, then its terrain model controller should
             // be the one sending the changes, so it should already have the changes.
-        }
-
-        private void ProcessGlobalLayerChange() {
-
         }
 
     }

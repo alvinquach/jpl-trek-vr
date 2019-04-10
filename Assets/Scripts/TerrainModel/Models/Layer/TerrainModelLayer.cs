@@ -7,6 +7,10 @@
         /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        ///     For display only.
+        /// </summary>
+        public string ThumbnailUrl { get; }
 
         /// <summary>
         ///     The UUID of the product used by the layer.
@@ -17,12 +21,15 @@
 
         public bool Visible { get; set; }
 
-        public bool Editable { get; }
 
-        public TerrainModelLayer(string name, string uuid, bool editable = true) {
+        public TerrainModelLayer(string name, string uuid) : this(name, uuid, null) {
+            
+        }
+
+        public TerrainModelLayer(string name, string uuid, string thumbnailUrl) {
             Name = name;
+            ThumbnailUrl = thumbnailUrl;
             ProductUUID = uuid;
-            Editable = editable;
             Opacity = 1.0f;
             Visible = true;
         }
