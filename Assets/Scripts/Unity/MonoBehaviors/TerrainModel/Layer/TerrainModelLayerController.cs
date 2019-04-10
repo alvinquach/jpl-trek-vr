@@ -12,7 +12,7 @@ namespace TrekVRApplication {
         /// <summary>
         ///     The maximum number of diffuese layers, including the base layer.
         /// </summary>
-        private const int MaxDiffuseLayers = 8;
+        protected const int MaxDiffuseLayers = 8;
 
         protected readonly TerrainModelManager _terrainModelManager = TerrainModelManager.Instance;
 

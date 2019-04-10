@@ -17,6 +17,12 @@ namespace TrekVRApplication {
 
         public override void AddLayer(string productUUID, Action callback = null, int? index = null) {
 
+            // Check if the number of layers is already maxed out.
+            if (_layers.Count >= MaxDiffuseLayers) {
+                Debug.LogError($"Number of layers cannot exceed {MaxDiffuseLayers}.");
+                return;
+            }
+
             // Check if the product has already been added.
             if (_layers.Any(l => l.ProductUUID == productUUID)) {
                 Debug.LogWarning($"{productUUID} has already been added as a layer.");

@@ -179,7 +179,7 @@ namespace TrekVRApplication {
 
         public bool AddGlobalLayer(TerrainModelLayer layer, int? index = null) {
             if (_globalLayers.Any(l => l.ProductUUID == layer.ProductUUID)) {
-                Debug.LogWarning($"{layer.ProductUUID} has already been added as a layer.");
+                Debug.LogError($"{layer.ProductUUID} has already been added as a layer.");
                 return false;
             }
             if (index == null) {

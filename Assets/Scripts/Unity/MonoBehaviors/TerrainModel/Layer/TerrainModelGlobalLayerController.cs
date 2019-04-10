@@ -33,11 +33,17 @@ namespace TrekVRApplication {
         #endregion
 
         public override void AddLayer(string productUUID, Action callback = null, int ? index = null) {
+            IList<TerrainModelLayer> layers = Layers;
+
+            // Check if the number of layers is already maxed out.
+            if (layers.Count >= MaxDiffuseLayers) {
+                Debug.LogError($"Number of layers cannot exceed {MaxDiffuseLayers}.");
+                return;
+            }
 
             // Check if the product has already been added.
-            IList<TerrainModelLayer> layers = Layers;
             if (layers.Any(l => l.ProductUUID == productUUID)) {
-                Debug.LogWarning($"{productUUID} has already been added as a layer.");
+                Debug.LogError($"{productUUID} has already been added as a layer.");
                 return;
             }
 
