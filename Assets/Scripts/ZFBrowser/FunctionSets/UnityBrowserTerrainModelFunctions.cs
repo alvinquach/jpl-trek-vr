@@ -57,8 +57,7 @@ namespace TrekVRApplication {
             // TODO Add additional product layers if present.
 
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            LocalTerrainModel terrainModel = 
-                terrainModelManager.CreateLocalModel(bbox, bookmark.DemUUID, baseProductMetadata, false, false);
+            LocalTerrainModel terrainModel = terrainModelManager.CreateLocalModelFromBookmark(bbox, bookmark.DemUUID, bookmark.TexturesUUID);
             terrainModelManager.ShowTerrainModel(terrainModel);
         }
 
@@ -130,20 +129,21 @@ namespace TrekVRApplication {
         // Temporary
         [RegisterToBrowser]
         public void AdjustLayer(double? layer, double? value) {
-            if (layer == null || value == null) {
-                return;
-            }
-            Material material = TerrainModelManager.Instance.CurrentVisibleModel.Material;
-            if (material) {
-                material.SetFloat($"_Diffuse{(int)layer}Opacity", (float)(value / 100));
-            }
+            // TODO Redo this method
+            //if (layer == null || value == null) {
+            //    return;
+            //}
+            //Material material = TerrainModelManager.Instance.CurrentVisibleModel.Material;
+            //if (material) {
+            //    material.SetFloat($"_Diffuse{(int)layer}Opacity", (float)(value / 100));
+            //}
         }
 
         // Temporary
         [RegisterToBrowser]
         public void GetCurrentLayers(string requestId) {
             // TODO Un-hardcode this data
-            Material material = TerrainModelManager.Instance.CurrentVisibleModel.Material;
+            Material material = TerrainModelManager.Instance.CurrentVisibleModel.LayerController.Material;
             IList<object> layers = new List<object>() {
                 new Dictionary<string, object>() {
                     { "name", "Test Texture" },

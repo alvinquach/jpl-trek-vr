@@ -8,6 +8,8 @@ namespace TrekVRApplication {
 
         void GetRasters(Action<SearchResult> callback, bool forceRefresh = false);
 
+        void GetRaster(string uuid, Action<SearchResultItem> callback, bool forceRefresh = false);
+
         void SubsetProduct(TerrainModelProductMetadata productInfo, Action<string> callback);
 
         void SubsetProduct(TerrainModelProductMetadata productInfo, bool forceRedownload, Action<string> callback);

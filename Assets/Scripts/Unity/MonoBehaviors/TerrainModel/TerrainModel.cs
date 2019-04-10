@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static TrekVRApplication.TerrainModelConstants;
-using static TrekVRApplication.FlagUtils;
 
 namespace TrekVRApplication {
 
@@ -11,6 +10,9 @@ namespace TrekVRApplication {
         protected GameObject _lodGroupContainer;
 
         public abstract XRInteractableTerrain InteractionController { get; }
+
+        // Don't forget to call AddLayerController() after adding a TerrainModel component.
+        public TerrainModelLayerController LayerController { get; private set; }
 
         public abstract string DemUUID { get; set; }
 
@@ -85,16 +87,6 @@ namespace TrekVRApplication {
             }
         }
 
-        protected TerrainModelProductMetadata _baseMosaicProduct;
-        public TerrainModelProductMetadata BaseMosaicProduct {
-            get => _baseMosaicProduct;
-            set {
-                if (_initTaskStatus == TaskStatus.NotStarted) {
-                    _baseMosaicProduct = value;
-                }
-            }
-        }
-
         /// <summary>
         ///     Copy of the mesh data with 1.0x height scale.
         /// </summary>
@@ -113,39 +105,6 @@ namespace TrekVRApplication {
             get => _heightScale;
             set {
                 RequestTerrainHeightRescale(value);
-            }
-        }
-
-        private Material _material;
-        public Material Material {
-            get => _material;
-            set {
-                _material = value;
-                UpdateMeshRendererMaterials();
-            }
-        }
-
-        public bool EnableOverlay {
-            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.Overlay);
-            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Overlay, value);
-        }
-
-        public bool DisableTextures {
-            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.NoTextures);
-            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.NoTextures, value);
-        }
-
-        public bool UseDisabledMaterial {
-            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled);
-            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled, value);
-        }
-
-        private TerrainModelRenderMode _renderMode;
-        public TerrainModelRenderMode RenderMode {
-            get => _renderMode;
-            private set {
-                _renderMode = value;
-                UpdateMaterialProperties();
             }
         }
 
@@ -183,7 +142,9 @@ namespace TrekVRApplication {
             }
 
             // Initialize the mesh/model.
-            InitModel();
+            _initTaskStatus = TaskStatus.InProgress;
+            AddRenderTextureOverlay();
+            GenerateMesh();
         }
 
         protected override void Update() {
@@ -193,35 +154,24 @@ namespace TrekVRApplication {
             }
         }
 
-        protected virtual void OnDestroy() {
-            Destroy(_material);
-            // TODO Destroy more things
-        }
-
         #endregion
 
-        // Can only be called once.
-        public void InitModel() {
+        /// <summary>
+        ///     Adds a TerrainModelLayerController to the TerrainModel. This can only be called
+        ///     once, and should be called right after the TerrainModel component is created.
+        /// </summary>
+        public T AddLayerController<T>() where T : TerrainModelLayerController {
             if (_initTaskStatus > TaskStatus.NotStarted) {
-                return;
+                throw new Exception("Cannot add layer controller after model initialization has already started.");
             }
-            _initTaskStatus = TaskStatus.InProgress;
-
-            GenerateMaterial();
-            GenerateMesh();
+            if (LayerController) {
+                throw new Exception("Terrain model already contains a layer controller.");
+            }
+            LayerController = gameObject.AddComponent<T>();
+            return (T)LayerController;
         }
 
-        protected virtual void GenerateMaterial() {
-            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-            if (!terrainModelManager.BaseMaterial) {
-                // TODO Throw exception.
-            }
-            _material = new Material(terrainModelManager.BaseMaterial);
-
-            UseDisabledMaterial = !terrainModelManager.TerrainInteractionEnabled;
-            DisableTextures = !terrainModelManager.TerrainTexturesEnabled;
-            // Population of the material's texture slots is up to the implementing class.
-        }
+        protected abstract void AddRenderTextureOverlay();
 
         protected abstract void GenerateMesh();
 
@@ -272,9 +222,7 @@ namespace TrekVRApplication {
                 lods[i] = new LOD(Mathf.Pow(GlobeModelLODCoefficient, i + 1), new Renderer[] { meshRenderer });
 
                 // Add material to the MeshRenderer.
-                if (_material != null) {
-                    meshRenderer.material = _material;
-                }
+                meshRenderer.material = LayerController.Material;
 
                 // Create a Mesh from the mesh data and add the mesh to a MeshFilter.
                 Mesh mesh = ConvertToMesh(meshData[i]);
@@ -360,7 +308,7 @@ namespace TrekVRApplication {
             };
             shadowCaster.transform.SetParent(transform, false);
             MeshRenderer meshRenderer = shadowCaster.AddComponent<MeshRenderer>();
-            meshRenderer.material = Material;
+            meshRenderer.material = LayerController.Material; // TODO Change this to a generic material.
             meshRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             meshRenderer.receiveShadows = false;
             MeshFilter meshFilter = shadowCaster.AddComponent<MeshFilter>();
@@ -377,32 +325,6 @@ namespace TrekVRApplication {
                 BaseDownsample = BaseDownsampleLevel,
                 PhysicsDownsample = PhysicsDownsampleLevel
             };
-        }
-
-        /// <summary>
-        ///     Update the material properties to reflect current render mode.
-        /// </summary>
-        private void UpdateMaterialProperties() {
-
-            Debug.Log($"DisableTextures={DisableTextures}, UseDisabledMaterial ={UseDisabledMaterial}, EnableOverlay={EnableOverlay}");
-
-            string shaderName;
-            if (DisableTextures) {
-                shaderName = UseDisabledMaterial ? "NoTexturesOverlayTransparent" : "NoTexturesOverlay";
-            } else {
-                shaderName = UseDisabledMaterial ? "MultiDiffuseOverlayTransparent" : "MultiDiffuseOverlay";
-            }
-
-            SwitchToShader($"Custom/Terrain/{shaderName}");
-
-            // This is redundant, since if UseDisabledMaterial is false, the shader
-            // is not used and the _DiffuseOpacity parameter has no effect.
-            Material.SetFloat("_DiffuseOpacity", UseDisabledMaterial ? 0.5f : 1);   // TODO Define the opacity as a constant.
-
-            Material.SetFloat("_Glossiness", DisableTextures ? NoTextureShaderSmoothness : ShaderSmoothness); 
-            Material.SetFloat("_Metallic", DisableTextures ? NoTextureShaderMetallic : ShaderMetallic); 
-
-            Material.SetFloat("_OverlayOpacity", EnableOverlay ? 1 : 0); 
         }
 
         private void RequestTerrainHeightRescale(float scale) {
@@ -423,26 +345,6 @@ namespace TrekVRApplication {
         protected abstract bool CanRescaleTerrainHeight();
 
         protected abstract void RescaleTerrainHeight(float scale);
-
-        private void SwitchToShader(string shaderName) {
-            Shader shader = Shader.Find(shaderName);
-            if (shader) {
-                Material.shader = shader;
-            } else {
-                Debug.LogError($"Could not find shader {shaderName}.");
-            }
-        }
-
-        private void UpdateMeshRendererMaterials() {
-            if (!_lodGroupContainer) {
-                return;
-            }
-
-            MeshRenderer[] meshRenderers = _lodGroupContainer.GetComponentsInChildren<MeshRenderer>();
-            foreach (MeshRenderer meshRenderer in meshRenderers) {
-                meshRenderer.material = Material;
-            }
-        }
 
     }
 

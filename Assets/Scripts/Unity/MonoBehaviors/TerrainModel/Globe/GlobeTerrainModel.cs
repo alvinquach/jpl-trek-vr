@@ -17,22 +17,11 @@ namespace TrekVRApplication {
 
         public event Action OnInitComplete = () => { };
 
-        public GlobeTerrainModel() {
-            BaseMosaicProduct = GenerateProductMetadata(GlobalMosaicUUID, 0, 0);
-        }
-
-        protected override void GenerateMaterial() {
-            base.GenerateMaterial();
-
-            TerrainOverlayController terrainModelOverlayController = GlobeTerrainOverlayController.Instance;
-            if (terrainModelOverlayController) {
-                Material.SetTexture("_Overlay", terrainModelOverlayController.RenderTexture);
+        protected override void AddRenderTextureOverlay() {
+            TerrainOverlayController overlayController = GlobeTerrainOverlayController.Instance;
+            if (overlayController) {
+                LayerController.Material.SetTexture("_Overlay", overlayController.RenderTexture);
             }
-
-            TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
-            textureManager.GetTexture(BaseMosaicProduct, texture => {
-                Material.SetTexture("_DiffuseBase", texture); // Assume Material is not null or default.
-            });
         }
 
         protected override void GenerateMesh() {

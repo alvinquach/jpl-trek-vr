@@ -66,10 +66,10 @@ namespace TrekVRApplication {
             // Switch to new mode.
             switch (activity) {
                 case XRInteractableTerrainActivity.Default:
-                    TerrainModel.EnableOverlay = false;
+                    TerrainModel.LayerController.EnableOverlay = false;
                     break;
                 case XRInteractableTerrainActivity.BBoxSelection:
-                    TerrainModel.EnableOverlay = true;
+                    TerrainModel.LayerController.EnableOverlay = true;
                     _bboxSelectionController.SetEnabled(true);
                     break;
                 case XRInteractableTerrainActivity.Disabled:

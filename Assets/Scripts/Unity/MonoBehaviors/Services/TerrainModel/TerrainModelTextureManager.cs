@@ -69,12 +69,16 @@ namespace TrekVRApplication {
         public TerrainModelTextureManager() {
             if (!Instance) {
                 Instance = this;
-            } else if (Instance != this) {
+            }
+            else if (Instance != this) {
                 throw new Exception($"Only one instance of {GetType().Name} is allowed.");
             }
         }
 
         private void Awake() {
+            if (Instance != this) {
+                Destroy(this);
+            }
 
             // Load the global mosaic texture.
             string fullMosaicFilepath = Path.Combine(

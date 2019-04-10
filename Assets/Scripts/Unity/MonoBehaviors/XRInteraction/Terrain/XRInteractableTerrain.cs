@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace TrekVRApplication {
+﻿namespace TrekVRApplication {
 
     public abstract class XRInteractableTerrain : XRInteractableObject {
 
@@ -41,7 +39,7 @@ namespace TrekVRApplication {
 
         protected virtual void EnableTerrainInteraction(bool enabled) {
             if (TerrainModel) {
-                TerrainModel.UseDisabledMaterial = !enabled;
+                TerrainModel.LayerController.UseDisabledMaterial = !enabled;
             }
             if (!enabled) {
                 SwitchToActivity(XRInteractableTerrainActivity.Disabled);
@@ -52,7 +50,7 @@ namespace TrekVRApplication {
 
         protected virtual void EnableTerrainTextures(bool enabled) {
             if (TerrainModel) {
-                TerrainModel.DisableTextures = !enabled;
+                TerrainModel.LayerController.DisableTextures = !enabled;
             }
         }
 

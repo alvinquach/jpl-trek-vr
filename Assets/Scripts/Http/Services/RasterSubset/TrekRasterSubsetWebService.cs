@@ -50,6 +50,18 @@ namespace TrekVRApplication {
             });
         }
 
+        public void GetRaster(string uuid, Action<SearchResultItem> callback, bool forceRefresh = false) {
+            GetRasters(rasters => {
+                foreach (SearchResultItem raster in rasters.Items) {
+                    if (raster.UUID == uuid) {
+                        callback(raster);
+                        return;
+                    }
+                }
+                callback(null);
+            }, forceRefresh);
+        }
+
         /// <summary>
         ///     Retrieves the product from the Trek web services and saves it to a file. If the
         ///     requested file is already present on the file system, then it is loaded instead.

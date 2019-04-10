@@ -19,16 +19,14 @@ namespace TrekVRApplication {
 
         private int _modelCounter = 0;
 
-        [SerializeField]
-        [Tooltip("The material that is used as a base for new terrain models.")]
-        private Material _baseMaterial;
         /// <summary>
         ///     The material that is used as a base for new terrain models.
         /// </summary>
-        public Material BaseMaterial => _baseMaterial;
-        
+        public Material BaseMaterial { get; private set; }
+
         #region Globe model fields/properties.
 
+        // TODO Change this to a const.
         [SerializeField]
         private string _globalDEMFilepath;
         public string GlobalDEMFilepath => _globalDEMFilepath;
@@ -58,6 +56,17 @@ namespace TrekVRApplication {
                 }
             }
         }
+
+        #region Globally shared properites
+
+        // NOTE: When modifying the global layers list within this class,
+        // access the backing variable directly instead of the property,
+        // as using the property accessor will return a new list object.
+        private readonly IList<TerrainModelLayer> _globalLayers = new List<TerrainModelLayer>();
+        /// <summary>
+        ///     Get a copy of the global layer list.
+        /// </summary>
+        public IList<TerrainModelLayer> GlobalLayers => new List<TerrainModelLayer>(_globalLayers);
 
         private bool _terrainInteractionEnabled = true;
         /// <summary>
@@ -100,6 +109,8 @@ namespace TrekVRApplication {
             }
         }
 
+        #endregion
+
         #region Event emitters
 
         public event Action<bool> OnEnableTerrainInteractionChange = e => { };
@@ -109,6 +120,8 @@ namespace TrekVRApplication {
         public event Action<float> OnHeightExagerrationChange = e => { };
 
         public event Action<TerrainModel> OnCurrentTerrainModelChange = e => { };
+
+        public event Action OnGlobalLayersChanged = () => { };
 
         #endregion
 
@@ -122,16 +135,11 @@ namespace TrekVRApplication {
                 layer = (int)CullingLayer.Terrain
             };
 
-            // Create the globe model conatiner game object.
-            GameObject globeModelGameObject = new GameObject(typeof(Mars).Name) {
-                layer = (int)CullingLayer.Terrain
-            };
-            globeModelGameObject.transform.parent = _terrainModelsContainer.transform;
-            GlobeModel = globeModelGameObject.AddComponent<GlobeTerrainModel>();
-            GlobeModel.Radius = Mars.Radius;
-            GlobeModel.BaseDownsampleLevel = _globeModelBaseDownsampleLevel;
-            GlobeModel.LodLevels = _globeModelLODLevels;
-            GlobeModel.Visible = true;
+            // Create base material.
+            InitializeMaterial();
+
+            // Create the globe model.
+            InitializeGlobeTerrainModel();
             CurrentVisibleModel = GlobeModel;
 
             // Shift up 1 meter.
@@ -154,7 +162,7 @@ namespace TrekVRApplication {
             _highlightedArea.UpdateArea(bbox);
 
             // In the future, overlay should always be enabled for globe.
-            GlobeModel.EnableOverlay = true;
+            GlobeModel.LayerController.EnableOverlay = true;
         }
 
         public void ClearHighlightedAreaOnGlobe() {
@@ -162,18 +170,87 @@ namespace TrekVRApplication {
             _highlightedArea = null;
 
             // In the future, overlay should always be enabled for globe.
-            GlobeModel.EnableOverlay = false;
+            GlobeModel.LayerController.EnableOverlay = false;
         }
 
         #endregion
 
-        public LocalTerrainModel CreateSubsetLocalModel(TerrainModel parent, BoundingBox boundingBox) {
-            bool initWithAnimations = parent is GlobeTerrainModel;
-            return CreateLocalModel(boundingBox, parent.DemUUID, parent.BaseMosaicProduct, initWithAnimations);
+        #region Layer management methods
+
+        public bool AddGlobalLayer(TerrainModelLayer layer, int? index = null) {
+            if (_globalLayers.Any(l => l.ProductUUID == layer.ProductUUID)) {
+                Debug.LogWarning($"{layer.ProductUUID} has already been added as a layer.");
+                return false;
+            }
+            if (index == null) {
+                _globalLayers.Add(layer);
+            }
+            else {
+                _globalLayers.Insert((int)index, layer);
+            }
+            OnGlobalLayersChanged.Invoke();
+            return true;
         }
 
-        public LocalTerrainModel CreateLocalModel(BoundingBox boundingBox, string demUUID, 
-            TerrainModelProductMetadata baseMosaicProduct, bool initWithAnimations = true, bool useTemporaryBaseTextures = true) {
+        public bool UpdateGlobalLayer(TerrainModelLayerChange changes) {
+            bool changed = false;
+            // TODO Update material here.
+            OnGlobalLayersChanged.Invoke();
+            return changed;
+        }
+
+        public bool RemoveGlobalLayer(int index) {
+            if (index < 0 || index >= _globalLayers.Count) {
+                return false;
+            }
+            _globalLayers.RemoveAt(index);
+            OnGlobalLayersChanged.Invoke();
+            return true;
+        }
+
+        #endregion
+
+        #region Model creation methods
+
+        public LocalTerrainModel CreateLocalModelFromSubset(TerrainModel parent, BoundingBox boundingBox) {
+
+            LocalTerrainModel terrainModel = CreateLocalModel(boundingBox, parent.DemUUID, parent is GlobeTerrainModel);
+
+            // TODO Make this code look better
+            TerrainModelLayerController layerController;
+            TerrainModelLayerController parentLayerController = parent.LayerController;
+            if (parentLayerController is TerrainModelGlobalLayerController) {
+                layerController = terrainModel.AddLayerController<TerrainModelGlobalLayerController>();
+            } else {
+                layerController = terrainModel.AddLayerController<TerrainModelBookmarkLayerController>();
+            }
+
+            layerController.Material = parentLayerController.Material;
+
+            // Set the bounding box to the parent's bounding box first,
+            // and then call update bounding box so that the parent's
+            // textures can be temporarily used correctly.
+            layerController.BoundingBox = parentLayerController.BoundingBox;
+            layerController.UpdateBoundingBox(terrainModel.SquareBoundingBox);
+
+            return terrainModel;
+        }
+
+        public LocalTerrainModel CreateLocalModelFromBookmark(BoundingBox boundingBox, string demUUID, IList<string> layersUUID) {
+
+            LocalTerrainModel terrainModel = CreateLocalModel(boundingBox, demUUID, false, false);
+
+            TerrainModelLayerController layerController = terrainModel.AddLayerController<TerrainModelBookmarkLayerController>();
+            layerController.UpdateBoundingBox(terrainModel.SquareBoundingBox, false);
+            foreach(string layerUUID in layersUUID) {
+                layerController.AddLayer(layerUUID);
+            }
+
+            return terrainModel;
+        }
+
+        private LocalTerrainModel CreateLocalModel(BoundingBox boundingBox, string demUUID, 
+            bool initWithAnimations = true, bool useTemporaryBaseTextures = true) {
 
             GameObject terrainModelContainer = new GameObject($"Model {++_modelCounter}") {
                 layer = (int)CullingLayer.Terrain
@@ -182,25 +259,19 @@ namespace TrekVRApplication {
             terrainModelContainer.SetActive(false);
 
             LocalTerrainModel terrainModel = terrainModelContainer.AddComponent<LocalTerrainModel>();
-            try {
-                terrainModel.Radius = Mars.Radius;
-                terrainModel.DemUUID = demUUID;
-                terrainModel.BaseMosaicProduct = baseMosaicProduct;
-                terrainModel.UseTemporaryBaseTextures = useTemporaryBaseTextures;
-                terrainModel.BoundingBox = boundingBox;
-                terrainModel.LodLevels = 0;
-                terrainModel.PhysicsDownsampleLevel = LocalTerrainPhysicsTargetDownsample;
-                terrainModel.AnimateOnInitialization = initWithAnimations;
-                terrainModel.InitModel();
-            }
-            catch (Exception e) {
-                Debug.LogError(e.Message);
-                Destroy(terrainModelContainer);
-                return null;
-            }
-
+            terrainModel.Radius = Mars.Radius;
+            terrainModel.DemUUID = demUUID;
+            terrainModel.UseTemporaryBaseTextures = useTemporaryBaseTextures;
+            terrainModel.BoundingBox = boundingBox;
+            terrainModel.LodLevels = 0;
+            terrainModel.PhysicsDownsampleLevel = LocalTerrainPhysicsTargetDownsample;
+            terrainModel.AnimateOnInitialization = initWithAnimations;
             return (LocalTerrainModel)AddTerrainModel(terrainModel);
         }
+
+        #endregion
+
+        #region Model visiblity control methods
 
         /// <summary>
         ///     Whether the globe model is currently visible as per this controller. 
@@ -254,6 +325,8 @@ namespace TrekVRApplication {
             _terrainModels.ForEach(w => w.Visible = false);
         }
 
+        #endregion
+
         public T GetComponentFromCurrentModel<T>() {
 
             // FIXME Change this so that it actually gets the component
@@ -282,6 +355,40 @@ namespace TrekVRApplication {
             _terrainModels.Add(terrainModel);
             return terrainModel;
         }
+
+        #region Initialization methods
+
+        private void InitializeGlobeTerrainModel() {
+            GameObject globeModelGameObject = new GameObject(typeof(Mars).Name) {
+                layer = (int)CullingLayer.Terrain
+            };
+            globeModelGameObject.transform.SetParent(_terrainModelsContainer.transform, false);
+            GlobeModel = globeModelGameObject.AddComponent<GlobeTerrainModel>();
+            GlobeModel.AddLayerController<TerrainModelGlobalLayerController>();
+            GlobeModel.Radius = Mars.Radius;
+            GlobeModel.BaseDownsampleLevel = _globeModelBaseDownsampleLevel;
+            GlobeModel.LodLevels = _globeModelLODLevels;
+            GlobeModel.Visible = true;
+        }
+
+        private void InitializeMaterial() {
+            BaseMaterial = new Material(Shader.Find("Custom/Terrain/MultiDiffuseOverlay"));
+            BaseMaterial.SetFloat("_DiffuseOpacity", 1);
+            BaseMaterial.SetFloat("_Glossiness", ShaderSmoothness);
+            BaseMaterial.SetFloat("_Metallic", ShaderMetallic);
+            BaseMaterial.SetFloat("_OverlayOpacity", 0);
+
+            // Set the base layer of the texture.
+            TerrainModelTextureManager.Instance.GetTexture(
+                new TerrainModelProductMetadata(GlobalMosaicUUID, UnrestrictedBoundingBox.Global, 0), 
+                texture => BaseMaterial.SetTexture("_DiffuseBase", texture)
+            );
+
+            // Also add the base layer to the layer list.
+            _globalLayers.Add(new TerrainModelLayer("Base", GlobalMosaicUUID, false));
+        }
+
+        #endregion
 
     }
 
