@@ -223,6 +223,9 @@ namespace TrekVRApplication {
                 layerController = terrainModel.AddLayerController<TerrainModelGlobalLayerController>();
             } else {
                 layerController = terrainModel.AddLayerController<TerrainModelBookmarkLayerController>();
+                foreach (TerrainModelLayer layer in parentLayerController.Layers) {
+                    layerController.AddLayer(layer.ProductUUID);
+                }
             }
 
             layerController.Material = parentLayerController.Material;

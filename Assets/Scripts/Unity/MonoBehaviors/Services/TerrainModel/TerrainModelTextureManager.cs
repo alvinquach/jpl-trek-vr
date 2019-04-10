@@ -11,7 +11,7 @@ namespace TrekVRApplication {
     [DisallowMultipleComponent]
     public sealed class TerrainModelTextureManager : MonoBehaviourWithTaskQueue {
 
-        private const int MaxGlobalTextures = 8;
+        private const int MaxGlobalTextures = 15;
 
         /// <summary>
         ///     The instance of the TerrainModelTextureManager that is present in the scene.
