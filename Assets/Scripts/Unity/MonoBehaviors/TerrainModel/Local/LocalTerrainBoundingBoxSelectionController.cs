@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using static TrekVRApplication.GlobeTerrainConstants;
+using static TrekVRApplication.GlobeTerrainModelConstants;
 using static TrekVRApplication.TerrainOverlayUtils;
 
 namespace TrekVRApplication {
