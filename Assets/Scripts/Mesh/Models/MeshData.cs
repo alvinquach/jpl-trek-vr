@@ -12,6 +12,18 @@ namespace TrekVRApplication {
 
         // TODO Add normals
 
+        public static bool operator true(MeshData o) {
+            return o != null;
+        }
+
+        public static bool operator false(MeshData o) {
+            return o == null;
+        }
+
+        public static bool operator !(MeshData o) {
+            return o ? false : true;
+        }
+
     }
 
 }

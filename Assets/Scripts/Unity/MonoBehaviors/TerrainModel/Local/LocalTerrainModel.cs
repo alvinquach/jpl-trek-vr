@@ -150,7 +150,8 @@ namespace TrekVRApplication {
 
         protected override void RescaleTerrainHeight(float scale) {
             TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
-            RescaleTerrainMeshHeightTask rescaleMeshHeightTask = new RescaleLocalTerrainMeshHeightTask(_referenceMeshData, metadata);
+            RescaleTerrainMeshHeightTask rescaleMeshHeightTask = 
+                new RescaleLocalTerrainMeshHeightTask(_referenceMeshData, metadata);
             _heightRescaleTaskStatus = TaskStatus.InProgress;
             rescaleMeshHeightTask.Execute(rescaledMeshData => {
                 QueueTask(() => {
@@ -158,9 +159,9 @@ namespace TrekVRApplication {
 
                     // Update the physics mesh if applicable.
                     int physicsMeshIndex = metadata.PhyiscsLodMeshIndex;
-                    MeshCollider collider = GetComponent<MeshCollider>();
-                    if (physicsMeshIndex >= 0 && collider) {
-                        UpdateMesh(collider.sharedMesh, rescaledMeshData[physicsMeshIndex], false);
+                    if (physicsMeshIndex >= 0) {
+                        _physicsMeshUpdateTimer = PhysicsMeshUpdateDelay;
+                        _physicsMeshUpdatedData = rescaledMeshData[physicsMeshIndex];
                     }
 
                     // Use the last LOD to recalculate position since it contains the least vertices.
@@ -226,6 +227,7 @@ namespace TrekVRApplication {
             if (physicsMeshIndex < 0) {
                 return;
             }
+
             // Do the heavy processing in the next update (does this help with the stutter?).
             QueueTask(() => {
                 MeshCollider collider = gameObject.AddComponent<MeshCollider>();

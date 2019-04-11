@@ -12,6 +12,8 @@ namespace TrekVRApplication {
 
         public const int LocalTerrainPhysicsTargetDownsample = 3;
 
+        public const float PhysicsMeshUpdateDelay = 0.5f;  // In seconds
+
         public const float ShaderSmoothness = 0.31f;
 
         public const float ShaderMetallic = 0.31f;
@@ -21,6 +23,8 @@ namespace TrekVRApplication {
         public const float NoTextureShaderMetallic = 0.31f;
 
         public const float GlobeModelLODCoefficient = 0.25f;
+
+        public const int GlobeModelPhysicsTargetDownsample = 4;
 
         public const string GlobalMosaicUUID = "8bc9352d-ee73-4d1f-94b8-de5495fd8dfa";
 

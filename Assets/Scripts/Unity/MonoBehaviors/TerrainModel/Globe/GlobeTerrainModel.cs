@@ -42,28 +42,42 @@ namespace TrekVRApplication {
                 _referenceMeshData = meshData;
                 QueueTask(() => {
                     ProcessMeshData(_referenceMeshData);
+                    PostProcessMeshData(_referenceMeshData, metadata);
                     _initTaskStatus = TaskStatus.Completed;
                     OnInitComplete.Invoke();
                 });
             });
         }
 
-        protected override void ProcessMeshData(MeshData[] meshData) {
-            base.ProcessMeshData(meshData);
+        private void PostProcessMeshData(MeshData[] meshData, TerrainModelMeshMetadata metadata) {
 
             float radius = Radius * TerrainModelScale;
 
-            // Adds a sphere collider to the mesh, so that it can be manipulated using the controller.
-            SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-            collider.radius = radius;
+            // Add mesh collider, if a physics mesh was generated.
+            int physicsMeshIndex = metadata.PhyiscsLodMeshIndex;
+            if (physicsMeshIndex < 0) {
+                return;
+            }
+            Mesh physicsMesh = ConvertToMesh(meshData[physicsMeshIndex], false);
 
-            // Add a sphere to cast shadows
-            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Mesh mesh = sphere.GetComponent<MeshFilter>().mesh;
-            GameObject shadowCaster = AddShadowCaster(mesh);
-            shadowCaster.transform.localScale = 2 * radius * Vector3.one;
-            Destroy(sphere);
+            // Do the heavy processing in the next update (does this help with the stutter?).
+            QueueTask(() => {
+                MeshCollider collider = gameObject.AddComponent<MeshCollider>();
+                collider.sharedMesh = physicsMesh;
+            });
+
+            // Use the lowest LOD as a shadow caster.
+            Mesh shadowMesh;
+            if (physicsMeshIndex == meshData.Length - 1) {
+                shadowMesh = physicsMesh;
+            } else {
+                Transform child = _lodGroupContainer.transform.Find($"LOD_{_lodLevels}");
+                MeshFilter meshFilter = child.GetComponent<MeshFilter>();
+                shadowMesh = meshFilter.mesh;
+            }
+            GameObject shadowCaster = AddShadowCaster(shadowMesh);
         }
+
 
         protected override bool CanRescaleTerrainHeight() {
             return isActiveAndEnabled
@@ -72,12 +86,21 @@ namespace TrekVRApplication {
         }
 
         protected override void RescaleTerrainHeight(float scale) {
+            TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
             RescaleTerrainMeshHeightTask rescaleMeshHeightTask = 
                 new RescaleGlobeTerrainMeshHeightTask(_referenceMeshData, GenerateMeshMetadata());
             _heightRescaleTaskStatus = TaskStatus.InProgress;
             rescaleMeshHeightTask.Execute(rescaledMeshData => {
                 QueueTask(() => {
                     ApplyRescaledMeshData(rescaledMeshData);
+
+                    // Update the physics mesh if applicable.
+                    int physicsMeshIndex = metadata.PhyiscsLodMeshIndex;
+                    if (physicsMeshIndex >= 0) {
+                        _physicsMeshUpdateTimer = PhysicsMeshUpdateDelay;
+                        _physicsMeshUpdatedData = rescaledMeshData[physicsMeshIndex];
+                    }
+
                     _heightRescaleTaskStatus = TaskStatus.Completed;
                 });
             });

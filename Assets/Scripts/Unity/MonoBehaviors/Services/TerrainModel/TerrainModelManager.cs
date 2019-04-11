@@ -403,6 +403,7 @@ namespace TrekVRApplication {
             GlobeModel.Radius = Mars.Radius;
             GlobeModel.BaseDownsampleLevel = _globeModelBaseDownsampleLevel;
             GlobeModel.LodLevels = _globeModelLODLevels;
+            GlobeModel.PhysicsDownsampleLevel = GlobeModelPhysicsTargetDownsample;
             GlobeModel.Visible = true;
 
             TerrainLayerController layerController = GlobeModel.AddLayerController<GlobalTerrainLayerController>();

@@ -92,6 +92,10 @@ namespace TrekVRApplication {
         /// </summary>
         protected MeshData[] _referenceMeshData;
 
+        protected float _physicsMeshUpdateTimer;
+
+        protected MeshData _physicsMeshUpdatedData;
+
         protected float _pendingHeightScale = float.NaN;
 
         protected TaskStatus _heightRescaleTaskStatus = TaskStatus.NotStarted;
@@ -151,6 +155,14 @@ namespace TrekVRApplication {
             base.Update();
             if (!float.IsNaN(_pendingHeightScale)) {
                 RequestTerrainHeightRescale(_pendingHeightScale);
+            }
+            if (_physicsMeshUpdatedData) {
+                if (_physicsMeshUpdateTimer <= 0) {
+                    UpdatePhysicsMesh(_physicsMeshUpdatedData);
+                    _physicsMeshUpdatedData = null;
+                } else {
+                    _physicsMeshUpdateTimer -= Time.deltaTime;
+                }
             }
         }
 
@@ -345,6 +357,15 @@ namespace TrekVRApplication {
         protected abstract bool CanRescaleTerrainHeight();
 
         protected abstract void RescaleTerrainHeight(float scale);
+
+        protected void UpdatePhysicsMesh(MeshData meshData) {
+            MeshCollider collider = GetComponent<MeshCollider>();
+            if (collider) {
+                Mesh mesh = collider.sharedMesh;
+                UpdateMesh(mesh, meshData, false);
+                collider.sharedMesh = mesh;
+            }
+        }
 
     }
 
