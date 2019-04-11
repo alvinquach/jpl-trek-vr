@@ -182,6 +182,10 @@ namespace TrekVRApplication {
             Material.SetFloat("_Metallic", DisableTextures ? NoTextureShaderMetallic : ShaderMetallic);
 
             Material.SetFloat("_OverlayOpacity", EnableOverlay ? 1 : 0);
+
+            if (DisableTextures) {
+                Material.SetColor("_Color", Color.white);
+            }
         }
 
         /// <summary>
