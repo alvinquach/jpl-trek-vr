@@ -24,7 +24,9 @@ namespace TrekVRApplication {
 
         public const float GlobeModelLODCoefficient = 0.25f;
 
-        public const int GlobeModelPhysicsTargetDownsample = 4;
+        // A value of 4 gives much better accuracy, but also has a much
+        // larger delay when updating after rescaling height.
+        public const int GlobeModelPhysicsTargetDownsample = 5;
 
         public const string GlobalMosaicUUID = "8bc9352d-ee73-4d1f-94b8-de5495fd8dfa";
 

@@ -198,7 +198,7 @@ namespace TrekVRApplication {
                     CancelSelection(true, activity);
                     break;
                 case XRInteractableTerrainActivity.Disabled:
-                    Collider collider = GetComponent<SphereCollider>();
+                    Collider collider = GetComponent<Collider>();
                     if (collider) {
                         collider.enabled = true;
                     }
@@ -212,7 +212,7 @@ namespace TrekVRApplication {
                     _bboxSelectionController.SetEnabled(true);
                     break;
                 case XRInteractableTerrainActivity.Disabled:
-                    Collider collider = GetComponent<SphereCollider>();
+                    Collider collider = GetComponent<Collider>();
                     if (collider) {
                         collider.enabled = false;
                     }

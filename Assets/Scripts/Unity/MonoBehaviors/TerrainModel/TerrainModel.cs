@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static TrekVRApplication.TerrainConstants;
+using Debug = UnityEngine.Debug;
 
 namespace TrekVRApplication {
 
@@ -361,9 +363,13 @@ namespace TrekVRApplication {
         protected void UpdatePhysicsMesh(MeshData meshData) {
             MeshCollider collider = GetComponent<MeshCollider>();
             if (collider) {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
                 Mesh mesh = collider.sharedMesh;
                 UpdateMesh(mesh, meshData, false);
                 collider.sharedMesh = mesh;
+                Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to update physics mesh.");
+                stopwatch.Stop();
             }
         }
 
