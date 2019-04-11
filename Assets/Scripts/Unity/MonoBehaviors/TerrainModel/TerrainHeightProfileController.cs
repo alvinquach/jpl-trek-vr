@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
     public class TerrainHeightProfileController : MonoBehaviour {
 
-        private GameObject _lodContainer;
+        private TerrainModel _terrainModel;
 
         private TerrainOverlayController _overlayController;
 
@@ -18,12 +19,20 @@ namespace TrekVRApplication {
 
         private readonly IList<Vector2> _points = new List<Vector2>();
 
+        private int _framesSinceLastControllerModalUpdate = 0;
+
+        /// <summary>
+        ///     If true, the controller is operating in height profile mode.
+        ///     Otherwise, it is operating in distance mode.
+        /// </summary>
+        public bool HeightProfileMode { get; private set; }
+
         private void Awake() {
             InitMaterials();
         }
 
         private void Start() {
-            //_lodContainer = transform.Find(GameObjectName.LODGroupContainer).gameObject;
+            _terrainModel = GetComponent<TerrainModel>();
 
             XRInteractableTerrain interactableTerrain = GetComponent<XRInteractableTerrain>();
             if (interactableTerrain is XRInteractableGlobeTerrain) {
@@ -33,17 +42,27 @@ namespace TrekVRApplication {
             }
         }
 
+        private void Update() {
+            _framesSinceLastControllerModalUpdate++;
+        }
 
-        public void SetEnabled(bool enabled) {
+        public void SetEnabled(bool enabled, bool heightProfileMode = false) {
+            if (this.enabled == enabled) {
+                return;
+            }
             this.enabled = enabled;
+            if (enabled) {
+                HeightProfileMode = heightProfileMode;
+            }
         }
 
         public void UpdateCursorPosition(RaycastHit hit) {
+            Vector2 currentPoint = hit.textureCoord;
+            ControllerModalUpdateCurrentPoint(currentPoint);
             if (_points.Count == 0) {
                 return;
             }
             Vector2 previousPoint = _points[_points.Count - 1];
-            Vector2 currentPoint = hit.textureCoord;
             if (_overlayLines.Count > 0) {
                 TerrainOverlayLine currentOverlayLine = _overlayLines.Peek();
                 currentOverlayLine.UpdateLine(previousPoint, currentPoint);
@@ -64,11 +83,13 @@ namespace TrekVRApplication {
             overlayLine.BaseThickness = 5e-3f; // TODO Unhardcode this
             _overlayLines.Push(overlayLine);
             _overlayController.UpdateTexture();
+            ControllerModalAddPoint(newPoint);
         }
 
         public bool CancelSelection(bool cancelAll = false) {
             if (!cancelAll && _overlayLines.Count > 0) {
                 _overlayController.RemoveObject(_overlayLines.Pop());
+                ControllerModalRemoveLastPoint();
                 return false;
             }
             ExitSelectionMode();
@@ -76,13 +97,90 @@ namespace TrekVRApplication {
         }
 
         private void ExitSelectionMode() {
+            ClearLines();
+
+            UserInterfaceManager userInterfaceManager = UserInterfaceManager.Instance;
+            if (HeightProfileMode) {
+                userInterfaceManager.HideControllerModalsWithActivity(ControllerModalActivity.ToolsHeightProfile);
+            } else {
+                userInterfaceManager.HideControllerModalsWithActivity(ControllerModalActivity.ToolsDistance);
+            }
+        }
+
+        private void ClearLines() {
             _overlayLines.ToList()
                 .ForEach(line => _overlayController.RemoveObject(line));
             _overlayLines.Clear();
+            ControllerModalClearPoints();
+        }
 
-            UserInterfaceManager uiManager = UserInterfaceManager.Instance;
-            uiManager.HideControllerModalsWithActivity(ControllerModalActivity.ToolsProfile);
-            uiManager.HideControllerModalsWithActivity(ControllerModalActivity.ToolsDistance);
+        private void ControllerModalAddPoint(Vector2 uv) {
+            ControllerModal controllerModal = GetControllerModal();
+            if (!controllerModal) {
+                return;
+            }
+
+            Vector2 latLon = BoundingBoxUtils.UVToCoordinates(GetBoundingBoxFromTerrainModel(), uv);
+            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
+
+            string js =
+                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"component && component.addPoint({latLon.x}, {latLon.y});";
+
+            controllerModal.Browser.EvalJS(js);
+            _framesSinceLastControllerModalUpdate = 0;
+        }
+
+        private void ControllerModalUpdateCurrentPoint(Vector2 uv) {
+            if (_framesSinceLastControllerModalUpdate < ControllerModalUpdateInterval) {
+                return;
+            }
+            ControllerModal controllerModal = GetControllerModal();
+            if (!controllerModal) {
+                return;
+            }
+
+            Vector2 latLon = BoundingBoxUtils.UVToCoordinates(GetBoundingBoxFromTerrainModel(), uv);
+            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
+
+            string js =
+                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"component && component.updateCurrentPoint({latLon.x}, {latLon.y});";
+
+            controllerModal.Browser.EvalJS(js);
+            _framesSinceLastControllerModalUpdate = 0;
+        }
+
+        private void ControllerModalRemoveLastPoint() {
+            ControllerModal controllerModal = GetControllerModal();
+            if (!controllerModal) {
+                return;
+            }
+
+            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
+
+            string js =
+                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"component && component.removeLastPoint();";
+
+            controllerModal.Browser.EvalJS(js);
+            _framesSinceLastControllerModalUpdate = 0;
+        }
+
+        private void ControllerModalClearPoints() {
+            ControllerModal controllerModal = GetControllerModal();
+            if (!controllerModal) {
+                return;
+            }
+
+            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
+
+            string js =
+                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"component && component.clearPoints();";
+
+            controllerModal.Browser.EvalJS(js);
+            _framesSinceLastControllerModalUpdate = 0;
         }
 
         private void InitMaterials() {
@@ -95,6 +193,20 @@ namespace TrekVRApplication {
             // Create material for next line
             _newLineMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColor"));
             _newLineMaterial.SetColor(colorId, Color.yellow);
+        }
+
+        private IBoundingBox GetBoundingBoxFromTerrainModel() {
+            if (_terrainModel is GlobeTerrainModel) {
+                return UnrestrictedBoundingBox.Global;
+            }
+            return ((LocalTerrainModel)_terrainModel).SquareBoundingBox;
+        }
+
+        private ControllerModal GetControllerModal() {
+            ControllerModalActivity activity = HeightProfileMode ? 
+                ControllerModalActivity.ToolsHeightProfile :
+                ControllerModalActivity.ToolsDistance;
+            return UserInterfaceManager.Instance.GetControllerModalWithActivity(activity);
         }
 
     }

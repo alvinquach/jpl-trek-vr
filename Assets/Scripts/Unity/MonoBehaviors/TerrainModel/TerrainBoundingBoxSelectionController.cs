@@ -5,8 +5,6 @@ namespace TrekVRApplication {
 
     public abstract class TerrainBoundingBoxSelectionController : MonoBehaviour {
 
-        protected const int ControllerModalBoundingBoxUpdateInterval = 10;
-
         protected Material _coordinateIndicatorMaterial;
 
         protected Vector4 _selectionBoundingBox;

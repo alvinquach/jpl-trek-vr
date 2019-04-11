@@ -2,6 +2,7 @@
 using static TrekVRApplication.TerrainConstants;
 using static TrekVRApplication.GlobeTerrainConstants;
 using static TrekVRApplication.TerrainOverlayUtils;
+using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
@@ -121,7 +122,7 @@ namespace TrekVRApplication {
             }
 
             // Send updated to controller modal.
-            if (_framesSinceLastControllerModalUpdate >= ControllerModalBoundingBoxUpdateInterval) {
+            if (_framesSinceLastControllerModalUpdate >= ControllerModalUpdateInterval) {
                 BoundingBox bbox = new BoundingBox(_selectionBoundingBox);
                 bbox[_selectionIndex] = angle;
                 SendBoundingBoxUpdateToControllerModal(bbox);

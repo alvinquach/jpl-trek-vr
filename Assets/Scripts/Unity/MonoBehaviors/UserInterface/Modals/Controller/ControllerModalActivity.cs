@@ -10,7 +10,7 @@ namespace TrekVRApplication {
         ProductResults,
         LayerManager,
         ToolsDistance,
-        ToolsProfile,
+        ToolsHeightProfile,
         ToolsSunAngle
     }
 
@@ -30,7 +30,7 @@ namespace TrekVRApplication {
                     return $"{ControllerModalUrl}/layer-manager";
                 case ControllerModalActivity.ToolsDistance:
                     return $"{ControllerModalUrl}/tools/distance";
-                case ControllerModalActivity.ToolsProfile:
+                case ControllerModalActivity.ToolsHeightProfile:
                     // TODO Add this
                 case ControllerModalActivity.ToolsSunAngle:
                     // TODO Add this

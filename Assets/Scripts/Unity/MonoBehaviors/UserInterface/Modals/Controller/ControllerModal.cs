@@ -103,7 +103,7 @@ namespace TrekVRApplication {
                     interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.Distance);
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
-                case ControllerModalActivity.ToolsProfile:
+                case ControllerModalActivity.ToolsHeightProfile:
                     interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.HeightProfile);
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;

@@ -10,6 +10,8 @@ namespace TrekVRApplication {
 
         public const string AngularGlobalObjectName = "AngularGlobalVariables";
         public const string BoundingBoxSelectionModalName = "ControllerModalBoundingBoxSelectionComponent";
+        public const string ToolsDistanceModalName = "ControllerModalToolsDistanceComponent";
+        public const string ToolsHeightProfileModalName = "TODO";
 
         public const string UnityGlobalObjectName = "UnityGlobalVariables";
         public const string DataServiceName = "UnityDataService";
@@ -22,6 +24,9 @@ namespace TrekVRApplication {
         public static readonly string AngularInjectableContainerPath = $"{AngularGlobalObjectPath}.injectablesMap";
 
         public static readonly string UnityGlobalObjectPath = $"window.{UnityGlobalObjectName}";
+
+        public const int ControllerModalUpdateInterval = 10;
+
 
     }
 

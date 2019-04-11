@@ -99,7 +99,7 @@ namespace TrekVRApplication {
                         mainModal.Visible = true;
                     }
                     break;
-                case ControllerModalActivity.ToolsProfile:
+                case ControllerModalActivity.ToolsHeightProfile:
                     break;
                 case ControllerModalActivity.ToolsSunAngle:
                     break;
