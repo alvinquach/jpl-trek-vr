@@ -367,10 +367,7 @@ namespace TrekVRApplication {
         #endregion
 
         public T GetComponentFromCurrentModel<T>() {
-
-            // FIXME Change this so that it actually gets the component
-            // for the current model instead of the globe model.
-            return GlobeModel.GetComponent<T>();
+            return CurrentVisibleModel.GetComponent<T>();
         }
 
         public Transform GetGlobeModelTransform() {

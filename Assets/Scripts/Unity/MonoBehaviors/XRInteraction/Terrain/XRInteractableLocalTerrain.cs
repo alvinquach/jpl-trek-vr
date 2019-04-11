@@ -27,14 +27,26 @@ namespace TrekVRApplication {
         #region Event handlers
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            if (CurrentActivity == XRInteractableTerrainActivity.BBoxSelection) {
-                _bboxSelectionController.MakeBoundarySelection(hit);
+            switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.BBoxSelection:
+                    _bboxSelectionController.MakeBoundarySelection(hit);
+                    break;
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    HeightProfileController.MakeSelection(hit);
+                    break;
             }
         }
 
         public override void OnCursorOver(XRController sender, RaycastHit hit) {
-            if (CurrentActivity == XRInteractableTerrainActivity.BBoxSelection) {
-                _bboxSelectionController.UpdateCursorPosition(hit);
+            switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.BBoxSelection:
+                    _bboxSelectionController.UpdateCursorPosition(hit);
+                    break;
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    HeightProfileController.UpdateCursorPosition(hit);
+                    break;
             }
         }
 
@@ -52,6 +64,9 @@ namespace TrekVRApplication {
 
             // Switching away from current mode.
             switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                case XRInteractableTerrainActivity.SunAngle:
                 case XRInteractableTerrainActivity.BBoxSelection:
                     CancelSelection(true, activity);
                     break;
@@ -65,6 +80,11 @@ namespace TrekVRApplication {
 
             // Switch to new mode.
             switch (activity) {
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    TerrainModel.LayerController.EnableOverlay = true;
+                    HeightProfileController.SetEnabled(true);
+                    break;
                 case XRInteractableTerrainActivity.Default:
                     TerrainModel.LayerController.EnableOverlay = false;
                     break;

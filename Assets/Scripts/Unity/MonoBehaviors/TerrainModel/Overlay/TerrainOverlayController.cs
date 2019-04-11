@@ -105,9 +105,12 @@ namespace TrekVRApplication {
         ///     The removed object will have its gameObject destroyed, which
         ///     will also destroy the object itself.
         /// </summary>
-        public void RemoveObject(TerrainOverlayObject overlayObject) {
+        public void RemoveObject(TerrainOverlayObject overlayObject, bool updateTexture = true) {
             if (_overlayObjects.Remove(overlayObject)) {
                 Destroy(overlayObject.gameObject);
+                if (updateTexture) {
+                    UpdateTexture();
+                }
             }
         }
 

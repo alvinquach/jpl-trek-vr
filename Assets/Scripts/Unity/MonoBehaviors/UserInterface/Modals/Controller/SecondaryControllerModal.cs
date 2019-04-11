@@ -70,6 +70,8 @@ namespace TrekVRApplication {
 
         private void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             MainModal mainModal = UserInterfaceManager.Instance.MainModal;
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            XRInteractableTerrain interactableTerrain = terrainModelManager.GetComponentFromCurrentModel<XRInteractableTerrain>();
             switch (CurrentActivity) {
                 case ControllerModalActivity.Default:
                     // TODO Turn on secondary controller menu instead.
@@ -77,10 +79,8 @@ namespace TrekVRApplication {
                     controller.Flashlight?.CycleNextColor();
                     break;
                 case ControllerModalActivity.BBoxSelection:
-                    // TODO This should also apply to localized terrain models.
-                    XRInteractableGlobeTerrain globe = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
-                    globe.CancelSelection();
-                    if (globe.CurrentActivity != XRInteractableTerrainActivity.BBoxSelection) {
+                    interactableTerrain.CancelSelection();
+                    if (interactableTerrain.CurrentActivity != XRInteractableTerrainActivity.BBoxSelection) {
                         mainModal.Visible = true;
                     }
                     break;
@@ -92,6 +92,16 @@ namespace TrekVRApplication {
                 case ControllerModalActivity.LayerManager:
                     mainModal.Visible = true;
                     StartActivity(ControllerModalActivity.Default);
+                    break;
+                case ControllerModalActivity.ToolsDistance:
+                    interactableTerrain.CancelSelection();
+                    if (interactableTerrain.CurrentActivity != XRInteractableTerrainActivity.BBoxSelection) {
+                        mainModal.Visible = true;
+                    }
+                    break;
+                case ControllerModalActivity.ToolsProfile:
+                    break;
+                case ControllerModalActivity.ToolsSunAngle:
                     break;
             }
         }

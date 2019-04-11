@@ -99,10 +99,6 @@ namespace TrekVRApplication {
             enabled = visible;
 
             if (visible) {
-
-                // Regenerate the coordinate lines.
-                GeneareteCoordinateLines();
-
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
                 float distance = Vector3.Distance(eye.transform.position, transform.position);
 
@@ -113,11 +109,13 @@ namespace TrekVRApplication {
                 _coordinateLabelOpacity = distance < CoordinateIndicatorStaticLabelFadeOutDistance ? 1 : 0;
                 UpdateMaterialAlpha(_verticalAxisMaterial, _coordinateLabelOpacity);
 
-                _overlayController.UpdateTexture();
+                // Regenerate the coordinate lines.
+                GeneareteCoordinateLines();
             }
             else {
+
+                // Remove the coordinate lines.
                 RemoveCoordinateLines();
-                _overlayController.UpdateTexture();
             }
         }
 

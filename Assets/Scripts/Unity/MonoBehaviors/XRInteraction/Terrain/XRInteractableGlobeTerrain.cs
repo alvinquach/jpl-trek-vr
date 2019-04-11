@@ -61,18 +61,24 @@ namespace TrekVRApplication {
         #region Event handlers
 
         public override void OnTriggerDown(XRController sender, RaycastHit hit, ClickedEventArgs e) {
-            if (CurrentActivity == XRInteractableTerrainActivity.Default) {
-                if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _gripGrabbed) {
-                    return;
-                }
-                _grabber = sender;
-                _grabPoint = hit.point;
-                _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
-                _triggerGrabbed = true;
-                _grabber.LaserPointer.Active = true;
-            }
-            else if (CurrentActivity == XRInteractableTerrainActivity.BBoxSelection) {
-                _bboxSelectionController.MakeBoundarySelection(hit);
+            switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.Default:
+                    if (Vector3.Distance(sender.transform.position, hit.point) > _maxGrabDistance || _gripGrabbed) {
+                        return;
+                    }
+                    _grabber = sender;
+                    _grabPoint = hit.point;
+                    _grabRadius = Vector3.Distance(transform.position, hit.point); // This should not change until another grab is made.
+                    _triggerGrabbed = true;
+                    _grabber.LaserPointer.Active = true;
+                    break;
+                case XRInteractableTerrainActivity.BBoxSelection:
+                    _bboxSelectionController.MakeBoundarySelection(hit);
+                    break;
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    HeightProfileController.MakeSelection(hit);
+                    break;
             }
         }
 
@@ -99,8 +105,14 @@ namespace TrekVRApplication {
         }
 
         public override void OnCursorOver(XRController sender, RaycastHit hit) {
-            if (CurrentActivity == XRInteractableTerrainActivity.BBoxSelection) {
-                _bboxSelectionController.UpdateCursorPosition(hit);
+            switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.BBoxSelection:
+                    _bboxSelectionController.UpdateCursorPosition(hit);
+                    break;
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    HeightProfileController.UpdateCursorPosition(hit);
+                    break;
             }
         }
 
@@ -203,6 +215,9 @@ namespace TrekVRApplication {
 
             // Switching away from current mode.
             switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                case XRInteractableTerrainActivity.SunAngle:
                 case XRInteractableTerrainActivity.BBoxSelection:
                     CancelSelection(true, activity);
                     break;
@@ -217,6 +232,10 @@ namespace TrekVRApplication {
 
             // Switch to new mode.
             switch (activity) {
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    HeightProfileController.SetEnabled(true);
+                    break;
                 case XRInteractableTerrainActivity.BBoxSelection:
                     _bboxSelectionController.SetEnabled(true);
                     break;

@@ -4,6 +4,8 @@
 
         protected abstract TerrainBoundingBoxSelectionController BBoxSelectionController { get; }
 
+        protected TerrainHeightProfileController HeightProfileController { get; private set; }
+
         public XRInteractableTerrainActivity CurrentActivity { get; protected set; } = XRInteractableTerrainActivity.Default;
 
         public abstract TerrainModel TerrainModel { get; }
@@ -17,6 +19,7 @@
 
         protected virtual void Start() {
             BBoxSelectionController.ResetSelectionBoundingBox();
+            HeightProfileController = gameObject.AddComponent<TerrainHeightProfileController>();
         }
 
         protected virtual void OnDestroy() {
@@ -26,14 +29,24 @@
             terrainModelManager.OnHeightExagerrationChange -= SetHeightExagerration;
         }
 
-        /** For bounding box selection. */
+        /** For bounding box selection and some tools. */
         public void CancelSelection(bool cancelAll = false, XRInteractableTerrainActivity nextMode = XRInteractableTerrainActivity.Default) {
-            if (CurrentActivity != XRInteractableTerrainActivity.BBoxSelection) {
-                return;
-            }
-            if (BBoxSelectionController.CancelSelection(cancelAll)) {
-                CurrentActivity = nextMode;
-                BBoxSelectionController.SetEnabled(false);
+            switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.BBoxSelection:
+                    if (BBoxSelectionController.CancelSelection(cancelAll)) {
+                        CurrentActivity = nextMode;
+                        BBoxSelectionController.SetEnabled(false);
+                    }
+                    break;
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    if (HeightProfileController.CancelSelection(cancelAll)) {
+                        CurrentActivity = nextMode;
+                        HeightProfileController.SetEnabled(false);
+                    }
+                    break;
+                case XRInteractableTerrainActivity.SunAngle:
+                    break;
             }
         }
 

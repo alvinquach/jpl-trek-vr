@@ -78,13 +78,11 @@ namespace TrekVRApplication {
             string modalUrl = activity.GetModalUrl();
 
             TerrainModelManager terrainModelController = TerrainModelManager.Instance;
-            XRInteractableGlobeTerrain globe;
+            XRInteractableTerrain interactableTerrain = terrainModelController.GetComponentFromCurrentModel<XRInteractableTerrain>();
 
             // Switch to new acivity.
             switch (activity) {
                 case ControllerModalActivity.BBoxSelection:
-                    TerrainModel terrainModel = terrainModelController.CurrentVisibleModel;
-                    XRInteractableTerrain interactableTerrain = terrainModel.InteractionController;
                     interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.BBoxSelection);
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
@@ -98,11 +96,19 @@ namespace TrekVRApplication {
                     }
                     goto case ControllerModalActivity.LayerManager;
                 case ControllerModalActivity.LayerManager:
-
-                    // FIXME Need to set the mode for all the terrain models, not just the planet.
-                    globe = terrainModelController.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
-                    globe.SwitchToActivity(XRInteractableTerrainActivity.Default);
-
+                    interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.Default);
+                    UserInterfaceManager.Instance.MainModal.Visible = false;
+                    break;
+                case ControllerModalActivity.ToolsDistance:
+                    interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.Distance);
+                    UserInterfaceManager.Instance.MainModal.Visible = false;
+                    break;
+                case ControllerModalActivity.ToolsProfile:
+                    interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.HeightProfile);
+                    UserInterfaceManager.Instance.MainModal.Visible = false;
+                    break;
+                case ControllerModalActivity.ToolsSunAngle:
+                    interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.SunAngle);
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
             }

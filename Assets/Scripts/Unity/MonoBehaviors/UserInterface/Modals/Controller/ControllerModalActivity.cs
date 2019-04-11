@@ -8,7 +8,10 @@ namespace TrekVRApplication {
         BookmarkResults,
         NomenclatureResults,
         ProductResults,
-        LayerManager
+        LayerManager,
+        ToolsDistance,
+        ToolsProfile,
+        ToolsSunAngle
     }
 
     public static class ControllerModalActivityEnumExtensions {
@@ -25,6 +28,12 @@ namespace TrekVRApplication {
                     return $"{ControllerModalUrl}/products";
                 case ControllerModalActivity.LayerManager:
                     return $"{ControllerModalUrl}/layer-manager";
+                case ControllerModalActivity.ToolsDistance:
+                    return $"{ControllerModalUrl}/tools/distance";
+                case ControllerModalActivity.ToolsProfile:
+                    // TODO Add this
+                case ControllerModalActivity.ToolsSunAngle:
+                    // TODO Add this
                 default:
                     return $"{ControllerModalUrl}";
             }

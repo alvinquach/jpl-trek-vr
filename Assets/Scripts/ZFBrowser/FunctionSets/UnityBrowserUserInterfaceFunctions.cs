@@ -30,10 +30,9 @@ namespace TrekVRApplication {
             bool value = (bool)visible;
             UserInterfaceManager.Instance.MainModal.Visible = value;
             
-            // FIXME Need to set the mode for all the terrain models, not just the planet.
             if (!value) {
-                XRInteractableGlobeTerrain globe = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
-                globe.SwitchToActivity(XRInteractableTerrainActivity.Default);
+                XRInteractableTerrain terrain = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableTerrain>();
+                terrain.SwitchToActivity(XRInteractableTerrainActivity.Default);
             }
         }
 

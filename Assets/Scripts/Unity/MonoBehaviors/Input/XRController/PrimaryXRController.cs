@@ -126,7 +126,7 @@ namespace TrekVRApplication {
         protected override void MenuButtonPressedHandler(object sender, ClickedEventArgs e) {
             UserInterfaceManager userInterfaceManager = UserInterfaceManager.Instance;
             MainModal mainModal = userInterfaceManager.MainModal;
-            if (userInterfaceManager.MainModal.Visible) {
+            if (mainModal.Visible) {
                 mainModal.XRBrowser.RegisterKeyPress(KeyCode.M);
             }
             else {
@@ -140,9 +140,9 @@ namespace TrekVRApplication {
             MainModal mainModal = userInterfaceManager.MainModal;
             if (mainModal.Visible) {
 
-                // FIXME Need to set the mode for all the terrain models, not just the planet.
-                XRInteractableGlobeTerrain planet = TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableGlobeTerrain>();
-                planet.SwitchToActivity(XRInteractableTerrainActivity.Default);
+                XRInteractableTerrain interactableTerrain = 
+                    TerrainModelManager.Instance.GetComponentFromCurrentModel<XRInteractableTerrain>();
+                interactableTerrain.SwitchToActivity(XRInteractableTerrainActivity.Default);
 
                 mainModal.Visible = false;
                 mainModal.NavigateToRootMenu();
