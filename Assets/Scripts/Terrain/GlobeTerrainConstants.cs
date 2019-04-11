@@ -9,9 +9,9 @@ namespace TrekVRApplication {
 
         public const float CoordinateIndicatorStaticThickness = 1e-3f;
 
-        public const float CoordinateIndicatorStaticBoldThickness = 3.1e-3f;
+        public const float CoordinateIndicatorStaticBoldThickness = 1.6e-3f;
 
-        public const float CoordinateIndicatorThickness = 1.5e-3f;
+        public const float CoordinateIndicatorThickness = 6.9e-4f;
 
         public const float CoordinateIndicatorActiveThickness = 6.9e-3f;
 

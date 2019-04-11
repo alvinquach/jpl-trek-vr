@@ -131,8 +131,15 @@ namespace TrekVRApplication {
 
         #region Add line methods
 
-        public TerrainOverlayLine AddLine(string name = null) {
+        public TerrainOverlayLine AddLine(Color32 color, string name = null) {
+            Material material = new Material(Shader.Find("Custom/Unlit/TransparentColor"));
+            material.SetColor("_Color", color);
+            return AddLine(material, name);
+        }
+
+        public TerrainOverlayLine AddLine(Material material, string name = null) {
             TerrainOverlayLine overlayLine = AddObject<TerrainOverlayLine>(name);
+            overlayLine.Material = material;
             _overlayObjects.Add(overlayLine);
             return overlayLine;
         }

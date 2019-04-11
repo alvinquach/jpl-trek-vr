@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using static TrekVRApplication.GlobeTerrainConstants;
 using static TrekVRApplication.TerrainOverlayUtils;
 using static TrekVRApplication.TerrainConstants;
+using System.Collections.Generic;
 
 namespace TrekVRApplication {
 
@@ -12,6 +13,8 @@ namespace TrekVRApplication {
     ///     coordinate lines and coordinate labels.
     /// </summary>
     public class GlobeTerrainCoordinateLinesController : MonoBehaviour {
+
+        private TerrainOverlayController _overlayController = GlobeTerrainOverlayController.Instance;
 
         #region Line and label counts (for naming purposes)
 
@@ -34,6 +37,8 @@ namespace TrekVRApplication {
         private Material _coordinateLabelMaterial;
 
         private Material _verticalAxisMaterial;
+
+        private readonly IList<TerrainOverlayLine> _overlayLines = new List<TerrainOverlayLine>();
 
         private bool _visible = false;
         public bool Visible {
@@ -66,8 +71,13 @@ namespace TrekVRApplication {
         #region Unity lifecycle methods
 
         private void Awake() {
-            GenerateCoordinateLinesAndLabels();
+            InitMaterials();
             ForceHidden = true;
+        }
+
+        private void Start() {
+            GeneareteCoordinateLines();
+            GenerateCoordinateLabels();
         }
 
         private void Update() {
@@ -89,6 +99,10 @@ namespace TrekVRApplication {
             enabled = visible;
 
             if (visible) {
+
+                // Regenerate the coordinate lines.
+                GeneareteCoordinateLines();
+
                 Camera eye = UserInterfaceManager.Instance.XRCamera;
                 float distance = Vector3.Distance(eye.transform.position, transform.position);
 
@@ -98,11 +112,16 @@ namespace TrekVRApplication {
 
                 _coordinateLabelOpacity = distance < CoordinateIndicatorStaticLabelFadeOutDistance ? 1 : 0;
                 UpdateMaterialAlpha(_verticalAxisMaterial, _coordinateLabelOpacity);
+
+                _overlayController.UpdateTexture();
+            }
+            else {
+                RemoveCoordinateLines();
+                _overlayController.UpdateTexture();
             }
         }
 
-        private void GenerateCoordinateLinesAndLabels() {
-
+        private void InitMaterials() {
             int colorId = Shader.PropertyToID("_Color");
 
             // Create material for coordinate lines
@@ -116,9 +135,28 @@ namespace TrekVRApplication {
             // Create material for vertical axis
             _verticalAxisMaterial = new Material(Shader.Find("Custom/Unlit/TransparentColorMasked"));
             _verticalAxisMaterial.SetColor(colorId, CoordinateIndicatorStaticColor);
+        }
+
+        private void GeneareteCoordinateLines() {
+
+            // Latitude lines
+            float latIncrement = 1f / (2 * (HemisphereLongLatCoordinateIndicatorCount + 1));
+            for (int i = 1; i <= HemisphereLongLatCoordinateIndicatorCount * 2 + 1; i++) {
+                TerrainOverlayLine line = GenerateLatitudeCoordinateLine(i * latIncrement);
+                _overlayLines.Add(line);
+            }
+
+            // Longitude lines
+            float lonIncrement = 1f / (4 * (HemisphereLongLatCoordinateIndicatorCount + 1));
+            for (int i = 0; i <= 4 * (HemisphereLongLatCoordinateIndicatorCount + 1); i++) {
+                TerrainOverlayLine line = GenerateLongitudeCoordinateLine(i * lonIncrement);
+                _overlayLines.Add(line);
+            }
+        }
+
+        private void GenerateCoordinateLabels() {
 
             // Scale
-            float linesScale = Mars.Radius * TerrainModelScale + CoordinateIndicatorRadiusOffset;
             float labelsScale = Mars.Radius * TerrainModelScale + CoordinateIndicatorLabelRadiusOffset;
 
             // Get template for labels
@@ -126,33 +164,11 @@ namespace TrekVRApplication {
 
             float angleIncrement = 90.0f / (HemisphereLongLatCoordinateIndicatorCount + 1);
 
-            // Latitude lines and labels
-            for (int i = 0; i <= HemisphereLongLatCoordinateIndicatorCount; i++) {
+            // Latitude labels
+            for (int i = 1; i <= HemisphereLongLatCoordinateIndicatorCount; i++) {
                 float latitude = i * angleIncrement;
-
-                // Upper hemisphere
-                LineRenderer line = GenerateLatitudeCoordinateLine(latitude, linesScale);
-
-                if (i == 0) {
-
-                    // Make the equator a bit thicker than the rest.
-                    line.startWidth = CoordinateIndicatorStaticBoldThickness;
-
-                    // We don't need an opposite set of lines for the equator.
-                    // We also don't need the zero degree latitude labels.
-                    continue;
-                }
-
-                GenerateLatitudeCoordinateLabels(labelTemplate, latitude, labelsScale);
-
-                // Lower hemisphere
-                GenerateLatitudeCoordinateLine(-latitude, linesScale);
-                GenerateLatitudeCoordinateLabels(labelTemplate, -latitude, labelsScale);
-            }
-
-            // Longitude lines
-            for (int i = 0; i < 2 * (HemisphereLongLatCoordinateIndicatorCount + 1); i++) {
-                GenerateLongitudeCoordinateLine(i * angleIncrement, linesScale);
+                GenerateLatitudeCoordinateLabels(labelTemplate, latitude, labelsScale); // Upper hemisphere
+                GenerateLatitudeCoordinateLabels(labelTemplate, -latitude, labelsScale); // Lower hemisphere
             }
 
             // Longitude labels
@@ -162,34 +178,29 @@ namespace TrekVRApplication {
 
             // Vertical axis
             GenerateVerticalAxis(labelsScale, labelTemplate);
+
         }
 
-        private LineRenderer GenerateLatitudeCoordinateLine(float latitude, float scale) {
-            GameObject gameObject = new GameObject($"Lat{GameObjectName.StaticCoordinateLines}{++_latitudeLineCount}") {
-                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
-            };
-            gameObject.transform.SetParent(transform, false);
-            LineRenderer lineRenderer = InitCoordinateIndicator(
-                gameObject,
+        private TerrainOverlayLine GenerateLatitudeCoordinateLine(float position) {
+            TerrainOverlayLine line = _overlayController.AddLine(
                 _coordinateLineMaterial,
-                CoordinateIndicatorStaticThickness
+                $"Lat{GameObjectName.StaticCoordinateLines}{++_latitudeLineCount}"
             );
-            GeneratePointsForLatitudeIndicator(lineRenderer, latitude, scale);
-            return lineRenderer;
+            line.UpdateLine(new Vector2(0, position), new Vector2(1, position));
+            line.BaseThickness = MathUtils.CompareFloats(position, 0.5f, 1) ?
+                CoordinateIndicatorStaticBoldThickness :
+                CoordinateIndicatorStaticThickness;
+            return line;
         }
 
-        private LineRenderer GenerateLongitudeCoordinateLine(float longitude, float scale) {
-            GameObject gameObject = new GameObject($"Lon{GameObjectName.StaticCoordinateLines}{++_longitudeLineCount}") {
-                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
-            };
-            gameObject.transform.SetParent(transform, false);
-            LineRenderer lineRenderer = InitCoordinateIndicator(
-                gameObject,
+        private TerrainOverlayLine GenerateLongitudeCoordinateLine(float position) {
+            TerrainOverlayLine line = _overlayController.AddLine(
                 _coordinateLineMaterial,
-                CoordinateIndicatorStaticThickness
+                $"Lon{GameObjectName.StaticCoordinateLines}{++_longitudeLineCount}"
             );
-            GeneratePointsForLongitudeIndicator(lineRenderer, longitude, scale);
-            return lineRenderer;
+            line.UpdateLine(new Vector2(position, 0), new Vector2(position, 1));
+            line.BaseThickness = CoordinateIndicatorStaticThickness;
+            return line;
         }
 
         private void GenerateLatitudeCoordinateLabels(GameObject template, float latitude, float positionalScale) {
@@ -200,7 +211,7 @@ namespace TrekVRApplication {
 
             GameObject label = Instantiate(template, transform, false);
             label.name = $"LatLabel{++_latitudeLabelCount}";
-            label.transform.position = basePosition;
+            label.transform.localPosition = basePosition;
             label.SetActive(true);
             Text text = label.GetComponentInChildren<Text>();
             text.text = formattedLatitude;
@@ -221,7 +232,7 @@ namespace TrekVRApplication {
 
             GameObject label = Instantiate(template, transform, false);
             label.name = $"LatLabel{++_longitudeLabelCount}";
-            label.transform.position = positionalScale * basePosition;
+            label.transform.localPosition = positionalScale * basePosition;
             label.SetActive(true);
             Text text = label.GetComponentInChildren<Text>();
             text.text = formattedLatitude;
@@ -262,6 +273,15 @@ namespace TrekVRApplication {
 
         }
 
+        private void RemoveCoordinateLines() {
+            foreach(TerrainOverlayLine line in _overlayLines) {
+                _overlayController.RemoveObject(line);
+            }
+            _overlayLines.Clear();
+            _longitudeLineCount = 0;
+            _latitudeLineCount = 0;
+        }
+
         private void UpdateCoordinateLinesOpacity(float eyeDistance) {
             bool changed = false;
 
@@ -283,6 +303,8 @@ namespace TrekVRApplication {
                 // The vertical axis fades in and out along with the coordinate lines,
                 // so update the vertical axis material here too.
                 UpdateMaterialAlpha(_verticalAxisMaterial, _coordinateLineOpacity);
+
+                _overlayController.UpdateTexture();
             }
         }
 

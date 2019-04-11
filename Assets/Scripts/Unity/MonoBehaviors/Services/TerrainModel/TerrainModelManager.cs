@@ -169,17 +169,11 @@ namespace TrekVRApplication {
                     GlobeTerrainOverlayController.Instance.AddArea(new Color(0.0f, 0.9f, 1.0f, 0.5f));
             }
             _highlightedArea.UpdateArea(bbox);
-
-            // In the future, overlay should always be enabled for globe.
-            GlobeModel.LayerController.EnableOverlay = true;
         }
 
         public void ClearHighlightedAreaOnGlobe() {
             GlobeTerrainOverlayController.Instance.RemoveObject(_highlightedArea);
             _highlightedArea = null;
-
-            // In the future, overlay should always be enabled for globe.
-            GlobeModel.LayerController.EnableOverlay = false;
         }
 
         #endregion
@@ -417,6 +411,7 @@ namespace TrekVRApplication {
 
             TerrainLayerController layerController = GlobeModel.AddLayerController<GlobalTerrainLayerController>();
             layerController.TargetTextureSize = new Vector2Int(2048, 1024); // TODO Make these constants.
+            layerController.EnableOverlay = true;
         }
 
         private void InitializeMaterial() {

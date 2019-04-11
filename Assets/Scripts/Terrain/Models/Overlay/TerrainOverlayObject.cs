@@ -6,6 +6,8 @@ namespace TrekVRApplication {
 
         public TerrainOverlayController Controller { get; private set; }
 
+        public abstract Material Material { get; set; }
+
         private int _depth = 0;
         public int Depth {
             get => _depth;

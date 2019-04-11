@@ -8,7 +8,7 @@ namespace TrekVRApplication {
 
         private Mesh _mesh;
 
-        public Material Material {
+        public override Material Material {
             get {
                 MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
                 return meshRenderer.material;

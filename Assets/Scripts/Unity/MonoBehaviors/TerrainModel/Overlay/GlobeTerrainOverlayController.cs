@@ -20,7 +20,7 @@ namespace TrekVRApplication {
                 throw new Exception($"Only one instace of {GetType().Name} is allowed!");
             }
 
-            _renderTextureResolution = 1024;
+            _renderTextureResolution = 2048;
         }
 
         protected override void Awake() {
