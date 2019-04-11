@@ -72,7 +72,7 @@ namespace TrekVRApplication {
                 { "heightExaggeration", terrainModelManager.HeightExagerration },
                 { "textures", terrainModelManager.TerrainTexturesEnabled },
                 { "coordinates", globe.EnableCoordinateLines },
-                { "locationNames", true },
+                { "locationNames", globe.EnableNomenclatures },
             };
             ZFBrowserUtils.SendDataResponse(_browser, requestId, settings);
         }

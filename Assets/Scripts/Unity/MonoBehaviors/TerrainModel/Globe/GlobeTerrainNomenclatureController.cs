@@ -39,7 +39,7 @@ namespace TrekVRApplication {
 
         private bool _repositionPinsOnVisible;
 
-        private bool _visible = true;
+        private bool _visible = false;
         public bool Visible {
             get => _visible;
             set {
