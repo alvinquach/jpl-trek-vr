@@ -89,6 +89,7 @@ namespace TrekVRApplication {
                     UserInterfaceManager.Instance.MainModal.Visible = false;
                     break;
                 case ControllerModalActivity.BookmarkResults:
+                case ControllerModalActivity.NomenclatureResults:
                 case ControllerModalActivity.ProductResults:
                     int? searchListActiveIndex = SearchWebService.SearchListActiveIndex;
                     Debug.Log(searchListActiveIndex == null ? "null" : searchListActiveIndex.ToString());

@@ -6,6 +6,7 @@ namespace TrekVRApplication {
         Default,
         BBoxSelection,
         BookmarkResults,
+        NomenclatureResults,
         ProductResults,
         LayerManager
     }
@@ -18,6 +19,8 @@ namespace TrekVRApplication {
                     return $"{ControllerModalUrl}/bbox-selection";
                 case ControllerModalActivity.BookmarkResults:
                     return $"{ControllerModalUrl}/bookmarks";
+                case ControllerModalActivity.NomenclatureResults:
+                    return $"{ControllerModalUrl}/nomenclatures";
                 case ControllerModalActivity.ProductResults:
                     return $"{ControllerModalUrl}/products";
                 case ControllerModalActivity.LayerManager:

@@ -35,7 +35,8 @@ namespace TrekVRApplication.SearchResponse {
         public string item_DBID;
         public string item_UUID;
         public string itemType;
-        public string keyword;
+        public string[] keyword;
+        public string[] keywords;
         public string productLabel;
         public string productType;
         public string shape;

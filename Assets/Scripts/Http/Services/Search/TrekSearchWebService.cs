@@ -11,6 +11,11 @@ namespace TrekVRApplication {
 
         private const string BaseUrl = "https://trek.nasa.gov/mars/TrekServices/ws/index/eq/searchItems?&&&&proj=urn:ogc:def:crs:EPSG::104905";
 
+        /// <summary>
+        ///     Limit search results to 400 items.
+        /// </summary>
+        private const int ResultsLimit = 400;
+
         public static TrekSearchWebService Instance { get; } = new TrekSearchWebService();
 
         private int? _searchListActiveIndex = null;
@@ -144,57 +149,68 @@ namespace TrekVRApplication {
 
             GetFacetInfo(data => {
 
-                IDictionary<string, string> paramsMap = new Dictionary<string, string>() {
-                    { "start", "0" } // Always start at index 0.
-                };
-
                 // Get the total count of the item type from the facet info.
                 // If a count doesn't exist for the item type, then the count
                 // is the total number of all items.
                 if (!data.FacetInfo.ItemType.TryGetValue(searchParams.ItemType, out int itemCount)) {
                     itemCount = data.FacetInfo.ItemType.Values.Aggregate(0, (sum, val) => sum + val);
                 }
-                paramsMap.Add("rows", itemCount.ToString());
 
-                string facetKeys = "", facetValues = "";
-                if (searchParams.ItemType > 0) {
-                    AppendFacetQuery(ref facetKeys, "itemType");
-                    AppendFacetQuery(ref facetValues, searchParams.ItemType.GetSearchQueryTerm());
-                }
-                if (!string.IsNullOrEmpty(searchParams.ProductType)) {
-                    AppendFacetQuery(ref facetKeys, "productType");
-                    AppendFacetQuery(ref facetValues, searchParams.ProductType);
-                }
-                if (!string.IsNullOrEmpty(searchParams.Mission)) {
-                    AppendFacetQuery(ref facetKeys, "mission");
-                    AppendFacetQuery(ref facetValues, searchParams.Mission);
-                }
-                if (!string.IsNullOrEmpty(searchParams.Instrument)) {
-                    AppendFacetQuery(ref facetKeys, "instrument");
-                    AppendFacetQuery(ref facetValues, searchParams.Instrument);
-                }
-                paramsMap.Add("facetKeys", facetKeys);
-                paramsMap.Add("facetValues", facetValues);
+                int limit = Math.Min(ResultsLimit, itemCount);
 
-                if (!string.IsNullOrEmpty(searchParams.Search)) {
-                    paramsMap.Add("key", searchParams.Search);
-                }
+                Search(searchParams, limit, callback);
+            });
+        }
 
-                string searchUrl = HttpRequestUtils.AppendParams(BaseUrl, paramsMap);
+        private void Search(SearchParameters searchParams, int limit, Action<SearchResult> callback) {
 
-                HttpClient.Get(searchUrl, (res) => {
-                    string responseBody = HttpClient.GetReponseBody(res);
-                    SearchResult searchResult = DeserializeResults(responseBody);
-                    callback?.Invoke(searchResult);
-                });
+            IDictionary<string, string> paramsMap = new Dictionary<string, string>() {
+                { "start", "0" }, // Always start at index 0.
+                { "rows", $"{limit}" }
+            };
 
+            string facetKeys = "", facetValues = "";
+            if (searchParams.ItemType > 0) {
+                AppendFacetQuery(ref facetKeys, "itemType");
+                AppendFacetQuery(ref facetValues, searchParams.ItemType.GetSearchQueryTerm());
+            }
+            if (!string.IsNullOrEmpty(searchParams.ProductType)) {
+                AppendFacetQuery(ref facetKeys, "productType");
+                AppendFacetQuery(ref facetValues, searchParams.ProductType);
+            }
+            if (!string.IsNullOrEmpty(searchParams.Mission)) {
+                AppendFacetQuery(ref facetKeys, "mission");
+                AppendFacetQuery(ref facetValues, searchParams.Mission);
+            }
+            if (!string.IsNullOrEmpty(searchParams.Instrument)) {
+                AppendFacetQuery(ref facetKeys, "instrument");
+                AppendFacetQuery(ref facetValues, searchParams.Instrument);
+            }
+            paramsMap.Add("facetKeys", facetKeys);
+            paramsMap.Add("facetValues", facetValues);
+
+            if (!string.IsNullOrEmpty(searchParams.Search)) {
+                paramsMap.Add("key", searchParams.Search);
+            }
+
+            string searchUrl = HttpRequestUtils.AppendParams(BaseUrl, paramsMap);
+            HttpClient.Get(searchUrl, res => {
+                string responseBody = HttpClient.GetReponseBody(res);
+                SearchResult searchResult = DeserializeResults(responseBody);
+                callback?.Invoke(searchResult);
             });
 
         }
 
         private SearchResult DeserializeResults(string json) {
-            Result result = JsonConvert.DeserializeObject<Result>(json, JsonConfig.SerializerSettings);
-            return new SearchResult(result);
+            try {
+                Result result = JsonConvert.DeserializeObject<Result>(json, JsonConfig.SerializerSettings);
+                return new SearchResult(result);
+            }
+            catch (Exception e) {
+                Debug.LogError(e.Message);
+                throw e;
+            }
         }
 
         private void AppendFacetQuery(ref string dest, string add) {

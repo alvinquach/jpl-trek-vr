@@ -85,6 +85,7 @@ namespace TrekVRApplication {
                     }
                     break;
                 case ControllerModalActivity.BookmarkResults:
+                case ControllerModalActivity.NomenclatureResults:
                 case ControllerModalActivity.ProductResults:
                     Input.RegisterKeyPress(KeyCode.M);
                     break;
