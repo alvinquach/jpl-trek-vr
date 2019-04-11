@@ -1,6 +1,6 @@
 using UnityEngine;
 using static TrekVRApplication.ServiceManager;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 
@@ -88,7 +88,7 @@ namespace TrekVRApplication {
 
         private void OnDestroy() {
             // TODO Unregister all layers
-            TerrainModelProductMetadata texInfo = GenerateProductMetadata(GlobalMosaicUUID);
+            TerrainProductMetadata texInfo = GenerateProductMetadata(GlobalMosaicUUID);
             TerrainModelTextureManager.Instance.RegisterUsage(texInfo, false);
         }
 
@@ -117,8 +117,8 @@ namespace TrekVRApplication {
                 });
             });
 
-            TerrainModelProductMetadata demMetadata = 
-                new TerrainModelProductMetadata(DemUUID, SquareBoundingBox, LocalTerrainDemTargetSize, ImageFileFormat.Tiff);
+            TerrainProductMetadata demMetadata = 
+                new TerrainProductMetadata(DemUUID, SquareBoundingBox, LocalTerrainDemTargetSize, ImageFileFormat.Tiff);
 
             // Load the DEM data, and then generate another mesh after using the data.
             RasterSubsetWebService.SubsetProduct(demMetadata, filepath => {
@@ -275,8 +275,8 @@ namespace TrekVRApplication {
             return min;
         }
 
-        private TerrainModelProductMetadata GenerateProductMetadata(string productId, int size = LocalTerrainTextureTargetSize) {
-            return new TerrainModelProductMetadata(productId, SquareBoundingBox, size);
+        private TerrainProductMetadata GenerateProductMetadata(string productId, int size = LocalTerrainTextureTargetSize) {
+            return new TerrainProductMetadata(productId, SquareBoundingBox, size);
         }
 
     }

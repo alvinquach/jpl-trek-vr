@@ -4,7 +4,7 @@
     ///     Used for relaying layer adjustments and changes from the user 
     ///     interface to the layer controller(s).
     /// </summary>
-    public class TerrainModelLayerChange {
+    public class TerrainLayerChange {
 
         public int Index { get; set; }
 

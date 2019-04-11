@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 
     [DisallowMultipleComponent]
-    public class TerrainModelBookmarkLayerController : TerrainModelLayerController {
+    public class TerrainBookmarkLayerController : TerrainLayerController {
 
         // NOTE: When modifying the global layers list within this class,
         // access the backing variable directly instead of the property,
         // as using the property accessor will return a new list object.
-        private IList<TerrainModelLayer> _layers = new List<TerrainModelLayer>();
-        public override IList<TerrainModelLayer> Layers => new List<TerrainModelLayer>(_layers);
+        private IList<TerrainLayer> _layers = new List<TerrainLayer>();
+        public override IList<TerrainLayer> Layers => new List<TerrainLayer>(_layers);
 
         public override void AddLayer(string productUUID, int? index = null, Action callback = null) {
 
@@ -43,11 +43,11 @@ namespace TrekVRApplication {
             });
         }
 
-        public override void UpdateLayer(TerrainModelLayerChange changes, Action callback = null) {
+        public override void UpdateLayer(TerrainLayerChange changes, Action callback = null) {
             int index = changes.Index;
             if (index > 0 && index < _layers.Count) {
                 bool changed = false;
-                TerrainModelLayer layer = _layers[index];
+                TerrainLayer layer = _layers[index];
                 if (changes.Opacity != null && layer.Opacity != changes.Opacity) {
                     layer.Opacity = (float)changes.Opacity;
                     changed = true;
@@ -66,7 +66,7 @@ namespace TrekVRApplication {
 
         public override void MoveLayer(int from, int to, Action callback = null) {
             if (from >= 0 && from < _layers.Count && to >= 0 && to < _layers.Count && from != to) {
-                TerrainModelLayer temp = _layers[from];
+                TerrainLayer temp = _layers[from];
                 _layers.RemoveAt(from);
                 _layers.Insert(to, temp);
                 if (Started) {

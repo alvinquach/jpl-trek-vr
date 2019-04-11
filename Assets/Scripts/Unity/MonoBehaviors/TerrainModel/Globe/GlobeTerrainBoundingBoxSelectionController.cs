@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
-using static TrekVRApplication.TerrainModelConstants;
-using static TrekVRApplication.GlobeTerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
+using static TrekVRApplication.GlobeTerrainConstants;
 using static TrekVRApplication.TerrainOverlayUtils;
 
 namespace TrekVRApplication {
 
-    public class GlobeBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
+    public class GlobeTerrainBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
 
         private POILabel _coordSelectionLabel;
 

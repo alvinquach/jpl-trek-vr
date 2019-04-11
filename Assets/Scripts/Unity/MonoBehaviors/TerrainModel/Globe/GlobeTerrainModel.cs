@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 
@@ -83,8 +83,8 @@ namespace TrekVRApplication {
             });
         }
 
-        private TerrainModelProductMetadata GenerateProductMetadata(string productId, int width, int height) {
-            return new TerrainModelProductMetadata(productId, UnrestrictedBoundingBox.Global, width, height);
+        private TerrainProductMetadata GenerateProductMetadata(string productId, int width, int height) {
+            return new TerrainProductMetadata(productId, UnrestrictedBoundingBox.Global, width, height);
         }
 
     }

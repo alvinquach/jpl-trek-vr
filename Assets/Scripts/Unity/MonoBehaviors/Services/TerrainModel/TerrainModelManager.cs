@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 
@@ -62,11 +62,11 @@ namespace TrekVRApplication {
         // NOTE: When modifying the global layers list within this class,
         // access the backing variable directly instead of the property,
         // as using the property accessor will return a new list object.
-        private readonly IList<TerrainModelLayer> _globalLayers = new List<TerrainModelLayer>();
+        private readonly IList<TerrainLayer> _globalLayers = new List<TerrainLayer>();
         /// <summary>
         ///     Get a copy of the global layer list.
         /// </summary>
-        public IList<TerrainModelLayer> GlobalLayers => new List<TerrainModelLayer>(_globalLayers);
+        public IList<TerrainLayer> GlobalLayers => new List<TerrainLayer>(_globalLayers);
 
         private bool _terrainInteractionEnabled = true;
         /// <summary>
@@ -177,7 +177,7 @@ namespace TrekVRApplication {
 
         #region Layer management methods
 
-        public bool AddGlobalLayer(TerrainModelLayer layer, int? index = null) {
+        public bool AddGlobalLayer(TerrainLayer layer, int? index = null) {
             if (_globalLayers.Any(l => l.ProductUUID == layer.ProductUUID)) {
                 Debug.LogError($"{layer.ProductUUID} has already been added as a layer.");
                 return false;
@@ -192,13 +192,13 @@ namespace TrekVRApplication {
             return true;
         }
 
-        public bool UpdateGlobalLayer(TerrainModelLayerChange changes) {
+        public bool UpdateGlobalLayer(TerrainLayerChange changes) {
             int index = changes.Index;
             if (index <= 0 || index >= _globalLayers.Count) {
                 return false;
             }
             bool changed = false;
-            TerrainModelLayer layer = _globalLayers[index];
+            TerrainLayer layer = _globalLayers[index];
             if (changes.Opacity != null && layer.Opacity != changes.Opacity) {
                 layer.Opacity = (float)changes.Opacity;
                 changed = true;
@@ -216,7 +216,7 @@ namespace TrekVRApplication {
             if (from < 0 || from >= _globalLayers.Count || from < 0 || from >= _globalLayers.Count || from == to) {
                 return false;
             }
-            TerrainModelLayer temp = _globalLayers[from];
+            TerrainLayer temp = _globalLayers[from];
             _globalLayers.RemoveAt(from);
             _globalLayers.Insert(to, temp);
             OnGlobalLayersChanged.Invoke();
@@ -241,15 +241,15 @@ namespace TrekVRApplication {
             LocalTerrainModel terrainModel = CreateLocalModel(boundingBox, parent.DemUUID, parent is GlobeTerrainModel);
 
             // TODO Make this code look better
-            TerrainModelLayerController layerController;
-            TerrainModelLayerController parentLayerController = parent.LayerController;
-            if (parentLayerController is TerrainModelGlobalLayerController) {
-                layerController = terrainModel.AddLayerController<TerrainModelGlobalLayerController>();
+            TerrainLayerController layerController;
+            TerrainLayerController parentLayerController = parent.LayerController;
+            if (parentLayerController is GlobalTerrainLayerController) {
+                layerController = terrainModel.AddLayerController<GlobalTerrainLayerController>();
             } else {
-                layerController = terrainModel.AddLayerController<TerrainModelBookmarkLayerController>();
+                layerController = terrainModel.AddLayerController<TerrainBookmarkLayerController>();
                 int index = 0;
-                foreach (TerrainModelLayer layer in parentLayerController.Layers) {
-                    TerrainModelLayerChange changes = new TerrainModelLayerChange() {
+                foreach (TerrainLayer layer in parentLayerController.Layers) {
+                    TerrainLayerChange changes = new TerrainLayerChange() {
                         Index = index,
                         Opacity = layer.Opacity,
                         Visible = layer.Visible
@@ -276,7 +276,7 @@ namespace TrekVRApplication {
 
             LocalTerrainModel terrainModel = CreateLocalModel(boundingBox, demUUID, false, false);
 
-            TerrainModelLayerController layerController = terrainModel.AddLayerController<TerrainModelBookmarkLayerController>();
+            TerrainLayerController layerController = terrainModel.AddLayerController<TerrainBookmarkLayerController>();
             layerController.UpdateBoundingBox(terrainModel.SquareBoundingBox, false);
             foreach(string layerUUID in layersUUID) {
                 layerController.AddLayer(layerUUID);
@@ -405,7 +405,7 @@ namespace TrekVRApplication {
             GlobeModel.LodLevels = _globeModelLODLevels;
             GlobeModel.Visible = true;
 
-            TerrainModelLayerController layerController = GlobeModel.AddLayerController<TerrainModelGlobalLayerController>();
+            TerrainLayerController layerController = GlobeModel.AddLayerController<GlobalTerrainLayerController>();
             layerController.TargetTextureSize = new Vector2Int(2048, 1024); // TODO Make these constants.
         }
 
@@ -418,12 +418,12 @@ namespace TrekVRApplication {
 
             // Set the base layer of the texture.
             TerrainModelTextureManager.Instance.GetTexture(
-                new TerrainModelProductMetadata(GlobalMosaicUUID, UnrestrictedBoundingBox.Global, 0), 
+                new TerrainProductMetadata(GlobalMosaicUUID, UnrestrictedBoundingBox.Global, 0), 
                 texture => BaseMaterial.SetTexture("_DiffuseBase", texture)
             );
 
             // Also add the base layer to the layer list.
-            _globalLayers.Add(new TerrainModelLayer("Base", GlobalMosaicUUID));
+            _globalLayers.Add(new TerrainLayer("Base", GlobalMosaicUUID));
         }
 
         #endregion

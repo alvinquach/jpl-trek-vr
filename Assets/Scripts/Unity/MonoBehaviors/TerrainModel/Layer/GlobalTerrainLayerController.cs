@@ -6,11 +6,11 @@ using UnityEngine;
 namespace TrekVRApplication {
 
     [DisallowMultipleComponent]
-    public class TerrainModelGlobalLayerController : TerrainModelLayerController {
+    public class GlobalTerrainLayerController : TerrainLayerController {
 
         private bool _globalLayersChanged;
 
-        public override IList<TerrainModelLayer> Layers => _terrainModelManager.GlobalLayers;
+        public override IList<TerrainLayer> Layers => _terrainModelManager.GlobalLayers;
 
         #region Unity lifecycle methods
 
@@ -33,7 +33,7 @@ namespace TrekVRApplication {
         #endregion
 
         public override void AddLayer(string productUUID, int ? index = null, Action callback = null) {
-            IList<TerrainModelLayer> layers = Layers;
+            IList<TerrainLayer> layers = Layers;
 
             // Check if the number of layers is already maxed out.
             if (layers.Count >= MaxDiffuseLayers) {
@@ -55,10 +55,10 @@ namespace TrekVRApplication {
             });
         }
 
-        public override void UpdateLayer(TerrainModelLayerChange changes, Action callback = null) {
+        public override void UpdateLayer(TerrainLayerChange changes, Action callback = null) {
             if (_terrainModelManager.UpdateGlobalLayer(changes)) {
                 int index = changes.Index;
-                TerrainModelLayer layer = Layers[index];
+                TerrainLayer layer = Layers[index];
                 Material.SetFloat($"_Diffuse{index}Opacity", layer.Visible ? layer.Opacity : 0);
             }
             callback?.Invoke();

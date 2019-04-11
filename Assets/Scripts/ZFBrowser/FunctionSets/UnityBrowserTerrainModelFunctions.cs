@@ -53,7 +53,7 @@ namespace TrekVRApplication {
         public void CreateLocalTerrainFromBookmark(string bookmarkJson) {
             Bookmark bookmark = JsonConvert.DeserializeObject<Bookmark>(bookmarkJson, JsonConfig.SerializerSettings);
             BoundingBox bbox = BoundingBoxUtils.ParseBoundingBox(bookmark.BoundingBox);
-            TerrainModelProductMetadata baseProductMetadata = new TerrainModelProductMetadata(bookmark.TexturesUUID[0], bbox, 0);
+            TerrainProductMetadata baseProductMetadata = new TerrainProductMetadata(bookmark.TexturesUUID[0], bbox, 0);
             // TODO Add additional product layers if present.
 
             TerrainModelManager terrainModelManager = TerrainModelManager.Instance;

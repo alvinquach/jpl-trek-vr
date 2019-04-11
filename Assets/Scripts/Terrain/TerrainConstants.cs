@@ -2,7 +2,7 @@
 
 namespace TrekVRApplication {
 
-    public static class TerrainModelConstants {
+    public static class TerrainConstants {
 
         public const float TerrainModelScale = 2.5e-7f;
 

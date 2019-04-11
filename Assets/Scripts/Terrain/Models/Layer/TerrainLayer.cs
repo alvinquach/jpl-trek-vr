@@ -1,6 +1,6 @@
 ﻿namespace TrekVRApplication {
 
-    public struct TerrainModelLayer {
+    public struct TerrainLayer {
 
         /// <summary>
         ///     Name of the layer for display only. Not used for identification purposes.
@@ -22,11 +22,11 @@
         public bool Visible { get; set; }
 
 
-        public TerrainModelLayer(string name, string uuid) : this(name, uuid, null) {
+        public TerrainLayer(string name, string uuid) : this(name, uuid, null) {
             
         }
 
-        public TerrainModelLayer(string name, string uuid, string thumbnailUrl) {
+        public TerrainLayer(string name, string uuid, string thumbnailUrl) {
             Name = name;
             ThumbnailUrl = thumbnailUrl;
             ProductUUID = uuid;

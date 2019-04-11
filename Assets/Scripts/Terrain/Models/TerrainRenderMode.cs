@@ -3,7 +3,7 @@
 namespace TrekVRApplication {
 
     [Flags]
-    public enum TerrainModelRenderMode : int {
+    public enum TerrainRenderMode : int {
 
         Default = 0,
         Disabled = 1 << 0,

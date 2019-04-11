@@ -12,7 +12,7 @@ namespace TrekVRApplication {
 
         protected override string FunctionsReadyVariable => "layerFunctionsReady";
 
-        private TerrainModelLayerController CurrentLayerController {
+        private TerrainLayerController CurrentLayerController {
             get => _terrainModelManager.CurrentVisibleModel.LayerController;
         }
 
@@ -27,8 +27,8 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void UpdateLayer(string layerChangeJson) {
-            TerrainModelLayerChange changes = 
-                JsonConvert.DeserializeObject<TerrainModelLayerChange>(layerChangeJson, JsonConfig.SerializerSettings);
+            TerrainLayerChange changes = 
+                JsonConvert.DeserializeObject<TerrainLayerChange>(layerChangeJson, JsonConfig.SerializerSettings);
 
             CurrentLayerController.UpdateLayer(changes);
         }
@@ -52,12 +52,12 @@ namespace TrekVRApplication {
 
         [RegisterToBrowser]
         public void GetCurrentLayers(string requestId) {
-            IList<TerrainModelLayer> layers = _terrainModelManager.CurrentVisibleModel.LayerController.Layers;
+            IList<TerrainLayer> layers = _terrainModelManager.CurrentVisibleModel.LayerController.Layers;
             ZFBrowserUtils.SendDataResponse(_browser, requestId, layers);
         }
 
         private void SendLayersToBrowser() {
-            IList<TerrainModelLayer> layers = CurrentLayerController.Layers;
+            IList<TerrainLayer> layers = CurrentLayerController.Layers;
             string response = JsonConvert.SerializeObject(layers, JsonConfig.SerializerSettings);
             Debug.Log(response);
             _browser.EvalJS($"{UnityGlobalObjectPath}.onLayersUpdated.next({response});");

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace TrekVRApplication {
 
-    public struct TerrainModelProductMetadata : IEquatable<TerrainModelProductMetadata> {
+    public struct TerrainProductMetadata : IEquatable<TerrainProductMetadata> {
 
         public string ProductUUID { get; }
 
@@ -15,12 +15,12 @@ namespace TrekVRApplication {
 
         public ImageFileFormat Format { get; set; }
 
-        public TerrainModelProductMetadata(string productUUID, IBoundingBox boundingBox, int size, ImageFileFormat format = 0) :
+        public TerrainProductMetadata(string productUUID, IBoundingBox boundingBox, int size, ImageFileFormat format = 0) :
             this(productUUID, boundingBox, size, size, format) {
 
         }
 
-        public TerrainModelProductMetadata(string productUUID, IBoundingBox boundingBox, int width, int height, ImageFileFormat format = 0) {
+        public TerrainProductMetadata(string productUUID, IBoundingBox boundingBox, int width, int height, ImageFileFormat format = 0) {
             ProductUUID = productUUID;
             BoundingBox = boundingBox;
             Width = width;
@@ -37,7 +37,7 @@ namespace TrekVRApplication {
             return Convert.ToBase64String(bytes);
         }
 
-        public static TerrainModelProductMetadata DecodeBase64(string filename) {
+        public static TerrainProductMetadata DecodeBase64(string filename) {
             // TODO Implement this
             throw new NotImplementedException();
         }
@@ -53,7 +53,7 @@ namespace TrekVRApplication {
             return ToString("\n");
         }
 
-        public bool Equals(TerrainModelProductMetadata other) {
+        public bool Equals(TerrainProductMetadata other) {
             return ProductUUID == other.ProductUUID &&
                    BoundingBox == other.BoundingBox &&
                    Width == other.Width &&

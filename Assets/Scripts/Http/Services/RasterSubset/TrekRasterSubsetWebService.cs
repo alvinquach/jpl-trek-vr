@@ -66,7 +66,7 @@ namespace TrekVRApplication {
         ///     Retrieves the product from the Trek web services and saves it to a file. If the
         ///     requested file is already present on the file system, then it is loaded instead.
         /// </summary>
-        public void SubsetProduct(TerrainModelProductMetadata productInfo, Action<string> callback) {
+        public void SubsetProduct(TerrainProductMetadata productInfo, Action<string> callback) {
             SubsetProduct(productInfo, false, callback);
         }
 
@@ -75,7 +75,7 @@ namespace TrekVRApplication {
         ///     requested file is already present on the file system, then it is loaded instead,
         ///     unless file redownload is forced.
         /// </summary>
-        public void SubsetProduct(TerrainModelProductMetadata productInfo, bool forceRedownload, Action<string> callback) {
+        public void SubsetProduct(TerrainProductMetadata productInfo, bool forceRedownload, Action<string> callback) {
 
             if (productInfo.Format == 0) {
                 productInfo.Format = ImageFileFormat.Tiff;
@@ -120,7 +120,7 @@ namespace TrekVRApplication {
 
         }
 
-        private void VerifyProductExists(TerrainModelProductMetadata productInfo, Action<bool> callback) {
+        private void VerifyProductExists(TerrainProductMetadata productInfo, Action<bool> callback) {
             GetRasters(res => {
                 foreach (SearchResultItem item in res.Items) {
                     if (item.UUID == productInfo.ProductUUID) {

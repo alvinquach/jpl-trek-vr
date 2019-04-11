@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using static TrekVRApplication.FlagUtils;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 using static TrekVRApplication.ServiceManager;
 using System;
 
 namespace TrekVRApplication {
 
-    public abstract class TerrainModelLayerController : MonoBehaviour {
+    public abstract class TerrainLayerController : MonoBehaviour {
 
         /// <summary>
         ///     The maximum number of diffuese layers, including the base layer.
@@ -18,7 +18,7 @@ namespace TrekVRApplication {
 
         protected bool Started { get; private set; }
 
-        public abstract IList<TerrainModelLayer> Layers { get; }
+        public abstract IList<TerrainLayer> Layers { get; }
 
         private Material _material;
         public Material Material {
@@ -54,22 +54,22 @@ namespace TrekVRApplication {
         #region Render mode properties
 
         public bool EnableOverlay {
-            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.Overlay);
-            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Overlay, value);
+            get => ContainsFlag((int)RenderMode, (int)TerrainRenderMode.Overlay);
+            set => RenderMode = (TerrainRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainRenderMode.Overlay, value);
         }
 
         public bool DisableTextures {
-            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.NoTextures);
-            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.NoTextures, value);
+            get => ContainsFlag((int)RenderMode, (int)TerrainRenderMode.NoTextures);
+            set => RenderMode = (TerrainRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainRenderMode.NoTextures, value);
         }
 
         public bool UseDisabledMaterial {
-            get => ContainsFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled);
-            set => RenderMode = (TerrainModelRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainModelRenderMode.Disabled, value);
+            get => ContainsFlag((int)RenderMode, (int)TerrainRenderMode.Disabled);
+            set => RenderMode = (TerrainRenderMode)AddOrRemoveFlag((int)RenderMode, (int)TerrainRenderMode.Disabled, value);
         }
 
-        private TerrainModelRenderMode _renderMode;
-        public TerrainModelRenderMode RenderMode {
+        private TerrainRenderMode _renderMode;
+        public TerrainRenderMode RenderMode {
             get => _renderMode;
             private set {
                 _renderMode = value;
@@ -105,7 +105,7 @@ namespace TrekVRApplication {
 
         public abstract void AddLayer(string productUUID, int? index = null, Action callback = null);
 
-        public abstract void UpdateLayer(TerrainModelLayerChange changes, Action callback = null);
+        public abstract void UpdateLayer(TerrainLayerChange changes, Action callback = null);
 
         public abstract void MoveLayer(int from, int to, Action callback = null);
 
@@ -205,13 +205,13 @@ namespace TrekVRApplication {
 
         protected abstract Material GenerateMaterial();
 
-        protected void ReloadTextures(IList<TerrainModelLayer> layers, bool reloadBase = true) {
+        protected void ReloadTextures(IList<TerrainLayer> layers, bool reloadBase = true) {
             TerrainModelTextureManager textureManager = TerrainModelTextureManager.Instance;
             for (int i = reloadBase ? 0 : 1; i < MaxDiffuseLayers; i++) {
                 int _i = i; // Copy the index for the anonymous function.
                 int layerId = GetShaderTextureId(i);
                 if (i < layers.Count) {
-                    TerrainModelLayer layer = layers[i];
+                    TerrainLayer layer = layers[i];
                     textureManager.GetTexture(GenerateProductMetadata(layer.ProductUUID), texture => {
                         Material.SetTexture(layerId, texture);
                         Material.SetTextureScale(layerId, Vector2.one);
@@ -230,17 +230,17 @@ namespace TrekVRApplication {
             }
         }
 
-        protected void CreateLayer(string uuid, Action<TerrainModelLayer> callback) {
+        protected void CreateLayer(string uuid, Action<TerrainLayer> callback) {
             RasterSubsetWebService.GetRaster(uuid, raster => {
                 if (raster == null) {
                     throw new Exception("No result.");
                 }
-                callback(new TerrainModelLayer(raster.Name, uuid, raster.ThumbnailUrl));
+                callback(new TerrainLayer(raster.Name, uuid, raster.ThumbnailUrl));
             });
         }
 
-        protected TerrainModelProductMetadata GenerateProductMetadata(string uuid) {
-            return new TerrainModelProductMetadata(uuid, BoundingBox, TargetTextureSize.x, TargetTextureSize.y);
+        protected TerrainProductMetadata GenerateProductMetadata(string uuid) {
+            return new TerrainProductMetadata(uuid, BoundingBox, TargetTextureSize.x, TargetTextureSize.y);
         }
 
         private int GetShaderTextureId(int index) {

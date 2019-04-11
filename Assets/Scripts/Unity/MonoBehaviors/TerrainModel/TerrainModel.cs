@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 
@@ -12,7 +12,7 @@ namespace TrekVRApplication {
         public abstract XRInteractableTerrain InteractionController { get; }
 
         // Don't forget to call AddLayerController() after adding a TerrainModel component.
-        public TerrainModelLayerController LayerController { get; private set; }
+        public TerrainLayerController LayerController { get; private set; }
 
         public abstract string DemUUID { get; set; }
 
@@ -157,10 +157,10 @@ namespace TrekVRApplication {
         #endregion
 
         /// <summary>
-        ///     Adds a TerrainModelLayerController to the TerrainModel. This can only be called
+        ///     Adds a TerrainLayerController to the TerrainModel. This can only be called
         ///     once, and should be called right after the TerrainModel component is created.
         /// </summary>
-        public T AddLayerController<T>() where T : TerrainModelLayerController {
+        public T AddLayerController<T>() where T : TerrainLayerController {
             if (_initTaskStatus > TaskStatus.NotStarted) {
                 throw new Exception("Cannot add layer controller after model initialization has already started.");
             }

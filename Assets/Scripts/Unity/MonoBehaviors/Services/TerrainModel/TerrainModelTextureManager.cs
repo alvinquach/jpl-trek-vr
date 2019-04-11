@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using static TrekVRApplication.ServiceManager;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 
@@ -54,8 +54,8 @@ namespace TrekVRApplication {
             }
         }
 
-        private readonly IDictionary<TerrainModelProductMetadata, TextureWrapper> _textureDictionary =
-            new Dictionary<TerrainModelProductMetadata, TextureWrapper>();
+        private readonly IDictionary<TerrainProductMetadata, TextureWrapper> _textureDictionary =
+            new Dictionary<TerrainProductMetadata, TextureWrapper>();
 
         [SerializeField]
         private string _globalMosaicFilepath;
@@ -103,7 +103,7 @@ namespace TrekVRApplication {
 
         #endregion
 
-        public void RegisterUsage(TerrainModelProductMetadata texInfo, bool inUse) {
+        public void RegisterUsage(TerrainProductMetadata texInfo, bool inUse) {
             if (!_textureDictionary.TryGetValue(texInfo, out TextureWrapper wrapper)) {
                 return;
             }
@@ -126,14 +126,14 @@ namespace TrekVRApplication {
         ///     A callback function that the requested Texture2D object will be passed through.
         ///     The callback function is guaranteed to be called on the main thread.
         /// </param>
-        public void GetTexture(TerrainModelProductMetadata productInfo, Action<Texture2D> callback = null) {
+        public void GetTexture(TerrainProductMetadata productInfo, Action<Texture2D> callback = null) {
 
             if (IsGlobalMosaic(productInfo)) {
                 GetGlobalMosaicTexture(callback);
                 return;
             }
 
-            TerrainModelProductMetadata texInfo = CleanMetadata(productInfo);
+            TerrainProductMetadata texInfo = CleanMetadata(productInfo);
 
             // If an entry for the texture doesn't exist yet, then create it.
             if (!_textureDictionary.TryGetValue(texInfo, out TextureWrapper wrapper)) {
@@ -181,14 +181,14 @@ namespace TrekVRApplication {
         ///     Prints debug info to the console.
         /// </summary>
         public void PrintTextureList() {
-            foreach (TerrainModelProductMetadata texInfo in _textureDictionary.Keys) {
+            foreach (TerrainProductMetadata texInfo in _textureDictionary.Keys) {
                 TextureWrapper wrapper = _textureDictionary[texInfo];
                 Debug.Log(texInfo + "\n" + wrapper.UsageCount);
             }
         }
 
-        private TerrainModelProductMetadata CleanMetadata(TerrainModelProductMetadata texInfo) {
-            return new TerrainModelProductMetadata(
+        private TerrainProductMetadata CleanMetadata(TerrainProductMetadata texInfo) {
+            return new TerrainProductMetadata(
                 texInfo.ProductUUID,
                 texInfo.BoundingBox,
                 texInfo.Width,
@@ -225,7 +225,7 @@ namespace TrekVRApplication {
             });
         }
 
-        private bool IsGlobalMosaic(TerrainModelProductMetadata texInfo) {
+        private bool IsGlobalMosaic(TerrainProductMetadata texInfo) {
             return texInfo.ProductUUID == GlobalMosaicUUID && texInfo.BoundingBox == UnrestrictedBoundingBox.Global;
         }
 
@@ -238,13 +238,13 @@ namespace TrekVRApplication {
                 return 0;
             }
 
-            IEnumerable<KeyValuePair<TerrainModelProductMetadata, TextureWrapper>> entries =
+            IEnumerable<KeyValuePair<TerrainProductMetadata, TextureWrapper>> entries =
                 _textureDictionary.ToList()
                 .Where(kv => kv.Value.UsageCount == 0)
                 .OrderByDescending(kv => kv.Value.LastUsed);
 
             int count = 0;
-            foreach (KeyValuePair<TerrainModelProductMetadata, TextureWrapper> entry in entries) {
+            foreach (KeyValuePair<TerrainProductMetadata, TextureWrapper> entry in entries) {
                 _textureDictionary.Remove(entry.Key);
                 Destroy(entry.Value.Texture);
                 if (++count == targetDeleteCount) {

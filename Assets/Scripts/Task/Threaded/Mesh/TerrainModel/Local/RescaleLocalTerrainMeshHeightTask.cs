@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 

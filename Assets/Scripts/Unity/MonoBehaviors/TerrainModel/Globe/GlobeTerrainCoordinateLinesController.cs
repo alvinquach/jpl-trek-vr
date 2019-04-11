@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using static TrekVRApplication.GlobeTerrainModelConstants;
+using static TrekVRApplication.GlobeTerrainConstants;
 using static TrekVRApplication.TerrainOverlayUtils;
-using static TrekVRApplication.TerrainModelConstants;
+using static TrekVRApplication.TerrainConstants;
 
 namespace TrekVRApplication {
 
@@ -11,7 +11,7 @@ namespace TrekVRApplication {
     ///     elements that are rendered on the planet, such as the
     ///     coordinate lines and coordinate labels.
     /// </summary>
-    public class GlobeCoordinateLinesController : MonoBehaviour {
+    public class GlobeTerrainCoordinateLinesController : MonoBehaviour {
 
         #region Line and label counts (for naming purposes)
 

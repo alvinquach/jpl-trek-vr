@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public static class GlobeTerrainModelConstants {
+    public static class GlobeTerrainConstants {
 
         public const int CoordinateIndicatorMaxSegmentCount = 128;
 

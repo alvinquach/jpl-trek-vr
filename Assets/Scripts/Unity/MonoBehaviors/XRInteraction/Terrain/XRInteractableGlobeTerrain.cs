@@ -4,9 +4,9 @@ namespace TrekVRApplication {
 
     public class XRInteractableGlobeTerrain : XRInteractableTerrain {
 
-        private GlobeCoordinateLinesController _coordinateLinesController;
+        private GlobeTerrainCoordinateLinesController _coordinateLinesController;
 
-        private GlobeBoundingBoxSelectionController _bboxSelectionController;
+        private GlobeTerrainBoundingBoxSelectionController _bboxSelectionController;
         protected override TerrainBoundingBoxSelectionController BBoxSelectionController => _bboxSelectionController;
 
         private GlobeTerrainModel _terrainModel;
@@ -109,7 +109,7 @@ namespace TrekVRApplication {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             selectionIndicatorsContainer.transform.SetParent(transform, false);
-            _bboxSelectionController = selectionIndicatorsContainer.AddComponent<GlobeBoundingBoxSelectionController>();
+            _bboxSelectionController = selectionIndicatorsContainer.AddComponent<GlobeTerrainBoundingBoxSelectionController>();
             _bboxSelectionController.SetEnabled(false);
 
             // Add container for coordinate lines
@@ -117,7 +117,7 @@ namespace TrekVRApplication {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
             };
             coordinateLines.transform.SetParent(transform, false);
-            _coordinateLinesController = coordinateLines.AddComponent<GlobeCoordinateLinesController>();
+            _coordinateLinesController = coordinateLines.AddComponent<GlobeTerrainCoordinateLinesController>();
         }
 
         protected override void Start() {
