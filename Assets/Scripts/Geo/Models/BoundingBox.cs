@@ -150,7 +150,7 @@ namespace TrekVRApplication {
         }
 
         private static float WrapLongitude(float lon) {
-            return lon == 180f ? lon : MathUtils.WrapAngle180(lon);
+            return MathUtils.WrapAngle180(lon);
         }
 
         private static float WrapLatitude(float lat) {

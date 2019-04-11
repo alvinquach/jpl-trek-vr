@@ -40,7 +40,12 @@ namespace TrekVRApplication {
         /// <param name="angle">Angle in degress.</param>
         /// <returns>The equivalent angle between -180 and 180 degrees.</returns>
         public static float WrapAngle180(float angle) {
-            return (angle + 180) % 360f - 180f;
+            if (angle < -180) {
+                return (angle - 180) % 360f + 180f;
+            } else if (angle > 180) {
+                return (angle + 180) % 360f - 180f;
+            }
+            return angle;
         }
 
         /// <summary>

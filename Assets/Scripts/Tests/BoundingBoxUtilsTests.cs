@@ -62,20 +62,31 @@ namespace Tests {
         public void MedianLatLon_BoundingBoxA_CorrectResult() {
             Vector2 expected = new Vector2(14.05f, 24.45f);
             Vector2 actual = BoundingBoxUtils.MedianLatLon(_boundingBoxA);
-            Assert.AreEqual(expected, actual);
+            for (int i = 0; i < 2; i++) {
+                TestUtils.CompareFloats(expected[i], actual[i], _floatCompareDecimalPrecision);
+            }
         }
 
         [Test]
         public void MedianLatLon_BoundingBoxB_CorrectResult() {
             Vector2 expected = new Vector2(-22.8f, 33.3f);
             Vector2 actual = BoundingBoxUtils.MedianLatLon(_boundingBoxB);
-            Assert.AreEqual(expected, actual);
+            for (int i = 0; i < 2; i++) {
+                TestUtils.CompareFloats(expected[i], actual[i], _floatCompareDecimalPrecision);
+            }
         }
 
         [Test]
         public void MedianLatLon_BoundingBoxD_CorrectResult() {
             Vector2 expected = new Vector2(-45.0f, -45.0f);
             Vector2 actual = BoundingBoxUtils.MedianLatLon(_boundingBoxD);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void MedianLatLon_BoundingBoxF_CorrectResult() {
+            Vector2 expected = new Vector2(0.0f, 180.0f);
+            Vector2 actual = BoundingBoxUtils.MedianLatLon(_boundingBoxF);
             Assert.AreEqual(expected, actual);
         }
 

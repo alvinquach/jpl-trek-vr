@@ -29,14 +29,9 @@ namespace TrekVRApplication {
         /// <param name="boundingBox"></param>
         /// <returns>A Vector2 where x is the latitude and y is the longitude.</returns>
         public static Vector2 MedianLatLon(IBoundingBox boundingBox) {
-            float lon = (boundingBox[0] + boundingBox[2]) / 2;
-
-            // Handle case where the start and end longitudes have opposite signs.
-            //if (ReverseLonOrder(boundingBox)) {
-            //    lon += (lon > 0 ? -180 : 180);
-            //}
-
-            return new Vector2((boundingBox[1] + boundingBox[3]) / 2, lon);
+            float lat = (boundingBox[1] + boundingBox[3]) / 2;
+            float lon = MathUtils.WrapAngle180(boundingBox[0] + boundingBox.LonSwing / 2);
+            return new Vector2(lat, lon);
         }
 
         public static Vector3 MedianDirection(BoundingBox boundingBox) {
