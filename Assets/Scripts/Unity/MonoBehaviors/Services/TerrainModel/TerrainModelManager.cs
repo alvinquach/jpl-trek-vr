@@ -119,9 +119,18 @@ namespace TrekVRApplication {
 
         public event Action<float> OnHeightExagerrationChange = e => { };
 
+        public event Action OnCurrentModelPhyscisMeshUpdated = () => { };
+
         public event Action<TerrainModel> OnCurrentTerrainModelChange = e => { };
 
         public event Action OnGlobalLayersChanged = () => { };
+
+        public void ReportPhysicsMeshUpdated(TerrainModel terrainModel) {
+            if (terrainModel != CurrentVisibleModel) {
+                return;
+            }
+            OnCurrentModelPhyscisMeshUpdated.Invoke();
+        }
 
         #endregion
 

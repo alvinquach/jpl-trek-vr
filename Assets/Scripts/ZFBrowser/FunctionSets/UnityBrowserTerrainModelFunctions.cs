@@ -112,7 +112,11 @@ namespace TrekVRApplication {
             if (visible == null) {
                 return;
             }
-            Debug.Log($"Terrain location names visiblity set to {visible}.");
+            TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
+            if (terrainModelManager.GlobeModelIsVisible()) {
+                XRInteractableGlobeTerrain globe = (XRInteractableGlobeTerrain)terrainModelManager.GlobeModel.InteractionController;
+                globe.EnableNomenclatures = (bool)visible;
+            }
         }
 
         // TODO Move this somewhere else?

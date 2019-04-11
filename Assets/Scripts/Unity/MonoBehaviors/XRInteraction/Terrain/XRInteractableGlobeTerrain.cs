@@ -6,6 +6,8 @@ namespace TrekVRApplication {
 
         private GlobeTerrainCoordinateLinesController _coordinateLinesController;
 
+        private GlobeTerrainNomenclatureController _nomenclatureController;
+
         private GlobeTerrainBoundingBoxSelectionController _bboxSelectionController;
         protected override TerrainBoundingBoxSelectionController BBoxSelectionController => _bboxSelectionController;
 
@@ -15,6 +17,11 @@ namespace TrekVRApplication {
         public bool EnableCoordinateLines {
             get => _coordinateLinesController.Visible;
             set => _coordinateLinesController.Visible = value;
+        }
+
+        public bool EnableNomenclatures {
+            get => _nomenclatureController.Visible;
+            set => _nomenclatureController.Visible = value;
         }
 
         #region Grab variables
@@ -118,6 +125,8 @@ namespace TrekVRApplication {
             };
             coordinateLines.transform.SetParent(transform, false);
             _coordinateLinesController = coordinateLines.AddComponent<GlobeTerrainCoordinateLinesController>();
+
+            _nomenclatureController = gameObject.AddComponent<GlobeTerrainNomenclatureController>();
         }
 
         protected override void Start() {

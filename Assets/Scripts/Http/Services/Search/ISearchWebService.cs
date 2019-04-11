@@ -20,6 +20,8 @@ namespace TrekVRApplication {
 
         void GetNomenclatures(Action<SearchResult> callback, bool forceRefresh = false);
 
+        void GetNomenclatures(IBoundingBox boundingBox, int limit, Action<SearchResult> callback);
+
         void GetProducts(Action<SearchResult> callback, bool forceRefresh = false);
 
         void Search(SearchParameters searchParms, Action<SearchResult> callback);

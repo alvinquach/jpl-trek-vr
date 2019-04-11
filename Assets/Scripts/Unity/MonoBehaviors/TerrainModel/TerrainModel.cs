@@ -370,6 +370,7 @@ namespace TrekVRApplication {
                 collider.sharedMesh = mesh;
                 Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to update physics mesh.");
                 stopwatch.Stop();
+                TerrainModelManager.Instance.ReportPhysicsMeshUpdated(this);
             }
         }
 

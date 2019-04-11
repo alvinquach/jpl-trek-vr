@@ -126,6 +126,14 @@ namespace TrekVRApplication {
             );
         }
 
+        public void GetNomenclatures(IBoundingBox boundingBox, int limit, Action<SearchResult> callback) {
+            Search(new SearchParameters() {
+                ItemType = SearchItemType.Nomenclature,
+                BoundingBox = boundingBox.ToString(","),
+                Limit = limit
+            }, callback);
+        }
+
         public void GetProducts(Action<SearchResult> callback, bool forceRefresh = false) {
             if (forceRefresh) {
                 _products = null;
@@ -157,6 +165,9 @@ namespace TrekVRApplication {
                 }
 
                 int limit = Math.Min(ResultsLimit, itemCount);
+                if (searchParams.Limit != null) {
+                    limit = Math.Min(limit, (int)searchParams.Limit);
+                }
 
                 Search(searchParams, limit, callback);
             });
@@ -191,6 +202,10 @@ namespace TrekVRApplication {
 
             if (!string.IsNullOrEmpty(searchParams.Search)) {
                 paramsMap.Add("key", searchParams.Search);
+            }
+
+            if (!string.IsNullOrEmpty(searchParams.BoundingBox)) {
+                paramsMap.Add("bbox", searchParams.BoundingBox);
             }
 
             string searchUrl = HttpRequestUtils.AppendParams(BaseUrl, paramsMap);
