@@ -51,7 +51,7 @@ SketchUpImporter:
     4300004: Mesh Group 1
   externalObjects: {}
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 2
     materialSearch: 0
     materialLocation: 1

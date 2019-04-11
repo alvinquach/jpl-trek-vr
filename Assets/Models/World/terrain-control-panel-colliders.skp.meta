@@ -6,16 +6,16 @@ SketchUpImporter:
   selectedNodes: 00000000010000000200000003000000040000000500000006000000
   assetHash:
     serializedVersion: 2
-    Hash: 8570e8aaac05d26b3520b21265ee4fd7
+    Hash: de06e49a72ef6f3a799938e7ff708f5f
   longitude: -105.242139
   latitude: 40.018309
   northCorrection: -0
   fileUnit: 0
   sketchUpImportData:
     defaultCamera:
-      position: {x: -2.0872314, y: 0.3751295, z: 2.8907914}
-      lookAt: {x: 20.346996, y: -5.308277, z: -29.328833}
-      up: {x: 0.081865594, y: 0.98968405, z: -0.11757386}
+      position: {x: -1.512027, y: 1.517396, z: 1.6235892}
+      lookAt: {x: 19.655884, y: -23.553637, z: -20.671312}
+      up: {x: 0.43515152, y: 0.77497524, z: -0.45831922}
       fov: 35
       aspectRatio: 0
       orthoSize: 1
@@ -51,7 +51,7 @@ SketchUpImporter:
     4300008: Mesh Group 5
   externalObjects: {}
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 2
     materialSearch: 0
     materialLocation: 1
