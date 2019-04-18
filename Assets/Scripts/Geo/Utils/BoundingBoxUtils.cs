@@ -219,6 +219,27 @@ namespace TrekVRApplication {
             return Mathf.Max(width, height);
         }
 
+        /// <summary>
+        ///     Checks wheter the bounding box crosses the +/- 180° longitude line.
+        /// </summary>
+        public static bool IsLongitudeWrapped(IBoundingBox bbox) {
+            return bbox[0] > bbox[2];
+        }
+
+        public static IBoundingBox UnwrapLeft(IBoundingBox bbox) {
+            if (!IsLongitudeWrapped(bbox)) {
+                return bbox;
+            }
+            return new UnrestrictedBoundingBox(bbox.LonEnd - bbox.LonSwing, bbox[1], bbox[2], bbox[3]);
+        }
+
+        public static IBoundingBox UnwrapRight(IBoundingBox bbox) {
+            if (!IsLongitudeWrapped(bbox)) {
+                return bbox;
+            }
+            return new UnrestrictedBoundingBox(bbox[0], bbox[1], bbox.LonStart + bbox.LonSwing, bbox[3]);
+        }
+
     }
 
 }

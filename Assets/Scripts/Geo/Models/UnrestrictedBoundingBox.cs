@@ -5,8 +5,8 @@ using UnityEngine;
 namespace TrekVRApplication {
 
     /// <summary>
-    ///     A geographic bounding box that allows longitudinal angle
-    ///     sweeps of up to 360°.
+    ///     A geographic bounding box that allows longitudinal angle sweeps greater
+    ///     than 180°. Also does not limit longitude extremes to +/- 180°.
     /// </summary>
     public struct UnrestrictedBoundingBox : IEquatable<IBoundingBox>, IBoundingBox {
 
@@ -18,7 +18,7 @@ namespace TrekVRApplication {
         public float LonStart {
             get => _lonStart;
             set {
-                _lonStart = WrapLongitude(value);
+                _lonStart = value;
                 SortBoundingBox();
             }
         }
@@ -36,7 +36,7 @@ namespace TrekVRApplication {
         public float LonEnd {
             get => _lonEnd;
             set {
-                _lonEnd = WrapLongitude(value);
+                _lonEnd = value;
                 SortBoundingBox();
             }
         }
@@ -80,9 +80,9 @@ namespace TrekVRApplication {
         }
 
         public UnrestrictedBoundingBox(float lonStart, float latStart, float lonEnd, float latEnd) {
-            _lonStart = WrapLongitude(lonStart);
+            _lonStart = lonStart;
             _latStart = WrapLatitude(latStart);
-            _lonEnd = WrapLongitude(lonEnd);
+            _lonEnd = lonEnd;
             _latEnd = WrapLatitude(latEnd);
             SortBoundingBox();
         }
@@ -145,10 +145,6 @@ namespace TrekVRApplication {
                    this[1].ToString(format) + delimiter +
                    this[2].ToString(format) + delimiter +
                    this[3].ToString(format);
-        }
-
-        private static float WrapLongitude(float lon) {
-            return lon == 180f ? lon : MathUtils.WrapAngle180(lon);
         }
 
         private static float WrapLatitude(float lat) {

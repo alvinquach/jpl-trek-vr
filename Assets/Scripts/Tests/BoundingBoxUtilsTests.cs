@@ -293,6 +293,21 @@ namespace Tests {
             Assert.AreEqual(expected, actual);
         }
 
+        [Test]
+        public void IsLongitudeWrapped_BoundingBoxA_False() {
+            Assert.IsFalse(BoundingBoxUtils.IsLongitudeWrapped(_boundingBoxA));
+        }
+
+        [Test]
+        public void IsLongitudeWrapped_BoundingBoxF_True() {
+            Assert.IsTrue(BoundingBoxUtils.IsLongitudeWrapped(_boundingBoxF));
+        }
+
+        [Test]
+        public void IsLongitudeWrapped_Global_False() {
+            Assert.IsFalse(BoundingBoxUtils.IsLongitudeWrapped(UnrestrictedBoundingBox.Global));
+        }
+
         private void CompareBoundingBoxes(BoundingBox a, BoundingBox b) {
             for (int i = 0; i < 4; i++) {
                 TestUtils.CompareFloats(a[i], b[i], _floatCompareDecimalPrecision);
