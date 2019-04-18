@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using static TrekVRApplication.BoundingBoxUtils;
 using static TrekVRApplication.ServiceManager;
 using static TrekVRApplication.TerrainConstants;
+using Debug = UnityEngine.Debug;
 
 namespace TrekVRApplication {
 
@@ -133,19 +136,63 @@ namespace TrekVRApplication {
                 return;
             }
 
-            TerrainProductMetadata texInfo = CleanMetadata(productInfo);
+            // If support for file formats other than TIFF are added in the future,
+            // then this line will need to be removed to retrieve specific formats.
+            productInfo = CleanMetadata(productInfo);
 
             // If an entry for the texture doesn't exist yet, then create it.
-            if (!_textureDictionary.TryGetValue(texInfo, out TextureWrapper wrapper)) {
-                _textureDictionary.Add(texInfo, wrapper = new TextureWrapper());
+            if (!_textureDictionary.TryGetValue(productInfo, out TextureWrapper wrapper)) {
+                _textureDictionary.Add(productInfo, wrapper = new TextureWrapper());
 
-                // Get product either from the file system (if available) or the web service.
-                RasterSubsetWebService.SubsetProduct(productInfo, filepath => {
-                    LoadTextureFromImage(filepath, texture => {
-                        wrapper.Texture = texture;
-                        ClearExcessTextures();
+                IBoundingBox boundingBox = productInfo.BoundingBox;
+
+                // If the bounding box crosses the +/- 180° longitude line, then the
+                // texture will need to be retrieved in two parts and then merged.
+                if (IsLongitudeWrapped(productInfo.BoundingBox)) {
+
+                    string filepath1 = null;
+                    string filepath2 = null;
+
+                    // Get the first half of the texture.
+                    RasterSubsetWebService.SubsetProduct(UnwrapBoundingBoxLeft(productInfo), filepath => {
+                        filepath1 = filepath;
+
+                        // If the second image was already finished downloading,
+                        // then convert the two images into a texture.
+                        if (filepath2 != null) {
+                            LoadTextureFromImages(filepath1, filepath2, texture => {
+                                wrapper.Texture = texture;
+                                ClearExcessTextures();
+                            });
+                        }
                     });
-                });
+
+                    // Get the second half of the texture.
+                    RasterSubsetWebService.SubsetProduct(UnwrapBoundingBoxRight(productInfo), filepath => {
+                        filepath2 = filepath;
+
+                        // If the first image was already finished downloading,
+                        // then convert the two images into a texture.
+                        if (filepath1 != null) {
+                            LoadTextureFromImages(filepath1, filepath2, texture => {
+                                wrapper.Texture = texture;
+                                ClearExcessTextures();
+                            });
+                        }
+                    });
+
+                }
+
+                // Else, the texture can be retrieved and processed as a whole.
+                else {
+                    RasterSubsetWebService.SubsetProduct(productInfo, filepath => {
+                        LoadTextureFromImage(filepath, texture => {
+                            wrapper.Texture = texture;
+                            ClearExcessTextures();
+                        });
+                    });
+                }
+
             }
 
             // Register the callback function if it is not null.
@@ -196,9 +243,28 @@ namespace TrekVRApplication {
             );
         }
 
+        private TerrainProductMetadata UnwrapBoundingBoxLeft(TerrainProductMetadata texInfo) {
+            return new TerrainProductMetadata(
+                texInfo.ProductUUID,
+                UnwrapLeft(texInfo.BoundingBox),
+                texInfo.Width,
+                texInfo.Height
+            );
+        }
+
+        private TerrainProductMetadata UnwrapBoundingBoxRight(TerrainProductMetadata texInfo) {
+            return new TerrainProductMetadata(
+                texInfo.ProductUUID,
+                UnwrapRight(texInfo.BoundingBox),
+                texInfo.Width,
+                texInfo.Height
+            );
+        }
+
         private void LoadTextureFromImage(string filepath, Action<Texture2D> callback) {
 
-            long start = DateTimeUtils.Now();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             // Create a task for loading texture data on a separate thread.
             LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(filepath);
@@ -213,7 +279,9 @@ namespace TrekVRApplication {
 
                 byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
                 image.CopyRawData(data);
-                Debug.Log($"Took {(DateTimeUtils.Now() - start) / 1000f} seconds to generate texture.");
+
+                Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to generate texture.");
+                stopwatch.Stop();
 
                 QueueTask(() => {
                     Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
@@ -223,6 +291,45 @@ namespace TrekVRApplication {
                 });
 
             });
+        }
+
+        private void LoadTextureFromImages(string filepath1, string filepath2, Action<Texture2D> callback) {
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            // Create and execute task to convert first downloaded image into an RGBImage object.
+            LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(filepath1);
+            loadImageTask.Execute(image1 => {
+
+                int width = loadImageTask.TextureWidth;
+                int height = loadImageTask.TextureHeight;
+
+                // Create and execute task to convert second downloaded image into an RGBImage object.
+                new LoadColorImageFromFileTask<RGBImage>(filepath2).Execute(image2 => {
+
+                    // Merge the two images together.
+                    image1.Merge(image2, new Color32(0, 0, 0, 255));
+
+                    TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
+
+                    byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
+                    image1.CopyRawData(data);
+
+                    Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to generate texture.");
+                    stopwatch.Stop();
+
+                    QueueTask(() => {
+                        Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
+                        texture.GetRawTextureData<byte>().CopyFrom(data);
+                        texture.Apply(true, true);
+                        callback?.Invoke(texture);
+                    });
+
+                });
+
+            });
+
         }
 
         private bool IsGlobalMosaic(TerrainProductMetadata texInfo) {
