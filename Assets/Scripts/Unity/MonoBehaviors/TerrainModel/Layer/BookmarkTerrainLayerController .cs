@@ -30,14 +30,13 @@ namespace TrekVRApplication {
             }
 
             CreateLayer(productUUID, layer => {
+                // Not thread safe
                 if (index == null) {
-                    _layers.Add(layer);
+                    index = _layers.Count;
                 }
-                else {
-                    _layers.Insert((int)index, layer);
-                }
+                _layers.Insert((int)index, layer);
                 if (Started) {
-                    ReloadTextures(_layers, false);
+                    ReloadTextures(_layers, index == 0);
                 }
                 callback?.Invoke();
             });

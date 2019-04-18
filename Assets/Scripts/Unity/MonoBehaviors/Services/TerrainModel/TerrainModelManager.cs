@@ -281,7 +281,7 @@ namespace TrekVRApplication {
 
             TerrainLayerController layerController = terrainModel.AddLayerController<TerrainBookmarkLayerController>();
             layerController.UpdateBoundingBox(terrainModel.SquareBoundingBox, false);
-            foreach(string layerUUID in layersUUID) {
+            foreach (string layerUUID in layersUUID) {
                 layerController.AddLayer(layerUUID);
             }
 
