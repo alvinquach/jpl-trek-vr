@@ -47,6 +47,42 @@ namespace TrekVRApplication {
             Array.Copy(_rawData, 0, destinationArray, destinationIndex, _rawData.Length);
         }
 
+        /// <summary>
+        ///     Merge data from another image to this image.
+        /// </summary>
+        /// <param name="other">The source iamge.</param>
+        public void Merge(Image<T, DATA> other) {
+            if (Width != other.Width || Height != other.Height) {
+                throw new Exception("Images must have same dimensions.");
+            }
+            for (int y = 0; y < Height; y++) {
+                for (int x = 0; x < Width; x++) {
+                    T pixel = other.GetPixel(x, y, ImageBoundaryMode.None);
+                    SetPixel(x, y, pixel);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Merge data from another image to this image. Pixel values from the 
+        ///     that source image that match the masked value will be ignored.
+        /// </summary>
+        /// <param name="other">The source iamge.</param>
+        public void Merge(Image<T, DATA> other, T mask) {
+            if (Width != other.Width || Height != other.Height) {
+                throw new Exception("Images must have same dimensions.");
+            }
+            for (int y = 0; y < Height; y++) {
+                for (int x = 0; x < Width; x++) {
+                    T pixel = other.GetPixel(x, y, ImageBoundaryMode.None);
+                    if (Equals(pixel, mask)) {
+                        continue;
+                    }
+                    SetPixel(x, y, pixel);
+                }
+            }
+        }
+
         protected long GetPixelOffet(int x, int y) {
             return (x + Width * y) * DataPerPixel;
         }
