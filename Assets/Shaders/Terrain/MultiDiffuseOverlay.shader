@@ -37,6 +37,9 @@
         // TODO Add UVs from other textures.
         struct Input {
             float2 uv_DiffuseBase;
+            float2 uv_Diffuse1;
+            float2 uv_Diffuse2;
+            float2 uv_Diffuse3;
         };
 
         half _Diffuse1Opacity;
@@ -69,7 +72,7 @@
         }
 
         int getLastOpaqueLayer() {
-            for (int i = 3; i > 0; i--) {
+            for (int i = MAX_ADDITIONAL_DIFFUSE_LAYERS; i > 0; i--) {
                 if (getOpacity(i) == 1.0) {
                     return i;
                 }
@@ -77,7 +80,7 @@
             return 0;
         }
 
-        fixed4 calculateAlbedo(float2 uv) {
+        fixed4 calculateAlbedo(Input IN) {
             fixed4 c = fixed4(0, 0, 0, 1);
 
             for (int i = getLastOpaqueLayer(); i <= MAX_ADDITIONAL_DIFFUSE_LAYERS; i++) {
@@ -89,26 +92,26 @@
                 // For some reason, calling lerp outisde of the switch case gives a 
                 // "Sampler parameter must come from a literal expression" error.
                 sampler2D diffuse = _DiffuseBase;
-                switch (i) {
-                    case 0:
-                        c = lerp(c, tex2D(_DiffuseBase, uv), opacity);
-                        break;
-                    case 1:
-                        c = lerp(c, tex2D(_Diffuse1, uv), opacity);
-                        break;
-                    case 2:
-                        c = lerp(c, tex2D(_Diffuse2, uv), opacity);
-                        break;
-                    case 3:
-                        c = lerp(c, tex2D(_Diffuse3, uv), opacity);
-                        break;
-                }
+				switch (i) {
+					case 0:
+						c = lerp(c, tex2D(_DiffuseBase, IN.uv_DiffuseBase), opacity);
+						break;
+					case 1:
+						c = lerp(c, tex2D(_Diffuse1, IN.uv_Diffuse1), opacity);
+						break;
+					case 2:
+						c = lerp(c, tex2D(_Diffuse2, IN.uv_Diffuse2), opacity);
+						break;
+					case 3:
+						c = lerp(c, tex2D(_Diffuse3, IN.uv_Diffuse3), opacity);
+						break;
+				}
             }
             return c;
         }
 
         void surf(Input IN, inout SurfaceOutputStandard o) {
-            fixed4 c = calculateAlbedo(IN.uv_DiffuseBase);
+            fixed4 c = calculateAlbedo(IN);
             o.Albedo = c.rgb;
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
