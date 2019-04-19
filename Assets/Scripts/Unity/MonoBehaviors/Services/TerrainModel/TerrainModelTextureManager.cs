@@ -90,7 +90,7 @@ namespace TrekVRApplication {
                 FilePath.Product,
                 _globalMosaicFilepath
             );
-            LoadTextureFromImage(fullMosaicFilepath, texture => {
+            LoadTextureFromImages(new string[] { fullMosaicFilepath }, texture => {
                 _globalMosaicTexture = texture;
                 foreach (Action<Texture2D> action in _onGlobalMosaicLoad) {
                     action.Invoke(_globalMosaicTexture);
@@ -144,8 +144,6 @@ namespace TrekVRApplication {
             if (!_textureDictionary.TryGetValue(productInfo, out TextureWrapper wrapper)) {
                 _textureDictionary.Add(productInfo, wrapper = new TextureWrapper());
 
-                IBoundingBox boundingBox = productInfo.BoundingBox;
-
                 // If the bounding box crosses the +/- 180° longitude line, then the
                 // texture will need to be retrieved in two parts and then merged.
                 if (IsLongitudeWrapped(productInfo.BoundingBox)) {
@@ -160,7 +158,7 @@ namespace TrekVRApplication {
                         // If the second image was already finished downloading,
                         // then convert the two images into a texture.
                         if (filepath2 != null) {
-                            LoadTextureFromImages(filepath1, filepath2, texture => {
+                            LoadTextureFromImages(new string[] { filepath1, filepath2 }, texture => {
                                 wrapper.Texture = texture;
                                 ClearExcessTextures();
                             });
@@ -174,7 +172,7 @@ namespace TrekVRApplication {
                         // If the first image was already finished downloading,
                         // then convert the two images into a texture.
                         if (filepath1 != null) {
-                            LoadTextureFromImages(filepath1, filepath2, texture => {
+                            LoadTextureFromImages(new string[] { filepath1, filepath2 }, texture => {
                                 wrapper.Texture = texture;
                                 ClearExcessTextures();
                             });
@@ -186,7 +184,7 @@ namespace TrekVRApplication {
                 // Else, the texture can be retrieved and processed as a whole.
                 else {
                     RasterSubsetWebService.SubsetProduct(productInfo, filepath => {
-                        LoadTextureFromImage(filepath, texture => {
+                        LoadTextureFromImages(new string[] { filepath }, texture => {
                             wrapper.Texture = texture;
                             ClearExcessTextures();
                         });
@@ -261,24 +259,38 @@ namespace TrekVRApplication {
             );
         }
 
-        private void LoadTextureFromImage(string filepath, Action<Texture2D> callback) {
+        private void LoadTextureFromImages(string[] filepaths, Action<Texture2D> callback) {
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // Create a task for loading texture data on a separate thread.
-            LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(filepath);
+            // Create and execute task to convert first image into an RGBImage object.
+            new LoadColorImageFromFileTask<RGBImage>(filepaths[0]).Execute(baseImage => {
 
-            // Execute the task.
-            loadImageTask.Execute(image => {
+                // If there are more files to process, then load and merge each image.
+                for (int i = 1; i < filepaths.Length; i++) {
 
-                int width = loadImageTask.TextureWidth;
-                int height = loadImageTask.TextureHeight;
+                    // Load the additional image. The additional images can be loaded 
+                    // syncronously in the same thread as this anonymous function.
+                    RGBImage image = new LoadColorImageFromFileTask<RGBImage>(filepaths[i]).ExecuteInCurrentThread();
+
+                    // Merge the images together.
+                    try {
+                        baseImage.Merge(image, new Color32(0, 0, 0, 255));
+                    }
+                    catch (Exception e) {
+                        Debug.LogError(e.Message);
+                        continue;
+                    }
+                }
+
+                int width = baseImage.Width;
+                int height = baseImage.Height;
 
                 TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
 
                 byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                image.CopyRawData(data);
+                baseImage.CopyRawData(data);
 
                 Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to generate texture.");
                 stopwatch.Stop();
@@ -291,45 +303,6 @@ namespace TrekVRApplication {
                 });
 
             });
-        }
-
-        private void LoadTextureFromImages(string filepath1, string filepath2, Action<Texture2D> callback) {
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            // Create and execute task to convert first downloaded image into an RGBImage object.
-            LoadColorImageFromFileTask<RGBImage> loadImageTask = new LoadColorImageFromFileTask<RGBImage>(filepath1);
-            loadImageTask.Execute(image1 => {
-
-                int width = loadImageTask.TextureWidth;
-                int height = loadImageTask.TextureHeight;
-
-                // Create and execute task to convert second downloaded image into an RGBImage object.
-                new LoadColorImageFromFileTask<RGBImage>(filepath2).Execute(image2 => {
-
-                    // Merge the two images together.
-                    image1.Merge(image2, new Color32(0, 0, 0, 255));
-
-                    TextureCompressionFormat format = TextureCompressionFormat.Uncompressed;
-
-                    byte[] data = new byte[TextureUtils.ComputeTextureSize(width, height, format)];
-                    image1.CopyRawData(data);
-
-                    Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to generate texture.");
-                    stopwatch.Stop();
-
-                    QueueTask(() => {
-                        Texture2D texture = new Texture2D(width, height, format.GetUnityFormat(), true);
-                        texture.GetRawTextureData<byte>().CopyFrom(data);
-                        texture.Apply(true, true);
-                        callback?.Invoke(texture);
-                    });
-
-                });
-
-            });
-
         }
 
         private bool IsGlobalMosaic(TerrainProductMetadata texInfo) {
