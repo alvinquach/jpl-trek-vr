@@ -128,8 +128,9 @@ namespace TrekVRApplication {
                     gameObject.SetActive(false);
                 }
                 else if (!gameObject.activeSelf) {
-                    LastVisible = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                     gameObject.SetActive(true);
+                    LastVisible = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    InteractionController.SwitchToActivity(XRInteractableTerrainActivity.Default);
                 }
             }
         }
