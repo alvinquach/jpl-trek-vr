@@ -9,12 +9,12 @@ namespace TrekVRApplication {
     ///     by bounding box coordinates. Uses TIFF DEM files as a source of
     ///     height data.
     /// </summary>
-    public class GenerateLocalTerrainMeshFromDigitalElevationModeTask : GenerateTerrainMeshFromDigitalElevationModelTask {
+    public class GenerateLocalTerrainMeshFromDigitalElevationModelTask : GenerateTerrainMeshFromDigitalElevationModelTask {
 
         protected BoundingBox _boundingBox;
         protected UVBounds _uvBounds;
 
-        public GenerateLocalTerrainMeshFromDigitalElevationModeTask(string demFilePath, TerrainModelMeshMetadata metadata,
+        public GenerateLocalTerrainMeshFromDigitalElevationModelTask(string demFilePath, TerrainModelMeshMetadata metadata,
             BoundingBox boundingBox, UVBounds uvBounds) : base(demFilePath, metadata) {
 
             _boundingBox = boundingBox;

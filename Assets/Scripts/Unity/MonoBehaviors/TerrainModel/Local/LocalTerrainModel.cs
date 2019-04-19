@@ -123,7 +123,7 @@ namespace TrekVRApplication {
             // Load the DEM data, and then generate another mesh after using the data.
             RasterSubsetWebService.SubsetProduct(demMetadata, filepath => {
                 GenerateTerrainMeshTask generateMeshTask = 
-                    new GenerateLocalTerrainMeshFromDigitalElevationModeTask(filepath, metadata, BoundingBox, uvBounds);
+                    new GenerateLocalTerrainMeshFromDigitalElevationModelTask(filepath, metadata, BoundingBox, uvBounds);
 
                 // Generate the high detailed mesh using the DEM.
                 _generateDetailedMeshTaskStatus = TaskStatus.InProgress; // TODO Move this before DEM retraval?
