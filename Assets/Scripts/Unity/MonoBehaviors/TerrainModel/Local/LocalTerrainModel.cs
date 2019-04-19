@@ -1,4 +1,5 @@
 using UnityEngine;
+using static TrekVRApplication.BoundingBoxUtils;
 using static TrekVRApplication.ServiceManager;
 using static TrekVRApplication.TerrainConstants;
 
@@ -117,28 +118,49 @@ namespace TrekVRApplication {
                 });
             });
 
+            // Then, start downloading the DEM data for generating higher detailed mesh.
+            _generateDetailedMeshTaskStatus = TaskStatus.InProgress; 
+
             TerrainProductMetadata demMetadata = 
                 new TerrainProductMetadata(DemUUID, SquareBoundingBox, LocalTerrainDemTargetSize, ImageFileFormat.Tiff);
 
-            // Load the DEM data, and then generate another mesh after using the data.
-            RasterSubsetWebService.SubsetProduct(demMetadata, filepath => {
-                GenerateTerrainMeshTask generateMeshTask = 
-                    new GenerateLocalTerrainMeshFromDigitalElevationModelTask(filepath, metadata, BoundingBox, uvBounds);
+            // If the bounding box crosses the +/- 180° longitude line, then the
+            // DEM data will need to be retrieved in two parts and then merged.
+            if (IsLongitudeWrapped(demMetadata.BoundingBox)) {
 
-                // Generate the high detailed mesh using the DEM.
-                _generateDetailedMeshTaskStatus = TaskStatus.InProgress; // TODO Move this before DEM retraval?
-                generateMeshTask.Execute(meshData => {
-                    _referenceMeshData = meshData;
-                    QueueTask(() => {
-                        if (_lodGroupContainer) {
-                            Destroy(_lodGroupContainer);
-                        }
-                        ProcessMeshData(meshData);
-                        PostProcessDetailedMeshData(meshData, metadata);
-                        _generateDetailedMeshTaskStatus = TaskStatus.Completed;
-                    });
+                string filepath1 = null;
+                string filepath2 = null;
+
+                // Get the first half of the DEM data.
+                RasterSubsetWebService.SubsetProduct(UnwrapBoundingBoxLeft(demMetadata), filepath => {
+                    filepath1 = filepath;
+
+                    // If the second DEM was already finished downloading,
+                    // then the DEMs can be processed.
+                    if (filepath2 != null) {
+                        ProcessDemFiles(new string[] { filepath1, filepath2 }, metadata, uvBounds);
+                    }
                 });
-            });
+
+                // Get the second half of the DEM data.
+                RasterSubsetWebService.SubsetProduct(UnwrapBoundingBoxRight(demMetadata), filepath => {
+                    filepath2 = filepath;
+
+                    // If the first DEM was already finished downloading,
+                    // then the DEMs can be processed.
+                    if (filepath1 != null) {
+                        ProcessDemFiles(new string[] { filepath1, filepath2 }, metadata, uvBounds);
+                    }
+                });
+
+            }
+
+            // Else, the DEM file can be retrieved and processed as a whole.
+            else {
+                RasterSubsetWebService.SubsetProduct(demMetadata, filepath => {
+                    ProcessDemFiles(new string[] { filepath }, metadata, uvBounds);
+                });
+            }
 
         }
 
@@ -220,6 +242,24 @@ namespace TrekVRApplication {
 
         }
 
+        private void ProcessDemFiles(string[] filepaths, TerrainModelMeshMetadata metadata, UVBounds uvBounds) {
+            GenerateTerrainMeshTask generateMeshTask = 
+                new GenerateLocalTerrainMeshFromDigitalElevationModelTask(filepaths, metadata, BoundingBox, uvBounds);
+
+            // Generate the high detailed mesh using the DEM.
+            generateMeshTask.Execute(meshData => {
+                _referenceMeshData = meshData;
+                QueueTask(() => {
+                    if (_lodGroupContainer) {
+                        Destroy(_lodGroupContainer);
+                    }
+                    ProcessMeshData(meshData);
+                    PostProcessDetailedMeshData(meshData, metadata);
+                    _generateDetailedMeshTaskStatus = TaskStatus.Completed;
+                });
+            });
+        }
+
         private void PostProcessDetailedMeshData(MeshData[] meshData, TerrainModelMeshMetadata metadata) {
 
             // Add mesh collider, if a physics mesh was generated.
@@ -279,6 +319,24 @@ namespace TrekVRApplication {
 
         private TerrainProductMetadata GenerateProductMetadata(string productId, int size = LocalTerrainTextureTargetSize) {
             return new TerrainProductMetadata(productId, SquareBoundingBox, size);
+        }
+
+        private TerrainProductMetadata UnwrapBoundingBoxLeft(TerrainProductMetadata metadata) {
+            return new TerrainProductMetadata(
+                metadata.ProductUUID,
+                UnwrapLeft(metadata.BoundingBox),
+                metadata.Width,
+                metadata.Height
+            );
+        }
+
+        private TerrainProductMetadata UnwrapBoundingBoxRight(TerrainProductMetadata texInfo) {
+            return new TerrainProductMetadata(
+                texInfo.ProductUUID,
+                UnwrapRight(texInfo.BoundingBox),
+                texInfo.Width,
+                texInfo.Height
+            );
         }
 
     }

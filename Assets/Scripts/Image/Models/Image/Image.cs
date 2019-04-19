@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -75,7 +76,7 @@ namespace TrekVRApplication {
             for (int y = 0; y < Height; y++) {
                 for (int x = 0; x < Width; x++) {
                     T pixel = other.GetPixel(x, y, ImageBoundaryMode.None);
-                    if (Equals(pixel, mask)) {
+                    if (EqualityComparer<T>.Default.Equals(pixel, mask)) {
                         continue;
                     }
                     SetPixel(x, y, pixel);

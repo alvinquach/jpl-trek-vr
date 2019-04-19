@@ -36,7 +36,7 @@ namespace TrekVRApplication {
             );
 
             GenerateTerrainMeshTask generateMeshTask = 
-                new GenerateGlobeTerrainMeshFromDigitalElevationModelTask(demFilePath, metadata);
+                new GenerateGlobeTerrainMeshFromDigitalElevationModelTask(new string[] { demFilePath }, metadata);
 
             generateMeshTask.Execute(meshData => {
                 _referenceMeshData = meshData;

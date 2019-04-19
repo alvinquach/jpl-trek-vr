@@ -14,8 +14,8 @@ namespace TrekVRApplication {
         protected BoundingBox _boundingBox;
         protected UVBounds _uvBounds;
 
-        public GenerateLocalTerrainMeshFromDigitalElevationModelTask(string demFilePath, TerrainModelMeshMetadata metadata,
-            BoundingBox boundingBox, UVBounds uvBounds) : base(demFilePath, metadata) {
+        public GenerateLocalTerrainMeshFromDigitalElevationModelTask(string[] demFilePaths, TerrainModelMeshMetadata metadata,
+            BoundingBox boundingBox, UVBounds uvBounds) : base(demFilePaths, metadata) {
 
             _boundingBox = boundingBox;
             _uvBounds = uvBounds;
