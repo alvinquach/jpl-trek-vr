@@ -10,6 +10,8 @@
 
         public static ISearchWebService SearchWebService { get; } = TrekSearchWebService.Instance;
 
+        public static IToolsWebService ToolsWebService { get; } = TrekToolsWebService.Instance;
+
     }
 
 }

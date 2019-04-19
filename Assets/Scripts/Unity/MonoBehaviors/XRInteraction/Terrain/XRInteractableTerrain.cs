@@ -29,23 +29,45 @@
             terrainModelManager.OnHeightExagerrationChange -= SetHeightExagerration;
         }
 
-        /** For bounding box selection and some tools. */
-        public void CancelSelection(bool cancelAll = false, XRInteractableTerrainActivity nextMode = XRInteractableTerrainActivity.Default) {
+        /// <summary>
+        ///     For bounding box selection and some tools.
+        /// </summary>
+        /// <returns>True if the entire selection cancelled, false otherwise.</returns>
+        public bool CancelSelection(bool cancelAll = false, XRInteractableTerrainActivity nextMode = XRInteractableTerrainActivity.Default) {
             switch (CurrentActivity) {
                 case XRInteractableTerrainActivity.BBoxSelection:
                     if (BBoxSelectionController.CancelSelection(cancelAll)) {
                         CurrentActivity = nextMode;
                         BBoxSelectionController.SetEnabled(false);
+                        return true;
                     }
                     break;
                 case XRInteractableTerrainActivity.Distance:
                 case XRInteractableTerrainActivity.HeightProfile:
+                    if (!HeightProfileController.SelectionInputEnabled) {
+                        cancelAll = true;
+                    }
                     if (HeightProfileController.CancelSelection(cancelAll)) {
                         CurrentActivity = nextMode;
                         HeightProfileController.SetEnabled(false);
+                        return true;
                     }
                     break;
                 case XRInteractableTerrainActivity.SunAngle:
+                    break;
+            }
+            return false;
+        }
+
+        public void CompleteSelection() {
+            switch (CurrentActivity) {
+                case XRInteractableTerrainActivity.Distance:
+                case XRInteractableTerrainActivity.HeightProfile:
+                    if (!HeightProfileController.SelectionInputEnabled) {
+                        HeightProfileController.ResumeSelection();
+                    } else {
+                        HeightProfileController.CompleteSelection();
+                    }
                     break;
             }
         }

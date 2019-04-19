@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
@@ -17,9 +19,11 @@ namespace TrekVRApplication {
 
         private readonly Stack<TerrainOverlayLine> _overlayLines = new Stack<TerrainOverlayLine>();
 
-        private readonly IList<Vector2> _points = new List<Vector2>();
+        private readonly Stack<Vector2> _points = new Stack<Vector2>();
 
         private int _framesSinceLastControllerModalUpdate = 0;
+
+        public bool SelectionInputEnabled { get; private set; } = true;
 
         /// <summary>
         ///     If true, the controller is operating in height profile mode.
@@ -53,16 +57,20 @@ namespace TrekVRApplication {
             this.enabled = enabled;
             if (enabled) {
                 HeightProfileMode = heightProfileMode;
+                SelectionInputEnabled = true;
             }
         }
 
         public void UpdateCursorPosition(RaycastHit hit) {
+            if (!SelectionInputEnabled) {
+                return;
+            }
             Vector2 currentPoint = hit.textureCoord;
             ControllerModalUpdateCurrentPoint(currentPoint);
             if (_points.Count == 0) {
                 return;
             }
-            Vector2 previousPoint = _points[_points.Count - 1];
+            Vector2 previousPoint = _points.Peek();
             if (_overlayLines.Count > 0) {
                 TerrainOverlayLine currentOverlayLine = _overlayLines.Peek();
                 currentOverlayLine.UpdateLine(previousPoint, currentPoint);
@@ -71,14 +79,17 @@ namespace TrekVRApplication {
         }
 
         public void MakeSelection(RaycastHit hit) {
+            if (!SelectionInputEnabled) {
+                return;
+            }
             Vector2 newPoint = hit.textureCoord;
             if (_points.Count > 0 && _overlayLines.Count > 0) {
-                Vector2 previousPoint = _points[_points.Count - 1];
+                Vector2 previousPoint = _points.Peek();
                 TerrainOverlayLine currentOverlayLine = _overlayLines.Peek();
                 currentOverlayLine.UpdateLine(previousPoint, newPoint);
                 currentOverlayLine.Material = _lineMaterial;
             }
-            _points.Add(newPoint);
+            _points.Push(newPoint);
             TerrainOverlayLine overlayLine = _overlayController.AddLine(_newLineMaterial);
             overlayLine.BaseThickness = 5e-3f; // TODO Unhardcode this
             _overlayLines.Push(overlayLine);
@@ -86,8 +97,38 @@ namespace TrekVRApplication {
             ControllerModalAddPoint(newPoint);
         }
 
+        public void CompleteSelection() {
+            if (!SelectionInputEnabled || _points.Count < 2) {
+                return;
+            }
+
+            // Remove the "current line".
+            _overlayController.RemoveObject(_overlayLines.Pop());
+
+            ControllerModalShowResults(true);
+            SelectionInputEnabled = false;
+        }
+
+        public void ResumeSelection() {
+            if (SelectionInputEnabled) {
+                return;
+            }
+            SelectionInputEnabled = true;
+            ControllerModalShowResults(false);
+            if (_points.Count == 0) {
+                return;
+            }
+
+            // Re-add the "current line".
+            TerrainOverlayLine overlayLine = _overlayController.AddLine(_newLineMaterial);
+            overlayLine.BaseThickness = 5e-3f; // TODO Unhardcode this
+            _overlayLines.Push(overlayLine);
+            _overlayController.UpdateTexture();
+        }
+
         public bool CancelSelection(bool cancelAll = false) {
             if (!cancelAll && _overlayLines.Count > 0) {
+                _points.Pop();
                 _overlayController.RemoveObject(_overlayLines.Pop());
                 ControllerModalRemoveLastPoint();
                 return false;
@@ -121,10 +162,9 @@ namespace TrekVRApplication {
             }
 
             Vector2 latLon = BoundingBoxUtils.UVToCoordinates(GetBoundingBoxFromTerrainModel(), uv);
-            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
 
             string js =
-                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"let component = {AngularComponentContainerPath}.{GetControllerModalName()};" +
                 $"component && component.addPoint({latLon.x}, {latLon.y});";
 
             controllerModal.Browser.EvalJS(js);
@@ -141,10 +181,9 @@ namespace TrekVRApplication {
             }
 
             Vector2 latLon = BoundingBoxUtils.UVToCoordinates(GetBoundingBoxFromTerrainModel(), uv);
-            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
 
             string js =
-                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"let component = {AngularComponentContainerPath}.{GetControllerModalName()};" +
                 $"component && component.updateCurrentPoint({latLon.x}, {latLon.y});";
 
             controllerModal.Browser.EvalJS(js);
@@ -157,10 +196,8 @@ namespace TrekVRApplication {
                 return;
             }
 
-            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
-
             string js =
-                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"let component = {AngularComponentContainerPath}.{GetControllerModalName()};" +
                 $"component && component.removeLastPoint();";
 
             controllerModal.Browser.EvalJS(js);
@@ -173,14 +210,29 @@ namespace TrekVRApplication {
                 return;
             }
 
-            string modalName = HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
-
             string js =
-                $"let component = {AngularComponentContainerPath}.{modalName};" +
+                $"let component = {AngularComponentContainerPath}.{GetControllerModalName()};" +
                 $"component && component.clearPoints();";
 
             controllerModal.Browser.EvalJS(js);
             _framesSinceLastControllerModalUpdate = 0;
+        }
+
+        private void ControllerModalShowResults(bool show) {
+            ControllerModal controllerModal = GetControllerModal();
+            if (!controllerModal) {
+                return;
+            }
+
+            string js =
+                $"let component = {AngularComponentContainerPath}.{GetControllerModalName()};" +
+                $"component && component.showResults({show.ToString().ToLower()});";
+
+            controllerModal.Browser.EvalJS(js);
+        }
+
+        private string GetControllerModalName() {
+            return HeightProfileMode ? ToolsHeightProfileModalName : ToolsDistanceModalName;
         }
 
         private void InitMaterials() {
