@@ -29,6 +29,7 @@ namespace TrekVRApplication {
                 // Apply new distance
                 vertex *= newDistance / distance;
 
+                // Store vertex in new array.
                 rescaledVertices[i] = vertex;
             }
 

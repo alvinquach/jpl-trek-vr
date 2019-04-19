@@ -50,7 +50,7 @@ namespace TrekVRApplication {
 
             Vector3 min = new Vector3(float.PositiveInfinity, 0, 0);
 
-            int yIndex = 0, vertexIndex = 0, edgeVertIndex = 0;
+            int yIndex = 0, vertexIndex = 0;
             for (float vy = _boundingBox.LatStart; yIndex < latVertCount; vy += latIncrement) {
 
                 // The y-coordinate on the image that corresponds to the current row of vertices.

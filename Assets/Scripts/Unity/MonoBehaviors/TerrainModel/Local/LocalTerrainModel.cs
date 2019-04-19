@@ -194,6 +194,20 @@ namespace TrekVRApplication {
             });
         }
 
+        protected override void ApplyRescaledMeshData(TerrainMeshData[] rescaledMeshData) {
+            base.ApplyRescaledMeshData(rescaledMeshData);
+            for (int i = 0; i <= _lodLevels; i++) {
+
+                // TODO Add null checks.
+                Transform child = _lodGroupContainer.transform.Find($"LOD_{i}_Edge");
+                MeshFilter meshFilter = child.GetComponent<MeshFilter>();
+                Mesh mesh = meshFilter.mesh;
+
+                TerrainMeshData meshData = rescaledMeshData[i];
+                UpdateMesh(mesh, meshData.ExtraVertices, null, null, true);  // Only update vertices
+            }
+        }
+
         protected override void CreateLod(TerrainMeshData[] meshData, LOD[] lods, int index) {
             base.CreateLod(meshData, lods, index);
 

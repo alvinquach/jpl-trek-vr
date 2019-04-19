@@ -37,7 +37,7 @@ namespace TrekVRApplication {
 
             Vector3 min = new Vector3(float.PositiveInfinity, 0, 0);
 
-            int yIndex = 0, vertIndex = 0, edgeVertIndex = 0;
+            int yIndex = 0, vertIndex = 0;
             for (float vy = _boundingBox.LatStart; yIndex < LatLongVertCount; vy += latIncrement) {
 
                 // Create a new vertex using the latitude angle. The coordinates of this vertex
