@@ -194,6 +194,38 @@ namespace TrekVRApplication {
             });
         }
 
+        protected override void CreateLod(TerrainMeshData[] meshData, LOD[] lods, int index) {
+            base.CreateLod(meshData, lods, index);
+
+            GameObject child = new GameObject($"LOD_{index}_Edge") {
+                layer = (int)CullingLayer.Terrain
+            };
+            child.transform.SetParent(_lodGroupContainer.transform);
+
+            // Use the parent's tranformations.
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localScale = Vector3.one;
+            child.transform.localEulerAngles = Vector3.zero;
+
+            // Add MeshRenderer to child, and to the LOD group.
+            MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
+            LOD lod = lods[index];
+            Renderer[] renderers = lod.renderers; 
+            renderers = new Renderer[] {
+                renderers[0],   // One renderer should have been added from the base method call.
+                meshRenderer
+            };
+            lod.renderers = renderers;
+
+            // Add material to the MeshRenderer.
+            meshRenderer.material = LayerController.Material;
+
+            // Create a Mesh from the extra mesh data and add the mesh to a MeshFilter.
+            TerrainMeshData data = meshData[index];
+            Mesh mesh = ConvertToMesh(data.ExtraVertices, null, data.ExtraTriangles);
+            child.AddComponent<MeshFilter>().mesh = mesh;
+        }
+
         /// <summary>
         ///     Positions the model after the basic placeholder mesh is generated,
         ///     and starts the view transition process.
@@ -267,11 +299,12 @@ namespace TrekVRApplication {
             if (physicsMeshIndex < 0) {
                 return;
             }
+            MeshData physicsMeshData = meshData[physicsMeshIndex];
+            Mesh physicsMesh = ConvertToMesh(physicsMeshData.Vertices, physicsMeshData.TexCoords, physicsMeshData.Triangles, false);
 
             // Do the heavy processing in the next update (does this help with the stutter?).
             QueueTask(() => {
                 MeshCollider collider = gameObject.AddComponent<MeshCollider>();
-                Mesh physicsMesh = ConvertToMesh(meshData[physicsMeshIndex], false);
                 collider.sharedMesh = physicsMesh;
             });
 

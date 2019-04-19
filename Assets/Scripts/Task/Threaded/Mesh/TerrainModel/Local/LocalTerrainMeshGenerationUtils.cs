@@ -54,6 +54,18 @@ namespace TrekVRApplication {
             return result;
         }
 
+        public static void ProcessEdgeVertices(Vector3[] edgeVertices, float offset) {
+            int lastIndex = edgeVertices.Length / 2 - 1;
+
+            // Repeat the first vertex to form a loop.
+            edgeVertices[lastIndex] = edgeVertices[0];
+
+            // Copy the other vertices minus the x-values.
+            for (int i = 0; i <= lastIndex; i++) {
+                Vector3 vertex = edgeVertices[i];
+                edgeVertices[i + edgeVertices.Length / 2] = new Vector3(offset, vertex.y, vertex.z);
+            }
+        }
 
     }
 

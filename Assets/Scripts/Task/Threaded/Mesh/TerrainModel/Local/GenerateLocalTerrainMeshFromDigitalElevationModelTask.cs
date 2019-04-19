@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using static TrekVRApplication.LocalTerrainMeshGenerationUtils;
+using static TrekVRApplication.MeshGenerationUtils;
 
 namespace TrekVRApplication {
 
@@ -21,7 +22,7 @@ namespace TrekVRApplication {
             _uvBounds = uvBounds;
         }
 
-        protected override MeshData GenerateForLod(IntensityImage image, int downsample) {
+        protected override TerrainMeshData GenerateForLod(IntensityImage image, int downsample) {
 
             // Downsampling rate must be a power of 2.
             if (!MathUtils.IsPowerOfTwo(downsample)) {
@@ -43,10 +44,13 @@ namespace TrekVRApplication {
 
             Vector3[] verts = new Vector3[latVertCount * lonVertCount];
             Vector2[] uvs = new Vector2[latVertCount * lonVertCount];
+            Vector3[] edgeVerts = new Vector3[4 * (latVertCount + lonVertCount - 2) + 2];
 
             Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(_boundingBox);
 
-            int yIndex = 0, vertexIndex = 0;
+            Vector3 min = new Vector3(float.PositiveInfinity, 0, 0);
+
+            int yIndex = 0, vertexIndex = 0, edgeVertIndex = 0;
             for (float vy = _boundingBox.LatStart; yIndex < latVertCount; vy += latIncrement) {
 
                 // The y-coordinate on the image that corresponds to the current row of vertices.
@@ -72,7 +76,28 @@ namespace TrekVRApplication {
                     // then add it to the radius to get the final "height".
                     float height = value * _metadata.HeightScale + _metadata.Radius;
 
-                    verts[vertexIndex] = GenerateVertex(height * baseLatVertex, vx, latLongOffset, _metadata.Radius);
+                    Vector3 vertex = GenerateVertex(height * baseLatVertex, vx, latLongOffset, _metadata.Radius);
+
+                    // Keep track of minimum; this will be used later to position the terrain on the table-top.
+                    if (vertex.x < min.x) {
+                        min = vertex;
+                    }
+
+                    // Add to edge vertices
+                    if (yIndex == 0) {
+                        edgeVerts[xIndex] = vertex;
+                    }
+                    else if (xIndex == lonVertCount - 1) {
+                        edgeVerts[lonVertCount + yIndex - 1] = vertex;
+                    }
+                    else if (yIndex == latVertCount - 1) {
+                        edgeVerts[2 * (lonVertCount - 1) + latVertCount - xIndex - 1] = vertex;
+                    }
+                    else if (xIndex == 0) {
+                        edgeVerts[2 * (lonVertCount + latVertCount - 2) - yIndex] = vertex;
+                    }
+
+                    verts[vertexIndex] = vertex;
                     uvs[vertexIndex] = GenerateUVCoord(xIndex, yIndex, lonVertCount, latVertCount, _uvBounds);
 
                     xIndex++;
@@ -82,10 +107,16 @@ namespace TrekVRApplication {
                 yIndex++;
             }
 
-            return new MeshData() {
+            // Finish generating the data for the terrain edge.
+            ProcessEdgeVertices(edgeVerts, min.x);
+
+            return new TerrainMeshData() {
                 Vertices = verts,
                 TexCoords = uvs,
-                Triangles = MeshGenerationUtils.GenerateTriangles(lonVertCount, latVertCount)
+                Triangles = GenerateTriangles(lonVertCount, latVertCount),
+                ExtraVertices = edgeVerts,
+                ExtraTriangles = GenerateTriangles(edgeVerts.Length / 2, 2, true),
+                MinimumVertex = min
             };
         }
 

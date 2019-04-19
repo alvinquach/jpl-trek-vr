@@ -5,12 +5,12 @@ namespace TrekVRApplication {
 
     public class RescaleLocalTerrainMeshHeightTask : RescaleTerrainMeshHeightTask {
 
-        public RescaleLocalTerrainMeshHeightTask(MeshData[] refernceMeshData, TerrainModelMeshMetadata metadata) : 
+        public RescaleLocalTerrainMeshHeightTask(TerrainMeshData[] refernceMeshData, TerrainModelMeshMetadata metadata) : 
             base(refernceMeshData, metadata) {
 
         }
 
-        protected override MeshData RescaleMeshHeight(MeshData referenceMeshData) {
+        protected override TerrainMeshData RescaleMeshHeight(TerrainMeshData referenceMeshData) {
 
             float scale = _metadata.HeightScale / TerrainModelScale;
             float radius = _metadata.Radius;
@@ -38,7 +38,7 @@ namespace TrekVRApplication {
                 rescaledVertices[i] = vertex;
             }
 
-            return new MeshData() {
+            return new TerrainMeshData() {
                 Vertices = rescaledVertices
                 // TODO Normals
             };

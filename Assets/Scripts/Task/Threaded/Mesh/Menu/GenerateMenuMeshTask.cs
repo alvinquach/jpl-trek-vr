@@ -1,6 +1,6 @@
 ﻿namespace TrekVRApplication {
 
-    public abstract class GenerateMenuMeshTask : GenerateMeshTask {
+    public abstract class GenerateMenuMeshTask : GenerateMeshTask<MeshData> {
 
     }
 

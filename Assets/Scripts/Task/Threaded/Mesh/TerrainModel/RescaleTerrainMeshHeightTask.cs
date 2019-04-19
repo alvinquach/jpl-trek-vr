@@ -1,24 +1,24 @@
 ﻿namespace TrekVRApplication {
 
-    public abstract class RescaleTerrainMeshHeightTask : ThreadedTask<float, MeshData[]> {
+    public abstract class RescaleTerrainMeshHeightTask : ThreadedTask<float, TerrainMeshData[]> {
 
         protected TerrainModelMeshMetadata _metadata;
 
-        protected MeshData[] _referenceMeshData;
+        protected TerrainMeshData[] _referenceMeshData;
 
-        protected MeshData[] _rescaledMeshData;
+        protected TerrainMeshData[] _rescaledMeshData;
 
         protected float _progress = 0.0f;
         public override float Progress => _progress;
 
-        public RescaleTerrainMeshHeightTask(MeshData[] refernceMeshData, TerrainModelMeshMetadata metadata) {
+        public RescaleTerrainMeshHeightTask(TerrainMeshData[] refernceMeshData, TerrainModelMeshMetadata metadata) {
             _referenceMeshData = refernceMeshData;
             _metadata = metadata;
         }
 
-        protected sealed override MeshData[] Task() {
+        protected sealed override TerrainMeshData[] Task() {
             int meshCount = _referenceMeshData.Length;
-            MeshData[] rescaledMeshData = new MeshData[meshCount];
+            TerrainMeshData[] rescaledMeshData = new TerrainMeshData[meshCount];
             for (int i = 0; i < meshCount; i++) {
                 rescaledMeshData[i] = RescaleMeshHeight(_referenceMeshData[i]);
             }
@@ -29,7 +29,7 @@
         }
 
         /// <summary>Rescale the mesh data and store it in the member variable.</summary>
-        protected abstract MeshData RescaleMeshHeight(MeshData referenceMeshData);
+        protected abstract TerrainMeshData RescaleMeshHeight(TerrainMeshData referenceMeshData);
 
     }
 

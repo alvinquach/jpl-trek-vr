@@ -1,13 +1,13 @@
 ﻿namespace TrekVRApplication {
 
-    public abstract class GenerateMeshTask : ThreadedTask<float, MeshData[]> {
+    public abstract class GenerateMeshTask<T> : ThreadedTask<float, T[]> where T : MeshData {
 
-        protected MeshData[] _meshData;
+        protected T[] _meshData;
 
         protected float _progress = 0.0f;
         public override float Progress => _progress;
 
-        protected sealed override MeshData[] Task() {
+        protected sealed override T[] Task() {
             Generate();
             return _meshData;
         }

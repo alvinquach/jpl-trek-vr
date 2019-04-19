@@ -45,7 +45,7 @@ namespace TrekVRApplication {
                 }
             }
 
-            MeshData[] meshData = new MeshData[_metadata.TotalLodLevels];
+            TerrainMeshData[] meshData = new TerrainMeshData[_metadata.TotalLodLevels];
 
             for (int lodLevel = 0; lodLevel <= _metadata.LodLevels; lodLevel++) {
                 int downsample = 1 << (_metadata.BaseDownsample + lodLevel);
@@ -66,7 +66,7 @@ namespace TrekVRApplication {
          * they generate all the LODs at the same time, instead of
          * having to read the image data once for each LOD.
          */
-        protected abstract MeshData GenerateForLod(IntensityImage image, int downsample);
+        protected abstract TerrainMeshData GenerateForLod(IntensityImage image, int downsample);
 
     }
 

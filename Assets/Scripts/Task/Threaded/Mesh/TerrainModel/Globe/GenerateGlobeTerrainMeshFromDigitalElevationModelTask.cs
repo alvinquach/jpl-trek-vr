@@ -10,7 +10,7 @@ namespace TrekVRApplication {
 
         }
 
-        protected override MeshData GenerateForLod(IntensityImage image, int downsample = 1) {
+        protected override TerrainMeshData GenerateForLod(IntensityImage image, int downsample = 1) {
 
             // Downsampling rate must be a power of 2.
             if (!MathUtils.IsPowerOfTwo(downsample)) {
@@ -75,7 +75,7 @@ namespace TrekVRApplication {
                 }
             }
 
-            return new MeshData() {
+            return new TerrainMeshData() {
                 Vertices = verts,
                 TexCoords = uvs,
                 Triangles = MeshGenerationUtils.GenerateTriangles(lonVertCount, latVertCount)

@@ -58,7 +58,8 @@ namespace TrekVRApplication {
             if (physicsMeshIndex < 0) {
                 return;
             }
-            Mesh physicsMesh = ConvertToMesh(meshData[physicsMeshIndex], false);
+            MeshData physicsMeshData = meshData[physicsMeshIndex];
+            Mesh physicsMesh = ConvertToMesh(physicsMeshData.Vertices, physicsMeshData.TexCoords, physicsMeshData.Triangles, false);
 
             // Do the heavy processing in the next update (does this help with the stutter?).
             QueueTask(() => {

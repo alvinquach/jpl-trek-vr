@@ -92,7 +92,7 @@ namespace TrekVRApplication {
         /// <summary>
         ///     Copy of the mesh data with 1.0x height scale.
         /// </summary>
-        protected MeshData[] _referenceMeshData;
+        protected TerrainMeshData[] _referenceMeshData;
 
         protected float _physicsMeshUpdateTimer;
 
@@ -205,7 +205,7 @@ namespace TrekVRApplication {
         ///         After this is called, the member variable _lodGroupContainer will be accessible.
         ///     </para>
         /// </summary>
-        protected virtual void ProcessMeshData(MeshData[] meshData) {
+        protected virtual void ProcessMeshData(TerrainMeshData[] meshData) {
 
             // Add LOD group manager.
             _lodGroupContainer = new GameObject(GameObjectName.LODGroupContainer) {
@@ -216,31 +216,9 @@ namespace TrekVRApplication {
             LODGroup lodGroup = _lodGroupContainer.AddComponent<LODGroup>();
             LOD[] lods = new LOD[_lodLevels + 1];
 
-            // Get Tiff file from the file path.
-
             // Create a child GameObject containing a mesh for each LOD level.
             for (int i = 0; i <= _lodLevels; i++) {
-
-                GameObject child = new GameObject($"LOD_{i}") {
-                    layer = (int)CullingLayer.Terrain
-                };
-                child.transform.SetParent(_lodGroupContainer.transform);
-
-                // Use the parent's tranformations.
-                child.transform.localPosition = Vector3.zero;
-                child.transform.localScale = Vector3.one;
-                child.transform.localEulerAngles = Vector3.zero;
-
-                // Add MeshRenderer to child, and to the LOD group.
-                MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
-                lods[i] = new LOD(Mathf.Pow(GlobeModelLODCoefficient, i + 1), new Renderer[] { meshRenderer });
-
-                // Add material to the MeshRenderer.
-                meshRenderer.material = LayerController.Material;
-
-                // Create a Mesh from the mesh data and add the mesh to a MeshFilter.
-                Mesh mesh = ConvertToMesh(meshData[i]);
-                child.AddComponent<MeshFilter>().mesh = mesh;
+                CreateLod(meshData, lods, i);
             }
 
             // Assign LOD meshes to LOD group.
@@ -257,35 +235,59 @@ namespace TrekVRApplication {
 
         }
 
-        protected Mesh ConvertToMesh(MeshData meshData, bool recaculateNormals = true) {
+        protected virtual void CreateLod(TerrainMeshData[] meshData, LOD[] lods, int index) {
+            GameObject child = new GameObject($"LOD_{index}") {
+                layer = (int)CullingLayer.Terrain
+            };
+            child.transform.SetParent(_lodGroupContainer.transform);
+
+            // Use the parent's tranformations.
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localScale = Vector3.one;
+            child.transform.localEulerAngles = Vector3.zero;
+
+            // Add MeshRenderer to child, and to the LOD group.
+            MeshRenderer meshRenderer = child.AddComponent<MeshRenderer>();
+            lods[index] = new LOD(Mathf.Pow(GlobeModelLODCoefficient, index + 1), new Renderer[] { meshRenderer });
+
+            // Add material to the MeshRenderer.
+            meshRenderer.material = LayerController.Material;
+
+            // Create a Mesh from the mesh data and add the mesh to a MeshFilter.
+            TerrainMeshData data = meshData[index];
+            Mesh mesh = ConvertToMesh(data.Vertices, data.TexCoords, data.Triangles);
+            child.AddComponent<MeshFilter>().mesh = mesh;
+        }
+
+        protected Mesh ConvertToMesh(Vector3[] vertices, Vector2[] texCoords, int[] triangles, bool recaculateNormals = true) {
             Mesh mesh = new Mesh();
-            UpdateMesh(mesh, meshData, recaculateNormals);
+            UpdateMesh(mesh, vertices, texCoords, triangles, recaculateNormals);
             return mesh;
         }
 
-        protected void UpdateMesh(Mesh mesh, MeshData meshData, bool recaculateNormals = true) {
+        protected void UpdateMesh(Mesh mesh, Vector3[] vertices, Vector2[] texCoords, int[] triangles, bool recaculateNormals = true) {
 
             // If needed, set the index format of the mesh to 32-bits,
             // so that the mesh can have more than 65k vertices.
-            if (meshData.Vertices.Length > (1 << 16)) {
+            if (vertices.Length > (1 << 16)) {
                 mesh.indexFormat = IndexFormat.UInt32;
             }
 
-            if (meshData.Vertices != null) {
+            if (vertices != null) {
                 float start = Time.realtimeSinceStartup;
-                mesh.vertices = meshData.Vertices;
+                mesh.vertices = vertices;
                 Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to assign vertices.");
             }
 
-            if (meshData.TexCoords != null) {
+            if (texCoords != null) {
                 float start = Time.realtimeSinceStartup;
-                mesh.uv = meshData.TexCoords;
+                mesh.uv = texCoords;
                 Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to assign UVs.");
             }
 
-            if (meshData.Triangles != null) {
+            if (triangles != null) {
                 float start = Time.realtimeSinceStartup;
-                mesh.triangles = meshData.Triangles;
+                mesh.triangles = triangles;
                 Debug.Log($"Took {Time.realtimeSinceStartup - start} seconds to assign triangles.");
             }
 
@@ -303,7 +305,7 @@ namespace TrekVRApplication {
 
         }
 
-        protected virtual void ApplyRescaledMeshData(MeshData[] rescaledMeshData) {
+        protected virtual void ApplyRescaledMeshData(TerrainMeshData[] rescaledMeshData) {
             for (int i = 0; i <= _lodLevels; i++) {
 
                 // TODO Add null checks.
@@ -311,7 +313,8 @@ namespace TrekVRApplication {
                 MeshFilter meshFilter = child.GetComponent<MeshFilter>();
                 Mesh mesh = meshFilter.mesh;
 
-                UpdateMesh(mesh, rescaledMeshData[i], true);
+                TerrainMeshData meshData = rescaledMeshData[i];
+                UpdateMesh(mesh, meshData.Vertices, null, null, true);  // Only update vertices
             }
         }
 
@@ -366,7 +369,7 @@ namespace TrekVRApplication {
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Mesh mesh = collider.sharedMesh;
-                UpdateMesh(mesh, meshData, false);
+                UpdateMesh(mesh, meshData.Vertices, null, null, false); // Only update vertices
                 collider.sharedMesh = mesh;
                 Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to update physics mesh.");
                 stopwatch.Stop();

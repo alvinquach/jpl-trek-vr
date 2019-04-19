@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace TrekVRApplication {
 
-    public abstract class GenerateTerrainMeshTask : GenerateMeshTask {
+    public abstract class GenerateTerrainMeshTask : GenerateMeshTask<TerrainMeshData> {
 
         protected TerrainModelMeshMetadata _metadata;
 
