@@ -244,7 +244,7 @@ namespace TrekVRApplication {
         ///     Positions the model after the basic placeholder mesh is generated,
         ///     and starts the view transition process.
         /// </summary>
-        private void PostProcessPlaceholderMeshData(MeshData[] meshData) {
+        private void PostProcessPlaceholderMeshData(TerrainMeshData[] meshData) {
 
             GameObject meshContainer = _lodGroupContainer.transform.GetChild(0).gameObject;
 
@@ -254,7 +254,7 @@ namespace TrekVRApplication {
             AddShadowCaster(mesh);
 
             // Calculate the mesh boundaries.
-            float meshOffset = CalculateMeshOffset(meshData[0]);
+            float meshOffset = meshData[0].MinimumVertex.x;
             Bounds bounds = mesh.bounds;
             float meshWidth = Mathf.Max(bounds.size.y, bounds.size.z);
 
@@ -306,7 +306,7 @@ namespace TrekVRApplication {
             });
         }
 
-        private void PostProcessDetailedMeshData(MeshData[] meshData, TerrainModelMeshMetadata metadata) {
+        private void PostProcessDetailedMeshData(TerrainMeshData[] meshData, TerrainModelMeshMetadata metadata) {
 
             // Add mesh collider, if a physics mesh was generated.
             int physicsMeshIndex = metadata.PhyiscsLodMeshIndex;
@@ -326,8 +326,8 @@ namespace TrekVRApplication {
             RepositionModel(meshData[LodLevels]);
         }
 
-        private void RepositionModel(MeshData referenceMeshData) {
-            float meshOffset = CalculateMeshOffset(referenceMeshData);
+        private void RepositionModel(TerrainMeshData referenceMeshData) {
+            float meshOffset = referenceMeshData.MinimumVertex.x;
             Vector3 newPosition = (_targetScale * -meshOffset + TableHeight + TableTopGap) * Vector3.up;
             if (_viewTransitionTaskStatus == TaskStatus.InProgress) {
                 _targetPosition = newPosition;
@@ -349,19 +349,6 @@ namespace TrekVRApplication {
             if (_viewTransitionProgress >= 1.0f) {
                 _viewTransitionTaskStatus = TaskStatus.Completed;
             }
-        }
-
-        private float CalculateMeshOffset(MeshData meshData) {
-            if (meshData.Vertices == null) {
-                return default;
-            }
-            float min = float.MaxValue;
-            foreach (Vector3 vertex in meshData.Vertices) {
-                if (vertex.x < min) {
-                    min = vertex.x;
-                }
-            }
-            return min;
         }
 
         private TerrainProductMetadata GenerateProductMetadata(string productId, int size = LocalTerrainTextureTargetSize) {
