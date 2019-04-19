@@ -219,7 +219,7 @@ namespace TrekVRApplication {
             label = Instantiate(label, transform, false);
             label.name = $"LatLabel{++_latitudeLabelCount}";
             basePosition.z *= -1;
-            label.transform.position = basePosition;
+            label.transform.localPosition = basePosition;
         }
 
         private void GenerateLongitudeCoordinateLabel(GameObject template, float longitude, float positionalScale) {
