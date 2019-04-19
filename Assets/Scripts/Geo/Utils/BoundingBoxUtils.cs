@@ -136,6 +136,7 @@ namespace TrekVRApplication {
         }
 
         public static UVScaleOffset CalculateUVScaleOffset(IBoundingBox boundingBox, IBoundingBox selectedArea) {
+            selectedArea = UnwrapRight(selectedArea);
             return CalculateUVScaleOffset(CalculateUVBounds(boundingBox, selectedArea));
         }
 

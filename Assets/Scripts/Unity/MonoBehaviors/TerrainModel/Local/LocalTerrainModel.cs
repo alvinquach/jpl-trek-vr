@@ -55,7 +55,7 @@ namespace TrekVRApplication {
             set {
                 if (_initTaskStatus == TaskStatus.NotStarted) {
                     _boundingBox = value;
-                    SquareBoundingBox = BoundingBoxUtils.ExpandToSquare(value);
+                    SquareBoundingBox = ExpandToSquare(value);
                 }
             }
         }
@@ -104,7 +104,7 @@ namespace TrekVRApplication {
 
         protected override void GenerateMesh() {
             TerrainModelMeshMetadata metadata = GenerateMeshMetadata();
-            UVBounds uvBounds = BoundingBoxUtils.CalculateUVBounds(SquareBoundingBox, BoundingBox);
+            UVBounds uvBounds = CalculateUVBounds(SquareBoundingBox, BoundingBox);
             GenerateTerrainMeshTask generateBaseMeshTask = new GenerateBaseLocalTerrainMeshTask(metadata, BoundingBox, uvBounds);
 
             // Generate a base mesh first to be displayed temporarily
@@ -220,7 +220,7 @@ namespace TrekVRApplication {
             if (AnimateOnInitialization) {
 
                 // Initially position the mesh to match its visual position on the globe.
-                Vector2 latLongOffset = BoundingBoxUtils.MedianLatLon(BoundingBox);
+                Vector2 latLongOffset = MedianLatLon(BoundingBox);
                 Quaternion rotation = TerrainModelManager.Instance.GlobeModel.transform.rotation;
                 rotation *= Quaternion.Euler(0, -latLongOffset.y - 90, 0);
                 rotation *= Quaternion.Euler(0, 0, latLongOffset.x);
