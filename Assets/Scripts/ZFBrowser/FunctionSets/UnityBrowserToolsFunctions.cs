@@ -18,6 +18,16 @@ namespace TrekVRApplication {
             });
         }
 
+        [RegisterToBrowser]
+        public void GetHeightProfile(string points, double? sampleCount, string requestId) {
+            if (sampleCount == null) {
+                return;
+            }
+            ToolsWebService.GetHeightProfile(points, (int)sampleCount, res => {
+                ZFBrowserUtils.SendDataResponse(_browser, requestId, res);
+            });
+        }
+
     }
 
 }

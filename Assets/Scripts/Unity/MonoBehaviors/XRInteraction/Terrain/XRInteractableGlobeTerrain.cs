@@ -233,8 +233,10 @@ namespace TrekVRApplication {
             // Switch to new mode.
             switch (activity) {
                 case XRInteractableTerrainActivity.Distance:
+                    HeightProfileController.SetEnabled(true, false);
+                    break;
                 case XRInteractableTerrainActivity.HeightProfile:
-                    HeightProfileController.SetEnabled(true);
+                    HeightProfileController.SetEnabled(true, true);
                     break;
                 case XRInteractableTerrainActivity.BBoxSelection:
                     _bboxSelectionController.SetEnabled(true);

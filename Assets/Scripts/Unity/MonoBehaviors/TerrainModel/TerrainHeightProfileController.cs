@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using ZenFulcrum.EmbeddedBrowser;
 using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
@@ -44,6 +42,9 @@ namespace TrekVRApplication {
             } else {
                 _overlayController = LocalTerrainOverlayController.Instance;
             }
+
+            // Disable script after initializing.
+            enabled = false;
         }
 
         private void Update() {
@@ -258,7 +259,8 @@ namespace TrekVRApplication {
             ControllerModalActivity activity = HeightProfileMode ? 
                 ControllerModalActivity.ToolsHeightProfile :
                 ControllerModalActivity.ToolsDistance;
-            return UserInterfaceManager.Instance.GetControllerModalWithActivity(activity);
+            ControllerModal controllerModal = UserInterfaceManager.Instance.GetControllerModalWithActivity(activity);
+            return controllerModal;
         }
 
     }

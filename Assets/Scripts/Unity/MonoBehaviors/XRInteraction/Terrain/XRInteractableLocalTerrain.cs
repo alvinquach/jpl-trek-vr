@@ -81,9 +81,12 @@ namespace TrekVRApplication {
             // Switch to new mode.
             switch (activity) {
                 case XRInteractableTerrainActivity.Distance:
+                    TerrainModel.LayerController.EnableOverlay = true;
+                    HeightProfileController.SetEnabled(true, false);
+                    break;
                 case XRInteractableTerrainActivity.HeightProfile:
                     TerrainModel.LayerController.EnableOverlay = true;
-                    HeightProfileController.SetEnabled(true);
+                    HeightProfileController.SetEnabled(true, true);
                     break;
                 case XRInteractableTerrainActivity.Default:
                     TerrainModel.LayerController.EnableOverlay = false;
