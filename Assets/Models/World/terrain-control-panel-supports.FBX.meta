@@ -1,69 +1,41 @@
 fileFormatVersion: 2
-guid: b9b6fa4f335a8014e8acebca4d6b9918
-SketchUpImporter:
-  generateBackFace: 0
-  mergeCoplanarFaces: 0
-  selectedNodes: 000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000e000000
-  assetHash:
-    serializedVersion: 2
-    Hash: 2836833eea8b7ed3db13e64db84aa46c
-  longitude: -105.242139
-  latitude: 40.018309
-  northCorrection: -0
-  fileUnit: 0
-  sketchUpImportData:
-    defaultCamera:
-      position: {x: 2.4638183, y: 4.133341, z: 0.6173201}
-      lookAt: {x: -12.845499, y: -32.365013, z: -2.0649753}
-      up: {x: -0.9062474, y: 0.39179644, z: -0.15878062}
-      fov: 35
-      aspectRatio: 0
-      orthoSize: 1
-      isPerspective: 1
-    scenes: []
+guid: b604d593120c64448b0a67a1620caab2
+ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: Component#1
-    100002: Component#1 1
-    100004: Component#2
-    100006: Component#2 1
-    100008: Group 1
-    100010: Group 3
-    100012: Group 5
-    100014: //RootNode
-    400000: Component#1
-    400002: Component#1 1
-    400004: Component#2
-    400006: Component#2 1
-    400008: Group 1
-    400010: Group 3
-    400012: Group 5
-    400014: //RootNode
-    2100000: _defaultMat
-    2300000: Component#1
-    2300002: Component#1 1
-    2300004: Component#2
-    2300006: Component#2 1
-    2300008: Group 1
-    2300010: Group 3
-    2300012: Group 5
-    3300000: Component#1
-    3300002: Component#1 1
-    3300004: Component#2
-    3300006: Component#2 1
-    3300008: Group 1
-    3300010: Group 3
-    3300012: Group 5
-    4300000: Mesh Group 1
-    4300002: Mesh Group 3
-    4300004: Mesh Group 5
-    4300006: Mesh Component#1
-    4300008: Mesh Component#2
+    100000: Component#1_001
+    100002: Component#1_002
+    100004: Component#2_001
+    100006: Component#2_002
+    100008: Group_001
+    100010: //RootNode
+    400000: Component#1_001
+    400002: Component#1_002
+    400004: Component#2_001
+    400006: Component#2_002
+    400008: Group_001
+    400010: //RootNode
+    2100000: skp_front_default
+    2300000: Component#1_001
+    2300002: Component#1_002
+    2300004: Component#2_001
+    2300006: Component#2_002
+    2300008: Group_001
+    3300000: Component#1_001
+    3300002: Component#1_002
+    3300004: Component#2_001
+    3300006: Component#2_002
+    3300008: Group_001
+    4300000: Group_001
+    4300002: Component#1_001
+    4300004: Component#1_002
+    4300006: Component#2_001
+    4300008: Component#2_002
   externalObjects: {}
   materials:
-    importMaterials: 0
-    materialName: 2
-    materialSearch: 0
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
     materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
@@ -90,7 +62,7 @@ SketchUpImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 0.0254
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -121,7 +93,7 @@ SketchUpImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
-  importAnimation: 0
+  importAnimation: 1
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2

@@ -1,56 +1,31 @@
 fileFormatVersion: 2
-guid: 5be6180a39f462d4d81f5281c3ff2f71
-SketchUpImporter:
-  generateBackFace: 0
-  mergeCoplanarFaces: 0
-  selectedNodes: 000000000100000002000000
-  assetHash:
-    serializedVersion: 2
-    Hash: 142e935d4725f8f1a04adc4cc178028a
-  longitude: -105.242139
-  latitude: 40.018309
-  northCorrection: -0
-  fileUnit: 0
-  sketchUpImportData:
-    defaultCamera:
-      position: {x: -2.4367955, y: 1.3470185, z: -1.521884}
-      lookAt: {x: 18.089153, y: -6.5019946, z: 9.3987055}
-      up: {x: 0.2823757, y: 0.9474669, z: 0.15023465}
-      fov: 35
-      aspectRatio: 0
-      orthoSize: 1
-      isPerspective: 1
-    scenes: []
+guid: cc69590c9ad8bd34c9c640b1d9e7b0d1
+ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: Group 1
-    100002: Group 3
-    100004: Group 5
-    100006: Group 7
-    100008: //RootNode
-    400000: Group 1
-    400002: Group 3
-    400004: Group 5
-    400006: Group 7
-    400008: //RootNode
-    2100000: _defaultMat
-    2300000: Group 1
-    2300002: Group 3
-    2300004: Group 5
-    2300006: Group 7
-    3300000: Group 1
-    3300002: Group 3
-    3300004: Group 5
-    3300006: Group 7
-    4300000: Mesh Group 1
-    4300002: Mesh Group 3
-    4300004: Mesh Group 5
-    4300006: Mesh Group 7
+    100000: Bezel Back
+    100002: Bezel Front
+    100004: Screen
+    100006: //RootNode
+    400000: Bezel Back
+    400002: Bezel Front
+    400004: Screen
+    400006: //RootNode
+    2100000: skp_front_default
+    2300000: Bezel Back
+    2300002: Bezel Front
+    2300004: Screen
+    3300000: Bezel Back
+    3300002: Bezel Front
+    3300004: Screen
+    4300000: Screen
+    4300002: Bezel Back
+    4300004: Bezel Front
   externalObjects: {}
   materials:
-    importMaterials: 0
-    materialName: 2
-    materialSearch: 0
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
     materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
@@ -77,7 +52,7 @@ SketchUpImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 0.0254
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -108,7 +83,7 @@ SketchUpImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
-  importAnimation: 0
+  importAnimation: 1
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2

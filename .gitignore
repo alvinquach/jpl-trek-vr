@@ -27,3 +27,6 @@ sysinfo.txt
 \.vscode/
 
 GPUCache/
+
+*.skb
+*.skb.meta

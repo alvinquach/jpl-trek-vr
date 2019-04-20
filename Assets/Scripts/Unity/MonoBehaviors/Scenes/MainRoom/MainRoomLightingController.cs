@@ -7,11 +7,17 @@ namespace TrekVRApplication.Scenes.MainRoom {
 
         private const float DirectionalLightMaxIntensity = 0.5f;
 
+        private const float TerrainDirectionalLightMinIntensity = 0.2f;
+
         private const float TerrainDirectionalLightMaxIntensity = 0.75f;
 
-        private const float PointLightMaxIntensity = 0.91f;
+        private const float PointLightMaxIntensity = 0.69f;
 
         private const float SpotLightMaxIntensity = 0.69f;
+
+        private const float SkylightMinRange = 9.5f;
+
+        private const float SkylightMaxRange = 40.0f;
 
         private const float DimIncrement = 0.2f;
 
@@ -38,15 +44,27 @@ namespace TrekVRApplication.Scenes.MainRoom {
             foreach (Light light in lights) {
                 switch (light.type) {
                     case LightType.Directional:
-                        Debug.Log(light.cullingMask);
-                        light.intensity = dimAmount * (light.cullingMask == 1 << (int)CullingLayer.Terrain ? 
-                            TerrainDirectionalLightMaxIntensity : DirectionalLightMaxIntensity);
+                        if (light.cullingMask == 1 << (int)CullingLayer.Terrain) {
+                            light.intensity = Mathf.Lerp(
+                                TerrainDirectionalLightMinIntensity, 
+                                TerrainDirectionalLightMaxIntensity, 
+                                dimAmount
+                            );
+                        }
+                        else {
+                            light.intensity = dimAmount * DirectionalLightMaxIntensity;
+                        }
                         break;
                     case LightType.Point:
                         light.intensity = dimAmount * PointLightMaxIntensity;
                         break;
                     case LightType.Spot:
-                        light.intensity = dimAmount * SpotLightMaxIntensity;
+                        if (light.gameObject.name.Contains("Skylight")) {
+                            light.range = Mathf.Lerp(SkylightMinRange, SkylightMaxRange, dimAmount);
+                        }
+                        else {
+                            light.intensity = dimAmount * SpotLightMaxIntensity;
+                        }
                         break;
                 }
             }

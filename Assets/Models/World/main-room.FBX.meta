@@ -1,64 +1,86 @@
 fileFormatVersion: 2
-guid: 9493f76ddf70fe14090ec3ccb63f3314
-SketchUpImporter:
-  generateBackFace: 0
-  mergeCoplanarFaces: 0
-  selectedNodes: 000000000100000002000000030000000400000005000000060000000700000008000000090000000a000000
-  assetHash:
-    serializedVersion: 2
-    Hash: 017919651129ac2998a4c4061bfa8876
-  longitude: -105.242139
-  latitude: 40.018309
-  northCorrection: -0
-  fileUnit: 0
-  sketchUpImportData:
-    defaultCamera:
-      position: {x: -2.0677173, y: 3.7832105, z: -2.2148325}
-      lookAt: {x: 8.262771, y: -16.074753, z: 7.841168}
-      up: {x: 0.5798629, y: 0.5874939, z: 0.56445557}
-      fov: 35
-      aspectRatio: 0
-      orthoSize: 1
-      isPerspective: 1
-    scenes: []
+guid: bd48ecd70e77c5d45a5543867c002bdd
+ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: //RootNode
-    100002: Group 1
-    100004: Group 3
-    100006: Group 5
-    100008: Group 7
-    100010: Group 9
-    400000: //RootNode
-    400002: Group 1
-    400004: Group 3
-    400006: Group 5
-    400008: Group 7
-    400010: Group 9
-    2100000: _defaultMat
-    2300000: //RootNode
-    2300002: Group 1
-    2300004: Group 3
-    2300006: Group 5
-    2300008: Group 7
-    2300010: Group 9
-    3300000: //RootNode
-    3300002: Group 1
-    3300004: Group 3
-    3300006: Group 5
-    3300008: Group 7
-    3300010: Group 9
-    4300000: Mesh test-room
-    4300002: Mesh Group 1
-    4300004: Mesh Group 3
-    4300006: Mesh Group 5
-    4300008: Mesh Group 7
-    4300010: Mesh Group 9
+    100000: Base Moulding
+    100002: Ceiling
+    100004: Floor
+    100006: Group_002
+    100008: //RootNode
+    100010: Pit
+    100012: Pit Edge
+    100014: Walls
+    100016: ' 1'
+    100018: Door 1
+    100020: Door 2
+    100022: Plane001
+    100024: Skylight
+    100026: Ceiling Moulding
+    100028: Group_003
+    400000: Base Moulding
+    400002: Ceiling
+    400004: Floor
+    400006: Group_002
+    400008: //RootNode
+    400010: Pit
+    400012: Pit Edge
+    400014: Walls
+    400016: ' 1'
+    400018: Door 1
+    400020: Door 2
+    400022: Plane001
+    400024: Skylight
+    400026: Ceiling Moulding
+    400028: Group_003
+    2100000: skp_front_default
+    2100002: No Name
+    2300000: Base Moulding
+    2300002: Ceiling
+    2300004: Floor
+    2300006: Group_002
+    2300008: Pit
+    2300010: Pit Edge
+    2300012: Walls
+    2300014: ' 1'
+    2300016: Door 1
+    2300018: Door 2
+    2300020: Plane001
+    2300022: Skylight
+    2300024: Ceiling Moulding
+    2300026: Group_003
+    3300000: Base Moulding
+    3300002: Ceiling
+    3300004: Floor
+    3300006: Group_002
+    3300008: Pit
+    3300010: Pit Edge
+    3300012: Walls
+    3300014: ' 1'
+    3300016: Door 1
+    3300018: Door 2
+    3300020: Plane001
+    3300022: Skylight
+    3300024: Ceiling Moulding
+    3300026: Group_003
+    4300000: Pit
+    4300002: Group_002
+    4300004: Walls
+    4300006: Ceiling
+    4300008: Floor
+    4300010: Base Moulding
+    4300012: Pit Edge
+    4300016: Door 2
+    4300018: Door 1
+    4300020: Plane001
+    4300022: Skylight
+    4300024: Ceiling Moulding
+    4300026: Group_003
   externalObjects: {}
   materials:
-    importMaterials: 0
-    materialName: 2
-    materialSearch: 0
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
     materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
@@ -85,7 +107,7 @@ SketchUpImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 0.0254
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -94,7 +116,7 @@ SketchUpImporter:
     importCameras: 1
     importLights: 1
     swapUVChannels: 0
-    generateSecondaryUV: 0
+    generateSecondaryUV: 1
     useFileUnits: 1
     optimizeMeshForGPU: 1
     keepQuads: 0
@@ -116,7 +138,7 @@ SketchUpImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
-  importAnimation: 0
+  importAnimation: 1
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2
