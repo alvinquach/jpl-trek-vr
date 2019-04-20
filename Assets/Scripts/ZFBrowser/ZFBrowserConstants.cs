@@ -11,7 +11,7 @@ namespace TrekVRApplication {
         public const string AngularGlobalObjectName = "AngularGlobalVariables";
         public const string BoundingBoxSelectionModalName = "ControllerModalBoundingBoxSelectionComponent";
         public const string ToolsDistanceModalName = "ControllerModalToolsDistanceComponent";
-        public const string ToolsHeightProfileModalName = "TODO";
+        public const string ToolsHeightProfileModalName = "ControllerModalToolsHeightProfileComponent";
 
         public const string UnityGlobalObjectName = "UnityGlobalVariables";
         public const string DataServiceName = "UnityDataService";

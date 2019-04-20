@@ -31,7 +31,7 @@ namespace TrekVRApplication {
                 case ControllerModalActivity.ToolsDistance:
                     return $"{ControllerModalUrl}/tools/distance";
                 case ControllerModalActivity.ToolsHeightProfile:
-                    // TODO Add this
+                    return $"{ControllerModalUrl}/tools/height-profile";
                 case ControllerModalActivity.ToolsSunAngle:
                     // TODO Add this
                 default:
