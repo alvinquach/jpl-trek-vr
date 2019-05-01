@@ -166,7 +166,7 @@ namespace TrekVRApplication {
         public void HighlightAreaOnGlobe(BoundingBox bbox) {
             if (!_highlightedArea) {
                 _highlightedArea = 
-                    GlobeTerrainOverlayController.Instance.AddArea(new Color(0.0f, 0.9f, 1.0f, 0.5f));
+                    GlobeTerrainOverlayController.Instance.AddArea(new Color(0.0f, 0.91f, 1.0f, 0.86f)); // TODO Un-hardcode color
             }
             _highlightedArea.UpdateArea(bbox);
         }
