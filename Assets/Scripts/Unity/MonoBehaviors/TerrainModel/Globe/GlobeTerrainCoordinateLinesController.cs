@@ -109,13 +109,10 @@ namespace TrekVRApplication {
                 _coordinateLabelOpacity = distance < CoordinateIndicatorStaticLabelFadeOutDistance ? 1 : 0;
                 UpdateMaterialAlpha(_verticalAxisMaterial, _coordinateLabelOpacity);
 
-                // Regenerate the coordinate lines.
-                GeneareteCoordinateLines();
+                GeneareteCoordinateLines(); // Regenerate the coordinate lines.
             }
             else {
-
-                // Remove the coordinate lines.
-                RemoveCoordinateLines();
+                RemoveCoordinateLines(); // Remove the coordinate lines.
             }
         }
 
@@ -255,7 +252,7 @@ namespace TrekVRApplication {
             // North label
             GameObject label = Instantiate(labelTemplate, transform, false);
             label.name = "NorthLabel";
-            label.transform.position = 1.05f * positionalScale * Vector3.up;
+            label.transform.localPosition = 1.05f * positionalScale * Vector3.up;
             label.SetActive(true);
             Text text = label.GetComponentInChildren<Text>();
             text.text = "N";
@@ -265,7 +262,7 @@ namespace TrekVRApplication {
             // South label
             label = Instantiate(label, transform, false);
             label.name = "SouthLabel";
-            label.transform.position = 1.05f * positionalScale * Vector3.down;
+            label.transform.localPosition = 1.05f * positionalScale * Vector3.down;
             text = label.GetComponentInChildren<Text>();
             text.text = "S";
 
