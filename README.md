@@ -47,12 +47,20 @@ The following hardware/software is required:
    git submodule update
    ```
    
-   This make take a couple of minutes, since the textures submodule contains some relatively large files.
+3. Pull LFS Files.
+   Example:
+   ```
+   git lfs install
+   git lfs fetch
+   git lfs pull
+   ```
+   This make take a couple of minutes, since the some textures are relatively large files.
 ### Running the Unity Project
 1. Start the Unity Editor
 2. In the Open Project dialog box, click Open. Then, navigate to the project folder (`jpl-trek-vr` if you followed the example commands in the previous section) and click Select Folder.
 3. Give Unity some time to automatically build some files.
-4. Click on the play button on top to run the application.
+4. Open the `main-room` scene under `Assets/Scenes` folder.
+5. Click on the play button on top to run the application.
 
 ## Controls
 ### HTC Vive
