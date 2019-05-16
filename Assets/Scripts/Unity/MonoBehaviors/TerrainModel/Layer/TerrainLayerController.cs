@@ -176,7 +176,7 @@ namespace TrekVRApplication {
 
             // This is redundant, since if UseDisabledMaterial is false, the shader
             // is not used and the _DiffuseOpacity parameter has no effect.
-            Material.SetFloat("_DiffuseOpacity", UseDisabledMaterial ? 0.5f : 1);   // TODO Define the opacity as a constant.
+            Material.SetFloat("_DiffuseOpacity", UseDisabledMaterial ? 0.69f : 1);   // TODO Define the opacity as a constant.
 
             Material.SetFloat("_Glossiness", DisableTextures ? NoTextureShaderSmoothness : ShaderSmoothness);
             Material.SetFloat("_Metallic", DisableTextures ? NoTextureShaderMetallic : ShaderMetallic);
