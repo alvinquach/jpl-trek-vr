@@ -28,7 +28,7 @@ namespace TrekVRApplication {
         /// </summary>
         protected bool _textureUpdateRequired = false;
 
-        public LocalTerrainBoundingBoxSelectionController BBoxSelectionController { get; private set; }
+        public TerrainBoundingBoxSelectionController BBoxSelectionController { get; protected set; }
 
         protected GameObject _renderTextureObjectsContainer;
 
@@ -63,13 +63,6 @@ namespace TrekVRApplication {
             _renderTextureObjectsContainer.transform.localPosition = 
                 new Vector3(-CameraVerticalSize * RenderTextureAspectRatio, -CameraVerticalSize, 1);
 
-            // Create the latitude and longitude selection indicators and controller.
-            GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.SelectionIndicatorContainer) {
-                layer = (int)CullingLayer.RenderToTexture
-            };
-            selectionIndicatorsContainer.transform.SetParent(_renderTextureObjectsContainer.transform, false);
-            BBoxSelectionController = selectionIndicatorsContainer.AddComponent<LocalTerrainBoundingBoxSelectionController>();
-            BBoxSelectionController.SetEnabled(false);
         }
 
         private void LateUpdate() {

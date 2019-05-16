@@ -4,7 +4,7 @@ namespace TrekVRApplication {
 
     public class XRInteractableLocalTerrain : XRInteractableTerrain {
 
-        private LocalTerrainBoundingBoxSelectionController _bboxSelectionController;
+        private TerrainBoundingBoxSelectionController _bboxSelectionController;
         protected override TerrainBoundingBoxSelectionController BBoxSelectionController => _bboxSelectionController;
 
         private LocalTerrainModel _terrainModel;

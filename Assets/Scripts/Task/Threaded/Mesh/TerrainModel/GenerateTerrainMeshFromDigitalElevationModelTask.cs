@@ -1,5 +1,7 @@
 ﻿using System;
 using UnityEngine;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 namespace TrekVRApplication {
 
@@ -18,12 +20,18 @@ namespace TrekVRApplication {
         /// </summary>
         protected override void Generate() {
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             // TODO Add support other image types if necessary.
 
             // Create and execute task to convert first image into an RGBImage object.
             // The task can be executed syncronously in the same thread since Generate() 
             // is called outside of the main thread.
             IntensityImage baseImage = new LoadIntensityImageFromFileTask(_demFilePaths[0]).ExecuteInCurrentThread();
+
+            Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to read DEM image file.");
+
 
             // If there are more files to process, then load and merge each image.
             for (int i = 1; i < _demFilePaths.Length; i++) {

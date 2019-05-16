@@ -8,7 +8,7 @@ namespace TrekVRApplication {
 
         private GlobeTerrainNomenclatureController _nomenclatureController;
 
-        private GlobeTerrainBoundingBoxSelectionController _bboxSelectionController;
+        private TerrainBoundingBoxSelectionController _bboxSelectionController;
         protected override TerrainBoundingBoxSelectionController BBoxSelectionController => _bboxSelectionController;
 
         private GlobeTerrainModel _terrainModel;
@@ -123,14 +123,6 @@ namespace TrekVRApplication {
         protected override void Awake() {
             base.Awake();
 
-            // Create the latitude and longitude selection indicators and controller.
-            GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.SelectionIndicatorContainer) {
-                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
-            };
-            selectionIndicatorsContainer.transform.SetParent(transform, false);
-            _bboxSelectionController = selectionIndicatorsContainer.AddComponent<GlobeTerrainBoundingBoxSelectionController>();
-            _bboxSelectionController.SetEnabled(false);
-
             // Add container for coordinate lines
             GameObject coordinateLines = new GameObject(GameObjectName.StaticCoordinateLines) {
                 layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
@@ -143,6 +135,7 @@ namespace TrekVRApplication {
 
         protected override void Start() {
             _terrainModel = GetComponent<GlobeTerrainModel>();
+            _bboxSelectionController = GlobeTerrainOverlayController.Instance.BBoxSelectionController;
 
             // There is no way to unsubscribe from this...but unsubscribing
             // is not really necessary in this case.

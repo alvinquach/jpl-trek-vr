@@ -267,6 +267,8 @@ namespace TrekVRApplication {
             // Create and execute task to convert first image into an RGBImage object.
             new LoadColorImageFromFileTask<RGBImage>(filepaths[0]).Execute(baseImage => {
 
+                Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to read texture image file.");
+
                 // If there are more files to process, then load and merge each image.
                 for (int i = 1; i < filepaths.Length; i++) {
 

@@ -32,6 +32,10 @@ namespace TrekVRApplication {
 
         public const string GlobalDigitalElevationModelUUID = "1cc3cfbb-ac38-46d1-a3df-5fff16ca397e";
 
+        public static readonly Color32 CoordinateIndicatorColor = new Color32(0, 224, 255, 255);
+
+        public static readonly Color32 CoordinateIndicatorStaticColor = new Color32(255, 160, 96, 255);
+
     }
 
 }

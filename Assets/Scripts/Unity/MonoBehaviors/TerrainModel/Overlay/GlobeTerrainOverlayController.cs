@@ -28,6 +28,14 @@ namespace TrekVRApplication {
                 Destroy(this);
             }
             base.Awake();
+
+            // Create the latitude and longitude selection indicators and controller.
+            GameObject selectionIndicatorsContainer = new GameObject(GameObjectName.SelectionIndicatorContainer) {
+                layer = (int)CullingLayer.RenderToTexture
+            };
+            selectionIndicatorsContainer.transform.SetParent(_renderTextureObjectsContainer.transform, false);
+            BBoxSelectionController = selectionIndicatorsContainer.AddComponent<GlobeTerrainBoundingBoxSelectionController>();
+            BBoxSelectionController.SetEnabled(false);
         }
 
     }

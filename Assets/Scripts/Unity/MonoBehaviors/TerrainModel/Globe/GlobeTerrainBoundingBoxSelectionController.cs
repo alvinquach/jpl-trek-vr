@@ -1,70 +1,30 @@
-﻿using UnityEngine;
-using static TrekVRApplication.TerrainConstants;
+﻿using System;
+using UnityEngine;
 using static TrekVRApplication.GlobeTerrainConstants;
-using static TrekVRApplication.TerrainOverlayUtils;
 using static TrekVRApplication.ZFBrowserConstants;
 
 namespace TrekVRApplication {
 
     public class GlobeTerrainBoundingBoxSelectionController : TerrainBoundingBoxSelectionController {
 
+        private GlobeTerrainOverlayController _overlayController;
+        protected override TerrainOverlayController OverlayController => _overlayController;
+
+        protected override float IndicatorThickness => CoordinateIndicatorThickness;
+
+        protected override float IndicatorActiveThickness => CoordinateIndicatorActiveThickness;
+
         private POILabel _coordSelectionLabel;
 
         #region Unity lifecycle methods
 
-        protected override void OnEnable() {
-            base.OnEnable();
-            _coordSelectionLabel.gameObject.SetActive(true);
+        protected override void Awake() {
+            base.Awake();
+            _overlayController = GlobeTerrainOverlayController.Instance;
+            _coordSelectionLabel.gameObject.SetActive(false);
         }
 
         #endregion
-
-        public override void MakeBoundarySelection(RaycastHit hit) {
-
-            Vector3 direction = transform.InverseTransformPoint(hit.point);
-            Vector3 flattened = new Vector3(direction.x, 0, direction.z);
-            float angle;
-
-            // Longitude selection
-            if (_selectionIndex % 2 == 0) {
-                angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
-                if (Vector3.Cross(flattened, Vector3.forward).y > 0) {
-                    angle = -angle;
-                }
-                Debug.Log($"Lon selection: {angle} degrees");
-            }
-
-            // Latitude selection
-            else {
-                angle = Vector3.Angle(direction, flattened);
-                if (direction.y < 0) {
-                    angle = -angle;
-                }
-                Debug.Log($"Lat selection: {angle} degrees");
-            }
-
-            _selectionBoundingBox[_selectionIndex] = angle;
-
-            CurrentSelectionIndicator.startWidth = CoordinateIndicatorThickness;
-            _selectionIndex++;
-
-            // Check if selection is finished.
-            if (_selectionIndex == 4) {
-                Debug.Log("Selection Complete: " + _selectionBoundingBox);
-                TerrainModelManager terrainModelManager = TerrainModelManager.Instance;
-                TerrainModel terrainModel = terrainModelManager.CreateLocalModelFromSubset(
-                    terrainModelManager.CurrentVisibleModel,
-                    _selectionBoundingBox
-                );
-                terrainModelManager.ShowTerrainModel(terrainModel, false);
-                terrainModelManager.GlobeModel.InteractionController.SwitchToActivity(XRInteractableTerrainActivity.Default);
-            }
-            else {
-                ActivateCurrentIndicator();
-            }
-
-            SendBoundingBoxUpdateToControllerModal(new BoundingBox(_selectionBoundingBox));
-        }
 
         /// <summary>
         ///     <para>
@@ -84,42 +44,35 @@ namespace TrekVRApplication {
         public override float UpdateCursorPosition(RaycastHit hit) {
 
             // Update the position and angle of the coordinate selection label.
+            _coordSelectionLabel.gameObject.SetActive(true); // TODO move this so it doesn't get called every update.
             _coordSelectionLabel.transform.position = hit.point;
             _coordSelectionLabel.transform.forward = -hit.normal;
-
-            // Get the current coordinate indicator to set its angles.
-            LineRenderer currentCoordinateIndicator = CurrentSelectionIndicator;
-
-            Vector3 direction = transform.InverseTransformPoint(hit.point);
-            Vector3 flattened = new Vector3(direction.x, 0, direction.z);
-
-            float angle;
+            
+            Vector2 coord = GetCoordFromHit(hit);
+            LineRenderer lineRenderer = CurrentSelectionIndicator;
+            float angle, position;
 
             // Longitude selection
             if (_selectionIndex % 2 == 0) {
-                angle = Vector3.Angle(flattened, -Vector3.forward) - 180;
-                if (Vector3.Cross(flattened, Vector3.forward).y > 0) {
-                    angle = -angle;
-                }
-                currentCoordinateIndicator.transform.localEulerAngles = new Vector3(0, -angle, 0);
+                position = 2 * hit.textureCoord.x;
+                lineRenderer.SetPosition(0, new Vector2(position, 0));
+                lineRenderer.SetPosition(1, new Vector2(position, 1));
+                angle = coord.y;
 
                 _coordSelectionLabel.Text = $"Lon: {angle.ToString("0.00")}°";
             }
 
             // Latitude selection
             else {
-                angle = Vector3.Angle(direction, flattened);
-                if (direction.y < 0) {
-                    angle = -angle;
-                }
-                Vector2 offsetAndScale = CalculateLatitudeIndicatorOffsetAndScale(angle);
-                float modelRadius = Mars.Radius * TerrainModelScale;
-
-                currentCoordinateIndicator.transform.localPosition = new Vector3(0, modelRadius * offsetAndScale.y, 0);
-                currentCoordinateIndicator.transform.localScale = (offsetAndScale.x * modelRadius + CoordinateIndicatorRadiusOffset) * Vector3.one;
+                position = hit.textureCoord.y;
+                lineRenderer.SetPosition(0, new Vector2(0, position));
+                lineRenderer.SetPosition(1, new Vector2(2, position));
+                angle = coord.x;
 
                 _coordSelectionLabel.Text = $"Lat: {angle.ToString("0.00")}°";
             }
+
+            _overlayController.UpdateTexture();
 
             // Send updated to controller modal.
             if (_framesSinceLastControllerModalUpdate >= ControllerModalUpdateInterval) {
@@ -137,68 +90,8 @@ namespace TrekVRApplication {
             _coordSelectionLabel.gameObject.SetActive(false);
         }
 
-        protected override void ActivateCurrentIndicator() {
-            CurrentSelectionIndicator.startWidth = CoordinateIndicatorActiveThickness;
-            CurrentSelectionIndicator.enabled = true;
-        }
-
         protected override void GenerateSelectionIndicatorLines() {
-
-            float indicatorRadius = Mars.Radius * TerrainModelScale + CoordinateIndicatorRadiusOffset;
-
-            // Create material for coordinate indicators
-            _coordinateIndicatorMaterial = new Material(Shader.Find("Unlit/Color"));
-            _coordinateIndicatorMaterial.SetColor("_Color", CoordinateIndicatorColor);
-
-            GameObject lonSelectionStartIndicator = new GameObject($"Lon{GameObjectName.SelectionIndicator}1") {
-                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
-            };
-            lonSelectionStartIndicator.transform.SetParent(transform, false);
-            lonSelectionStartIndicator.transform.localScale = indicatorRadius * Vector3.one;
-            _lonSelectionStartIndicator = InitCoordinateIndicator(
-                lonSelectionStartIndicator,
-                _coordinateIndicatorMaterial,
-                CoordinateIndicatorThickness
-            );
-            _lonSelectionStartIndicator.enabled = false;
-            GeneratePointsForLongitudeIndicator(_lonSelectionStartIndicator);
-
-            GameObject latSelectionStartIndicator = new GameObject($"Lat{GameObjectName.SelectionIndicator}1") {
-                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
-            };
-            latSelectionStartIndicator.transform.SetParent(transform, false);
-            _latSelectionStartIndicator = InitCoordinateIndicator(
-                latSelectionStartIndicator,
-                _coordinateIndicatorMaterial,
-                CoordinateIndicatorThickness
-            );
-            _latSelectionStartIndicator.enabled = false;
-            GeneratePointsForLatitudeIndicator(_latSelectionStartIndicator);
-
-            GameObject lonSelectionEndIndicator = new GameObject($"Lon{GameObjectName.SelectionIndicator}2") {
-                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
-            };
-            lonSelectionEndIndicator.transform.SetParent(transform, false);
-            lonSelectionEndIndicator.transform.localScale = indicatorRadius * Vector3.one;
-            _lonSelectionEndIndicator = InitCoordinateIndicator(
-                lonSelectionEndIndicator,
-                _coordinateIndicatorMaterial,
-                CoordinateIndicatorThickness
-            );
-            _lonSelectionEndIndicator.enabled = false;
-            GeneratePointsForLongitudeIndicator(_lonSelectionEndIndicator);
-
-            GameObject latSelectionEndIndicator = new GameObject($"Lat{GameObjectName.SelectionIndicator}2") {
-                layer = (int)CullingLayer.Terrain // TODO Make a new layer for coordinate lines and labels
-            };
-            latSelectionEndIndicator.transform.SetParent(transform, false);
-            _latSelectionEndIndicator = InitCoordinateIndicator(
-                latSelectionEndIndicator,
-                _coordinateIndicatorMaterial,
-                CoordinateIndicatorThickness
-            );
-            _latSelectionEndIndicator.enabled = false;
-            GeneratePointsForLatitudeIndicator(_latSelectionEndIndicator);
+            base.GenerateSelectionIndicatorLines();
 
             // Instantiate a copy of the coordinate template to display the coordiate values.
             GameObject coordinateTemplate = TemplateService.Instance.GetTemplate(GameObjectName.CoordinateTemplate);
@@ -211,12 +104,37 @@ namespace TrekVRApplication {
 
         }
         protected override void ResetIndicatorPositions(bool disable) {
-            if (disable) {
-                _lonSelectionStartIndicator.enabled = false;
-                _latSelectionStartIndicator.enabled = false;
-                _lonSelectionEndIndicator.enabled = false;
-                _latSelectionEndIndicator.enabled = false;
+            for (int i = 0; i < 4; i++) {
+                LineRenderer lineRenderer = GetSelectionIndicatorByIndex(i);
+                if (i % 2 == 0) {
+                    lineRenderer.SetPosition(0, new Vector2(0, 0));
+                    lineRenderer.SetPosition(1, new Vector2(0, 1));
+                }
+                else {
+                    lineRenderer.SetPosition(0, new Vector2(0, 0));
+                    lineRenderer.SetPosition(1, new Vector2(1, 0));
+                }
+                if (disable) {
+                    lineRenderer.enabled = false;
+                }
             }
+            _overlayController.UpdateTexture();
+        }
+
+        private GlobeTerrainModel GetActiveTerrainModel() {
+            TerrainModel terrainModel = TerrainModelManager.Instance.CurrentVisibleModel;
+            if (terrainModel is GlobeTerrainModel) {
+                return (GlobeTerrainModel)terrainModel;
+            }
+            return null;
+        }
+
+        protected override Vector2 GetCoordFromHit(RaycastHit hit) {
+            GlobeTerrainModel terrainModel = GetActiveTerrainModel();
+            if (!terrainModel) {
+                throw new Exception("Globe model is not currently active.");
+            }
+            return BoundingBoxUtils.UVToCoordinates(UnrestrictedBoundingBox.Global, hit.textureCoord);
         }
 
     }

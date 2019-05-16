@@ -11,11 +11,9 @@ namespace TrekVRApplication {
 
         public const float CoordinateIndicatorStaticBoldThickness = 1.6e-3f;
 
-        public const float CoordinateIndicatorThickness = 6.9e-4f;
+        public const float CoordinateIndicatorThickness = 1.337e-3f;
 
-        public const float CoordinateIndicatorActiveThickness = 6.9e-3f;
-
-        public const float CoordinateIndicatorRadiusOffset = 3.33e-3f;
+        public const float CoordinateIndicatorActiveThickness = 4.2e-3f;
 
         public const float CoordinateIndicatorLabelRadiusOffset = 3.1e-2f;
 
@@ -28,11 +26,6 @@ namespace TrekVRApplication {
         public const float CoordinateIndicatorStaticLabelFadeInDistance = 2.0f;
 
         public const float CoordinateIndicatorStaticLabelFadeOutDistance = 2.5f;
-
-        // TODO Move this somewhere else since localized terrains also use it.
-        public static readonly Color32 CoordinateIndicatorColor = new Color32(0, 224, 255, 255);
-
-        public static readonly Color32 CoordinateIndicatorStaticColor = new Color32(255, 160, 96, 255);
 
         public const int HemisphereLongLatCoordinateIndicatorCount = 5;
 
